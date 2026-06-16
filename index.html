@@ -1,29 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SkillHire — Fresher Talent Discovery Platform</title>
-  <meta name="description" content="Discover fresh engineering and design talent through real projects, skills, and portfolios instead of resumes or years of experience.">
-  
+  <title>Exhibitly — Fresher Talent Discovery Platform</title>
+  <meta name="description"
+    content="Discover fresh engineering and design talent through real projects, skills, and portfolios instead of resumes or years of experience.">
+
   <!-- CSS Stylesheets -->
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/navbar.css">
   <link rel="stylesheet" href="css/footer.css">
   <link rel="stylesheet" href="css/home.css">
 </head>
+
 <body>
 
-  <!-- Floating Glass Navbar -->
-  <header>
+  <!-- Full-width Flush Navbar -->
+  <header id="site-header">
     <div class="nav-container">
       <a href="index.html" class="logo" id="nav-logo">
-        SkillHire
+        Exhibitly
         <div class="logo-dot"></div>
       </a>
       <ul class="nav-menu" id="nav-menu-list">
-        <li><a href="index.html" class="nav-link" id="nav-link-home">Home</a></li>
+        <li><a href="index.html" class="nav-link active" id="nav-link-home">Home</a></li>
         <li><a href="candidates.html" class="nav-link" id="nav-link-candidates">Candidates</a></li>
+        <li><a href="about.html" class="nav-link" id="nav-link-about">About</a></li>
         <li><a href="create-profile.html" class="nav-link" id="nav-link-create">Create Profile</a></li>
       </ul>
       <div class="nav-cta">
@@ -36,12 +40,13 @@
     </div>
   </header>
 
-  <!-- Mobile Drawer Overlay and Drawer -->
+  <!-- Mobile Drawer -->
   <div class="mobile-drawer-overlay" id="mobile-overlay"></div>
   <div class="mobile-drawer" id="mobile-drawer-menu">
     <ul class="mobile-nav-list">
-      <li><a href="index.html" class="mobile-nav-link" id="mob-link-home">Home</a></li>
+      <li><a href="index.html" class="mobile-nav-link active" id="mob-link-home">Home</a></li>
       <li><a href="candidates.html" class="mobile-nav-link" id="mob-link-candidates">Candidates</a></li>
+      <li><a href="about.html" class="mobile-nav-link" id="mob-link-about">About</a></li>
       <li><a href="create-profile.html" class="mobile-nav-link" id="mob-link-create">Create Profile</a></li>
     </ul>
     <div class="mobile-nav-cta">
@@ -50,290 +55,225 @@
   </div>
 
   <main>
-    <!-- Hero Section -->
-    <section class="hero container fade-in-section">
-      <div class="hero-badge">
-        <div class="hero-badge-pulse"></div>
-        <span>Over 500+ projects showcased this week</span>
-      </div>
-      <h1>Get Hired For What You Build.</h1>
-      <p>Discover fresh talent through projects, skills, and real work instead of years of experience. The platform acts as an open showcase database.</p>
-      <div class="hero-actions" id="hero-actions-container">
-        <a href="candidates.html" class="btn btn-primary" id="hero-btn-explore">Explore Talent</a>
-        <a href="create-profile.html" class="btn btn-secondary" id="hero-btn-create">Create Profile</a>
-      </div>
-    </section>
 
-    <!-- Infinite Scroll Showcase Carousel Section -->
-    <section class="showcase-carousel-section">
-      <div class="showcase-title">Explore Talents by Specialization</div>
-      <div class="marquee-wrapper">
-        <!-- Duplicate categories for smooth seamless loop scrolling -->
-        <div class="marquee-content">
-          <!-- 1. Frontend -->
-          <div class="category-card" data-role="Frontend Developer">
-            <span class="category-icon">💻</span>
-            <div class="category-info">
-              <h3>Frontend Developer</h3>
-              <p>React, JS, CSS</p>
-            </div>
-            <div class="category-bg-art">
-              <div class="category-art-line"></div>
-              <div class="category-art-line"></div>
-              <div class="category-art-line"></div>
-            </div>
-          </div>
-          <!-- 2. MERN -->
-          <div class="category-card" data-role="MERN Developer">
-            <span class="category-icon">🚀</span>
-            <div class="category-info">
-              <h3>MERN Developer</h3>
-              <p>React, Node, Mongo, Express</p>
-            </div>
-            <div class="category-bg-art">
-              <div class="category-art-line"></div>
-              <div class="category-art-line"></div>
-              <div class="category-art-line"></div>
-            </div>
-          </div>
-          <!-- 3. Java -->
-          <div class="category-card" data-role="Java Developer">
-            <span class="category-icon">☕</span>
-            <div class="category-info">
-              <h3>Java Developer</h3>
-              <p>Java, Spring Boot, SQL</p>
-            </div>
-            <div class="category-bg-art">
-              <div class="category-art-line"></div>
-              <div class="category-art-line"></div>
-              <div class="category-art-line"></div>
-            </div>
-          </div>
-          <!-- 4. Python -->
-          <div class="category-card" data-role="Python Developer">
-            <span class="category-icon">🐍</span>
-            <div class="category-info">
-              <h3>Python Developer</h3>
-              <p>Python, Django, FastAPI</p>
-            </div>
-            <div class="category-bg-art">
-              <div class="category-art-line"></div>
-              <div class="category-art-line"></div>
-              <div class="category-art-line"></div>
-            </div>
-          </div>
-          <!-- 5. UI/UX -->
-          <div class="category-card" data-role="UI/UX Designer">
-            <span class="category-icon">🎨</span>
-            <div class="category-info">
-              <h3>UI/UX Designer</h3>
-              <p>Figma, UI Systems, Interaction</p>
-            </div>
-            <div class="category-bg-art">
-              <div class="category-art-line"></div>
-              <div class="category-art-line"></div>
-              <div class="category-art-line"></div>
-            </div>
-          </div>
-          <!-- 6. Mobile -->
-          <div class="category-card" data-role="Mobile Developer">
-            <span class="category-icon">📱</span>
-            <div class="category-info">
-              <h3>Mobile Developer</h3>
-              <p>Flutter, React Native, Swift</p>
-            </div>
-            <div class="category-bg-art">
-              <div class="category-art-line"></div>
-              <div class="category-art-line"></div>
-              <div class="category-art-line"></div>
-            </div>
-          </div>
+    <!-- ================================================================
+         HERO SECTION — Split layout with video
+         ================================================================ -->
+    <section class="hero-split" id="hero-section">
+      <!-- Left: Text + CTAs -->
+      <div class="hero-left">
+        <div class="hero-badge" id="hero-badge">
+          <div class="hero-badge-pulse"></div>
+          <span>Over 500+ projects showcased this week</span>
+        </div>
 
-          <!-- DUPLICATED COPY FOR LOOP -->
-          <div class="category-card" data-role="Frontend Developer">
-            <span class="category-icon">💻</span>
-            <div class="category-info">
-              <h3>Frontend Developer</h3>
-              <p>React, JS, CSS</p>
+        <h1 class="hero-heading">
+          Get Hired For<br>
+          <span class="hero-heading-accent">What You Build.</span>
+        </h1>
+
+        <p class="hero-subtext">
+          Discover fresh talent through projects, skills, and real work
+          instead of years of experience. An open showcase database for
+          creators and builders.
+        </p>
+
+        <ul class="hero-bullets">
+          <li>
+            <svg class="hero-bullet-icon" viewBox="0 0 20 20" fill="none">
+              <path d="M7 10l2.5 2.5L14 7" stroke="#e1306c" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+            Browse real-world design and development work
+          </li>
+          <li>
+            <svg class="hero-bullet-icon" viewBox="0 0 20 20" fill="none">
+              <path d="M7 10l2.5 2.5L14 7" stroke="#e1306c" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+            Hire top-rated freshers with confidence
+          </li>
+          <li>
+            <svg class="hero-bullet-icon" viewBox="0 0 20 20" fill="none">
+              <path d="M7 10l2.5 2.5L14 7" stroke="#e1306c" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+            Showcase your work and get discovered by recruiters
+          </li>
+        </ul>
+
+        <div class="hero-actions" id="hero-actions-container">
+          <a href="candidates.html" class="btn btn-primary" id="hero-btn-explore">Explore Talent</a>
+          <a href="create-profile.html" class="btn btn-secondary" id="hero-btn-create">Create Profile</a>
+        </div>
+      </div>
+
+      <!-- Right: Video / Preview -->
+      <div class="hero-right">
+        <div class="hero-video-wrapper" id="hero-video-wrapper">
+          <!-- Video embed — replace src with your actual video URL -->
+          <video class="hero-video" autoplay muted loop playsinline poster="assets/images/spectra.....webp"
+            id="hero-video-el">
+            <!-- Add your video file here, e.g.: -->
+            <!-- <source src="assets/videos/demo.mp4" type="video/mp4"> -->
+            <!-- Fallback poster image shown if no video source is provided -->
+          </video>
+          <!-- Overlay badge -->
+          <div class="hero-video-badge">
+            <div class="hero-video-badge-avatar">
+              <img src="assets/images/avatar1.png" alt="Rahul Sharma">
             </div>
-            <div class="category-bg-art">
-              <div class="category-art-line"></div>
-              <div class="category-art-line"></div>
-              <div class="category-art-line"></div>
-            </div>
-          </div>
-          <div class="category-card" data-role="MERN Developer">
-            <span class="category-icon">🚀</span>
-            <div class="category-info">
-              <h3>MERN Developer</h3>
-              <p>React, Node, Mongo, Express</p>
-            </div>
-            <div class="category-bg-art">
-              <div class="category-art-line"></div>
-              <div class="category-art-line"></div>
-              <div class="category-art-line"></div>
-            </div>
-          </div>
-          <div class="category-card" data-role="Java Developer">
-            <span class="category-icon">☕</span>
-            <div class="category-info">
-              <h3>Java Developer</h3>
-              <p>Java, Spring Boot, SQL</p>
-            </div>
-            <div class="category-bg-art">
-              <div class="category-art-line"></div>
-              <div class="category-art-line"></div>
-              <div class="category-art-line"></div>
-            </div>
-          </div>
-          <div class="category-card" data-role="Python Developer">
-            <span class="category-icon">🐍</span>
-            <div class="category-info">
-              <h3>Python Developer</h3>
-              <p>Python, Django, FastAPI</p>
-            </div>
-            <div class="category-bg-art">
-              <div class="category-art-line"></div>
-              <div class="category-art-line"></div>
-              <div class="category-art-line"></div>
-            </div>
-          </div>
-          <div class="category-card" data-role="UI/UX Designer">
-            <span class="category-icon">🎨</span>
-            <div class="category-info">
-              <h3>UI/UX Designer</h3>
-              <p>Figma, UI Systems, Interaction</p>
-            </div>
-            <div class="category-bg-art">
-              <div class="category-art-line"></div>
-              <div class="category-art-line"></div>
-              <div class="category-art-line"></div>
-            </div>
-          </div>
-          <div class="category-card" data-role="Mobile Developer">
-            <span class="category-icon">📱</span>
-            <div class="category-info">
-              <h3>Mobile Developer</h3>
-              <p>Flutter, React Native, Swift</p>
-            </div>
-            <div class="category-bg-art">
-              <div class="category-art-line"></div>
-              <div class="category-art-line"></div>
-              <div class="category-art-line"></div>
-            </div>
+            <span>Rahul Sharma</span>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- How SkillHire Works Section -->
-    <section class="how-it-works container fade-in-section">
-      <div class="section-header">
-        <h2>How SkillHire Works</h2>
-        <p>Simple, visual discovery built for recruiters who value real competence.</p>
+    <!-- ================================================================
+         SEARCH BAR SECTION (replaces old carousel)
+         ================================================================ -->
+    <section class="search-section" id="search-section">
+      <div class="search-tabs" id="search-tabs">
+        <button class="search-tab active" data-tab="shots" id="tab-shots">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2" />
+            <path d="M3 9h18M9 21V9" />
+          </svg>
+          Shots
+        </button>
+        <button class="search-tab" data-tab="designers" id="tab-designers">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="8" r="4" />
+            <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+          </svg>
+          Designers
+        </button>
+        <button class="search-tab" data-tab="services" id="tab-services">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+          </svg>
+          Services
+        </button>
       </div>
-      <div class="steps-grid">
-        <!-- Step 1 -->
-        <div class="step-card">
-          <div class="step-number">01</div>
-          <h3>Create Profile</h3>
-          <p>Add your skills, contact channels, and portfolio bio. Build your page in minutes.</p>
-        </div>
-        <!-- Step 2 -->
-        <div class="step-card">
-          <div class="step-number">02</div>
-          <h3>Showcase Work</h3>
-          <p>Upload screenshots, descriptions, source repositories, and live URLs of your primary projects.</p>
-        </div>
-        <!-- Step 3 -->
-        <div class="step-card">
-          <div class="step-number">03</div>
-          <h3>Get Discovered</h3>
-          <p>Recruiters search the database by skill or keyword and contact you directly via email or LinkedIn.</p>
-        </div>
+
+      <div class="search-bar-wrap">
+        <input type="text" class="search-bar-input" id="hero-search-input"
+          placeholder="What type of work are you looking for?" autocomplete="off">
+        <button class="search-bar-btn" id="hero-search-btn" aria-label="Search">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="search-popular-tags">
+        <span class="search-popular-label">Popular:</span>
+        <a href="candidates.html?search=dashboard" class="search-popular-tag" id="tag-dashboard">dashboard</a>
+        <a href="candidates.html?search=landing+page" class="search-popular-tag" id="tag-landing">landing page</a>
+        <a href="candidates.html?search=mobile+app" class="search-popular-tag" id="tag-mobile">mobile app</a>
+        <a href="candidates.html?search=portfolio" class="search-popular-tag" id="tag-portfolio">portfolio</a>
+        <a href="candidates.html?search=UI/UX" class="search-popular-tag" id="tag-uiux">UI/UX</a>
+        <a href="candidates.html?search=animation" class="search-popular-tag" id="tag-animation">animation</a>
+        <a href="candidates.html?search=ecommerce" class="search-popular-tag" id="tag-ecommerce">e-commerce</a>
       </div>
     </section>
 
-    <!-- Featured Candidates Section -->
-    <section class="featured-candidates container fade-in-section">
-      <div class="featured-header">
-        <div class="section-header">
-          <h2>Featured Candidates</h2>
-          <p>Discover spotlighted freshers with premium portfolio entries.</p>
+    <!-- ================================================================
+         Dribbble-Style Projects Showcase
+         ================================================================ -->
+    <section class="projects-showcase container fade-in-section" id="projects-showcase-section">
+      <div class="projects-showcase-header">
+        <div class="section-header" style="text-align:left; margin-bottom:0;">
+          <h2>Explore Projects</h2>
+          <p>Browse real work from talented creators — hover to interact.</p>
         </div>
-        <a href="candidates.html" class="btn btn-secondary" id="featured-btn-all">Browse Directory &rarr;</a>
+        <div class="projects-filter-tabs" id="projects-filter-tabs">
+          <button class="proj-filter-btn active" data-filter="all" id="filter-btn-all">All</button>
+          <button class="proj-filter-btn" data-filter="UI/UX" id="filter-btn-uiux">UI/UX</button>
+          <button class="proj-filter-btn" data-filter="Dashboard" id="filter-btn-dashboard">Dashboard</button>
+          <button class="proj-filter-btn" data-filter="Branding" id="filter-btn-branding">Branding</button>
+          <button class="proj-filter-btn" data-filter="Mobile App" id="filter-btn-mobile">Mobile</button>
+        </div>
       </div>
-      <div class="featured-grid" id="featured-candidates-grid">
-        <!-- Rendered Dynamically from JS -->
+
+      <div class="projects-grid" id="projects-grid">
+        <!-- Rendered dynamically by home.js -->
+      </div>
+
+      <div class="projects-load-more">
+        <a href="candidates.html" class="btn btn-secondary" id="projects-browse-all">Browse All Talent &rarr;</a>
       </div>
     </section>
 
-    <!-- Popular Skills Section -->
-    <section class="popular-skills container fade-in-section">
-      <div class="section-header">
-        <h2>Explore By Popular Skills</h2>
-        <p>Find candidates matching your project stack immediately.</p>
-      </div>
-      <div class="skills-cloud">
-        <span class="skill-tag" data-skill="React">React</span>
-        <span class="skill-tag" data-skill="JavaScript">JavaScript</span>
-        <span class="skill-tag" data-skill="Node.js">Node.js</span>
-        <span class="skill-tag" data-skill="Java">Java</span>
-        <span class="skill-tag" data-skill="Python">Python</span>
-        <span class="skill-tag" data-skill="MongoDB">MongoDB</span>
-        <span class="skill-tag" data-skill="SQL">SQL</span>
-        <span class="skill-tag" data-skill="UI/UX">UI/UX</span>
-        <span class="skill-tag" data-skill="MERN">MERN</span>
-        <span class="skill-tag" data-skill="Express">Express</span>
-      </div>
-    </section>
-
-    <!-- Call to Action Section -->
-    <section class="cta-banner-section container fade-in-section">
-      <div class="cta-banner">
-        <h2>Your Projects Are Your Experience.</h2>
-        <p>Stop sending resume sheets. Showcase your software products and designs where tech recruiters can review them directly.</p>
-        <a href="create-profile.html" class="btn btn-primary" id="cta-btn-join">Create Your Profile</a>
-      </div>
-    </section>
   </main>
 
-  <!-- Footer Section -->
-  <footer>
-    <div class="container">
-      <div class="footer-content">
-        <div class="footer-brand">
-          <a href="index.html" class="logo">
-            SkillHire
-            <div class="logo-dot"></div>
+  <!-- ================================================================
+       DRIBBBLE-STYLE FOOTER
+       ================================================================ -->
+  <footer id="site-footer">
+    <!-- Top row: Logo + Nav links + Social icons -->
+    <div class="footer-top">
+      <div class="container footer-top-inner">
+        <a href="index.html" class="footer-logo" id="footer-logo">
+          exhibitly
+          <div class="logo-dot"></div>
+        </a>
+        <nav class="footer-nav" aria-label="Footer navigation">
+          <a href="candidates.html" class="footer-nav-link" id="footer-nav-candidates">For Designers</a>
+          <a href="candidates.html" class="footer-nav-link" id="footer-nav-hire">Hire Talent</a>
+          <a href="about.html" class="footer-nav-link" id="footer-nav-about">About</a>
+          <a href="about.html#how-it-works" class="footer-nav-link" id="footer-nav-inspiration">How It Works</a>
+          <a href="about.html" class="footer-nav-link" id="footer-nav-careers">Careers</a>
+          <a href="about.html" class="footer-nav-link footer-nav-link-accent" id="footer-nav-support">Support</a>
+        </nav>
+        <div class="footer-socials">
+          <a href="https://twitter.com" target="_blank" rel="noopener" class="footer-social-icon"
+            id="footer-social-twitter" aria-label="Twitter/X">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.736l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+            </svg>
           </a>
-          <p class="footer-description">A curated portfolio directory designed to discover fresher candidates by their projects and technical capabilities instead of resumes.</p>
-        </div>
-        <div class="footer-links-group">
-          <div class="footer-column">
-            <div class="footer-title">Platform</div>
-            <ul class="footer-list">
-              <li><a href="index.html" class="footer-link">Home</a></li>
-              <li><a href="candidates.html" class="footer-link">Explore Talent</a></li>
-              <li><a href="create-profile.html" class="footer-link">Create Profile</a></li>
-            </ul>
-          </div>
-          <div class="footer-column">
-            <div class="footer-title">Inspiration</div>
-            <ul class="footer-list">
-              <li><a href="https://vercel.com" target="_blank" class="footer-link">Vercel</a></li>
-              <li><a href="https://linear.app" target="_blank" class="footer-link">Linear</a></li>
-              <li><a href="https://apple.com" target="_blank" class="footer-link">Apple Design</a></li>
-            </ul>
-          </div>
+          <a href="https://facebook.com" target="_blank" rel="noopener" class="footer-social-icon"
+            id="footer-social-facebook" aria-label="Facebook">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+            </svg>
+          </a>
+          <a href="https://instagram.com" target="_blank" rel="noopener" class="footer-social-icon"
+            id="footer-social-instagram" aria-label="Instagram">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
+            </svg>
+          </a>
+          <a href="https://pinterest.com" target="_blank" rel="noopener" class="footer-social-icon"
+            id="footer-social-pinterest" aria-label="Pinterest">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M12 0C5.373 0 0 5.373 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738a.36.36 0 01.083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.632-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0z" />
+            </svg>
+          </a>
         </div>
       </div>
-      <div class="footer-bottom">
-        <div class="footer-copy">&copy; 2026 SkillHire Platform. All rights reserved.</div>
-        <div class="footer-socials">
-          <a href="https://github.com" target="_blank" class="footer-social-link">GitHub</a>
-          <a href="https://linkedin.com" target="_blank" class="footer-social-link">LinkedIn</a>
-          <a href="https://twitter.com" target="_blank" class="footer-social-link">Twitter</a>
+    </div>
+
+    <!-- Bottom strip -->
+    <div class="footer-bottom-strip">
+      <div class="container footer-bottom-inner">
+        <div class="footer-copy">&copy; 2026 exhibitly. All rights reserved.</div>
+        <div class="footer-legal-links">
+          <a href="about.html" class="footer-legal-link" id="footer-legal-jobs">Jobs</a>
+          <a href="candidates.html" class="footer-legal-link footer-legal-link-accent"
+            id="footer-legal-designers">Designers</a>
+          <a href="candidates.html" class="footer-legal-link footer-legal-link-accent"
+            id="footer-legal-freelancers">Freelancers</a>
+          <a href="candidates.html" class="footer-legal-link" id="footer-legal-tags">Tags</a>
+          <a href="about.html" class="footer-legal-link" id="footer-legal-places">Places</a>
+          <a href="about.html" class="footer-legal-link" id="footer-legal-resources">Resources</a>
         </div>
       </div>
     </div>
@@ -344,4 +284,5 @@
   <script src="js/main.js"></script>
   <script src="js/home.js"></script>
 </body>
+
 </html>

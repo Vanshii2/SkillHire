@@ -3,6 +3,238 @@
    ========================================================================== */
 
 const STORAGE_KEY = 'skillhire_candidates';
+
+/* ==========================================================================
+   Static Projects Showcase Data (Dribbble-style feed)
+   ========================================================================== */
+const PROJECTS_DATA = [
+  {
+    id: 'aatma-brand-identity',
+    title: 'Aatma — Brand Identity',
+    description: 'A complete visual identity system for Aatma, a contemporary wellness brand. This project covers logo design, color system, typography scale, and packaging mockups — all built around a philosophy of mindful minimalism.',
+    thumbnail: 'assets/images/aatma1.webp',
+    images: [
+      'assets/images/aatma1.webp',
+      'assets/images/aatmaa2.webp'
+    ],
+    tags: ['Branding', 'Identity', 'Figma'],
+    authorName: 'Aditi Rao',
+    authorAvatar: 'assets/images/avatar2.png',
+    authorId: 'aditi-rao',
+    likes: 247,
+    views: 6800
+  },
+  {
+    id: 'spectra-dashboard',
+    title: 'Spectra — Analytics Dashboard',
+    description: 'Spectra is a next-generation SaaS analytics dashboard built for marketing teams. It surfaces actionable insights across multiple data channels with a focus on visual clarity and zero-cognitive-load UI.',
+    thumbnail: 'assets/images/spectra.....webp',
+    images: [
+      'assets/images/spectra.....webp',
+      'assets/images/spectra2.avif'
+    ],
+    tags: ['Dashboard', 'UI/UX', 'SaaS'],
+    authorName: 'Rahul Sharma',
+    authorAvatar: 'assets/images/avatar1.png',
+    authorId: 'rahul-sharma',
+    likes: 189,
+    views: 5200
+  },
+  {
+    id: 'plate-food-app',
+    title: 'Plate — Food Delivery App',
+    description: 'Plate is a premium mobile food delivery application designed for a seamless ordering experience. The UI system focuses on rich food photography, contextual micro-animations, and a one-tap checkout flow.',
+    thumbnail: 'assets/images/plateui.webp',
+    images: [
+      'assets/images/plateui.webp',
+      'assets/images/plateui2.webp',
+      'assets/images/plateappui.webp'
+    ],
+    tags: ['Mobile App', 'UI/UX', 'React Native'],
+    authorName: 'Sarah Jenkins',
+    authorAvatar: 'assets/images/avatar2.png',
+    authorId: 'sarah-jenkins',
+    likes: 312,
+    views: 9100
+  },
+  {
+    id: 'steer-saas-platform',
+    title: 'Steer — Project Management',
+    description: 'Steer is a modern project management SaaS platform built for distributed teams. Features include Kanban boards, sprint planning, automated status updates, and a real-time activity feed.',
+    thumbnail: 'assets/images/steer.webp',
+    images: [
+      'assets/images/steer.webp',
+      'assets/images/steer2.webp',
+      'assets/images/steer3.webp',
+      'assets/images/steer4.png'
+    ],
+    tags: ['SaaS', 'MERN', 'Dashboard'],
+    authorName: 'Aman Verma',
+    authorAvatar: 'assets/images/avatar1.png',
+    authorId: 'aman-verma',
+    likes: 156,
+    views: 4300
+  },
+  {
+    id: 'matcha-ecommerce',
+    title: 'Matcha — E-Commerce UI Kit',
+    description: 'A sophisticated e-commerce UI kit designed for premium tea brands. Includes landing page templates, product detail views, cart flows, and a comprehensive component library built in Figma and HTML/CSS.',
+    thumbnail: 'assets/images/matcha2.webp',
+    images: [
+      'assets/images/matcha2.webp',
+      'assets/images/matcha2.webp',
+      'assets/images/matcha3.webp',
+      'assets/images/matcha4.webp',
+      'assets/images/matcha5.webp'
+    ],
+    tags: ['E-Commerce', 'UI Kit', 'Figma'],
+    authorName: 'Aditi Rao',
+    authorAvatar: 'assets/images/avatar2.png',
+    authorId: 'aditi-rao',
+    likes: 428,
+    views: 11200
+  },
+  {
+    id: 'tira-beauty-app',
+    title: 'Tira — Beauty Discovery App',
+    description: 'Tira is a mobile-first beauty discovery platform that uses AI to suggest personalised skincare and makeup products. The UI features a luxurious dark palette, gesture-driven navigation, and AR try-on previews.',
+    thumbnail: 'assets/images/tira.webp',
+    images: [
+      'assets/images/tira.webp',
+      'assets/images/tira2.webp'
+    ],
+    tags: ['Mobile App', 'AI', 'Beauty'],
+    authorName: 'Sarah Jenkins',
+    authorAvatar: 'assets/images/avatar2.png',
+    authorId: 'sarah-jenkins',
+    likes: 201,
+    views: 7600
+  },
+  {
+    id: 'pix-portfolio-template',
+    title: 'Pix — Creative Portfolio Template',
+    description: 'Pix is a high-impact portfolio template designed for creative professionals. The layout system adapts dynamically to the content type — photography, video, or design work — and ships with a dark and light mode.',
+    thumbnail: 'assets/images/pix3.webp',
+    images: [
+      'assets/images/pix3.webp',
+      'assets/images/pix2.jpg',
+      'assets/images/pix3.webp',
+      'assets/images/pix4.webp',
+      'assets/images/pix5.webp',
+      'assets/images/pix6.webp'
+    ],
+    tags: ['Portfolio', 'HTML/CSS', 'Template'],
+    authorName: 'Rahul Sharma',
+    authorAvatar: 'assets/images/avatar1.png',
+    authorId: 'rahul-sharma',
+    likes: 335,
+    views: 8900
+  },
+  {
+    id: 'book-cover-series',
+    title: 'Book Cover Design Series',
+    description: 'A curated series of editorial book cover designs that blend typographic experimentation with bold illustration. Each cover tells a visual story that complements and amplifies the narrative of the book.',
+    thumbnail: 'assets/images/bookIllustraion.webp',
+    images: [
+      'assets/images/bookIllustraion.webp',
+      'assets/images/book2.webp',
+      'assets/images/book3.webp',
+      'assets/images/book4.webp',
+      'assets/images/book5.webp',
+      'assets/images/book7.jpg'
+    ],
+    tags: ['Editorial', 'Illustration', 'Typography'],
+    authorName: 'Tanmay Patel',
+    authorAvatar: 'assets/images/avatar1.png',
+    authorId: 'tanmay-patel',
+    likes: 519,
+    views: 14300
+  },
+  {
+    id: 'port-portfolio-site',
+    title: 'Port — Developer Portfolio Site',
+    description: 'Port is a fully responsive developer portfolio site with an immersive hero section, scroll-driven animations, and a project grid that showcases work in a magazine-style layout.',
+    thumbnail: 'assets/images/port1.webp',
+    images: [
+      'assets/images/port1.webp',
+      'assets/images/portbox2.webp'
+    ],
+    tags: ['Portfolio', 'JavaScript', 'Animation'],
+    authorName: 'Aman Verma',
+    authorAvatar: 'assets/images/avatar1.png',
+    authorId: 'aman-verma',
+    likes: 274,
+    views: 6100
+  },
+  {
+    id: 'monkey-nft-collection',
+    title: 'Monkey Club — NFT Collection',
+    description: 'A vibrant generative NFT collection featuring 10,000 unique monkey characters. Each asset is procedurally generated from over 200 hand-drawn traits across background, clothing, accessories, and expression layers.',
+    thumbnail: 'assets/images/monkey1.webp',
+    images: [
+      'assets/images/monkey1.webp',
+      'assets/images/monkey2.webp',
+      'assets/images/monkey3.webp',
+      'assets/images/monkey4.webp'
+    ],
+    tags: ['NFT', 'Generative Art', 'Web3'],
+    authorName: 'Tanmay Patel',
+    authorAvatar: 'assets/images/avatar1.png',
+    authorId: 'tanmay-patel',
+    likes: 682,
+    views: 18500
+  },
+  {
+    id: 'maps-location-ui',
+    title: 'Mapsi — Location Intelligence UI',
+    description: 'Mapsi is a B2B location intelligence dashboard that helps logistics companies visualise fleet movements, delivery zones, and route efficiency in real-time on an interactive map canvas.',
+    thumbnail: 'assets/images/mapsi.png',
+    images: [
+      'assets/images/mapsi.png'
+    ],
+    tags: ['Dashboard', 'Maps', 'Logistics'],
+    authorName: 'Rahul Sharma',
+    authorAvatar: 'assets/images/avatar1.png',
+    authorId: 'rahul-sharma',
+    likes: 143,
+    views: 3900
+  },
+  {
+    id: 'personal-branding-shoot',
+    title: 'Personal Branding Shoot — Visuals',
+    description: 'A personal branding visual set including professional headshots, lifestyle photos, and environmental portraits. Designed to give freelancers and founders a cohesive and authentic visual presence across digital platforms.',
+    thumbnail: 'assets/images/pix7.webp',
+    images: [
+      'assets/images/pix7.webp',
+      'assets/images/pix8.webp',
+      'assets/images/pix9.webp',
+      'assets/images/personbg.jpg'
+    ],
+    tags: ['Photography', 'Branding', 'Visual'],
+    authorName: 'Aditi Rao',
+    authorAvatar: 'assets/images/avatar2.png',
+    authorId: 'aditi-rao',
+    likes: 397,
+    views: 10200
+  }
+];
+
+class ProjectsDB {
+  static getAll() {
+    return PROJECTS_DATA;
+  }
+
+  static getById(id) {
+    return PROJECTS_DATA.find(p => p.id === id) || null;
+  }
+
+  static getByAuthor(authorId) {
+    return PROJECTS_DATA.filter(p => p.authorId === authorId);
+  }
+}
+
+window.ProjectsDB = ProjectsDB;
+
 const RECRUITERS_KEY = 'skillhire_recruiters';
 const MESSAGES_KEY = 'skillhire_messages';
 
@@ -167,12 +399,12 @@ class CandidatesDB {
 
   static save(candidate) {
     const candidates = this.getAll();
-    
+
     // Auto-generate slug ID if not provided
     if (!candidate.id) {
       candidate.id = candidate.name.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Date.now().toString().slice(-4);
     }
-    
+
     // Check if candidate already exists
     const index = candidates.findIndex(c => c.id === candidate.id);
     if (index !== -1) {
@@ -180,7 +412,7 @@ class CandidatesDB {
     } else {
       candidates.push(candidate);
     }
-    
+
     localStorage.setItem(STORAGE_KEY, JSON.stringify(candidates));
     return candidate.id;
   }
@@ -223,8 +455,8 @@ class CandidatesDB {
     // 1. Search filter (Name or Skill match)
     if (search.trim()) {
       const queryStr = search.toLowerCase().trim();
-      candidates = candidates.filter(c => 
-        c.name.toLowerCase().includes(queryStr) || 
+      candidates = candidates.filter(c =>
+        c.name.toLowerCase().includes(queryStr) ||
         c.role.toLowerCase().includes(queryStr) ||
         c.skills.some(skill => skill.toLowerCase().includes(queryStr))
       );
@@ -232,7 +464,7 @@ class CandidatesDB {
 
     // 2. Skill tags filters
     if (skills.length > 0) {
-      candidates = candidates.filter(c => 
+      candidates = candidates.filter(c =>
         skills.some(skill => c.skills.some(s => s.toLowerCase() === skill.toLowerCase()))
       );
     }
@@ -319,11 +551,11 @@ class RecruitersDB {
   static toggleSaveCandidate(recruiterId, candidateId) {
     const recruiter = this.getById(recruiterId);
     if (!recruiter) return false;
-    
+
     if (!recruiter.savedCandidates) {
       recruiter.savedCandidates = [];
     }
-    
+
     const index = recruiter.savedCandidates.indexOf(candidateId);
     let isSaved = false;
     if (index === -1) {
@@ -333,7 +565,7 @@ class RecruitersDB {
       recruiter.savedCandidates.splice(index, 1);
       isSaved = false;
     }
-    
+
     this.update(recruiter);
     return isSaved;
   }
@@ -391,7 +623,7 @@ class SessionManager {
     const role = localStorage.getItem('skillhire_active_role');
     const id = localStorage.getItem('skillhire_active_id');
     if (!role || !id) return null;
-    
+
     if (role === 'candidate') {
       const user = CandidatesDB.getById(id);
       return user ? { role, user } : null;
@@ -401,7 +633,7 @@ class SessionManager {
     }
     return null;
   }
-  
+
   static loginCandidate(email, password) {
     const candidate = CandidatesDB.getByEmail(email);
     if (candidate && (candidate.password === password || (!candidate.password && password === 'password123'))) {
@@ -421,7 +653,7 @@ class SessionManager {
     }
     return null;
   }
-  
+
   static logout() {
     localStorage.removeItem('skillhire_active_role');
     localStorage.removeItem('skillhire_active_id');

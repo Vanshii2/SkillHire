@@ -1,5 +1,5 @@
 /* ==========================================================================
-   SkillHire Floating Glass Navbar
+   Exhibily Navbar — Full-width flush (no floating pill)
    ========================================================================== */
 
 header {
@@ -8,33 +8,26 @@ header {
   left: 0;
   width: 100%;
   z-index: 1000;
-  padding: 16px 0;
-  pointer-events: none; /* Let clicks pass through outside the actual bar */
+  background-color: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(20px) saturate(190%);
+  -webkit-backdrop-filter: blur(20px) saturate(190%);
+  border-bottom: 1px solid var(--border-color);
+  transition: box-shadow var(--transition-normal);
+}
+
+header.scrolled {
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.06);
 }
 
 .nav-container {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 90%;
+  width: 100%;
   max-width: var(--max-width);
   margin: 0 auto;
-  padding: 12px 24px;
-  background-color: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(20px) saturate(190%);
-  -webkit-backdrop-filter: blur(20px) saturate(190%);
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  border-radius: var(--radius-full);
-  box-shadow: var(--shadow-sm);
-  pointer-events: auto; /* Enable clicks inside navbar */
-  transition: all var(--transition-normal);
-}
-
-header.scrolled .nav-container {
-  padding: 8px 20px;
-  background-color: rgba(255, 255, 255, 0.85);
-  box-shadow: var(--shadow-md);
-  border-color: rgba(0, 0, 0, 0.08);
+  padding: 0 32px;
+  height: 64px;
 }
 
 /* Logo */
@@ -46,13 +39,13 @@ header.scrolled .nav-container {
   color: var(--primary-text);
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .logo-dot {
-  width: 8px;
-  height: 8px;
-  background-color: var(--primary-text);
+  width: 7px;
+  height: 7px;
+  background-color: #e1306c;
   border-radius: var(--radius-full);
 }
 
@@ -60,7 +53,7 @@ header.scrolled .nav-container {
 .nav-menu {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
   list-style: none;
 }
 
@@ -68,24 +61,24 @@ header.scrolled .nav-container {
   font-size: 0.9rem;
   font-weight: 500;
   color: var(--secondary-text);
-  padding: 8px 16px;
+  padding: 6px 14px;
   border-radius: var(--radius-full);
   transition: all var(--transition-fast);
 }
 
 .nav-link:hover {
   color: var(--primary-text);
-  background-color: rgba(0, 0, 0, 0.03);
+  background-color: rgba(0, 0, 0, 0.04);
 }
 
 .nav-link.active {
   color: var(--primary-text);
-  background-color: rgba(0, 0, 0, 0.05);
+  font-weight: 600;
 }
 
 /* Navigation CTA Button */
 .nav-cta .btn {
-  padding: 8px 16px;
+  padding: 8px 18px;
   font-size: 0.85rem;
 }
 
@@ -125,7 +118,6 @@ header.scrolled .nav-container {
   transform: translateY(5px);
 }
 
-/* Mobile Menu Open State toggles */
 .mobile-toggle.active .hamburger-line:first-child {
   transform: rotate(45deg);
 }
@@ -143,8 +135,8 @@ header.scrolled .nav-container {
   height: 100vh;
   background-color: var(--surface-color);
   z-index: 999;
-  padding: 100px 40px 40px 40px;
-  box-shadow: -10px 0 40px rgba(0, 0, 0, 0.03);
+  padding: 80px 40px 40px 40px;
+  box-shadow: -10px 0 40px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
   gap: 32px;
@@ -195,9 +187,7 @@ header.scrolled .nav-container {
 }
 
 .mobile-nav-link.active {
-  color: var(--accent-color);
-  padding-left: 8px;
-  border-left: 2px solid var(--primary-text);
+  color: #e1306c;
 }
 
 .mobile-nav-cta {
@@ -209,12 +199,15 @@ header.scrolled .nav-container {
   padding: 14px;
 }
 
-/* Media Queries for Navbar responsive states */
+/* Media Queries */
 @media (max-width: 768px) {
   .nav-menu, .nav-cta {
     display: none;
   }
   .mobile-toggle {
     display: flex;
+  }
+  .nav-container {
+    padding: 0 20px;
   }
 }

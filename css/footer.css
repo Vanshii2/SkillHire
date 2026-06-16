@@ -1,120 +1,191 @@
 /* ==========================================================================
-   SkillHire Minimal Footer
+   Exhibily — Dribbble-Style Footer
    ========================================================================== */
 
 footer {
   background-color: var(--surface-color);
   border-top: 1px solid var(--border-color);
-  padding: 64px 0 32px 0;
   margin-top: auto;
 }
 
+/* ── TOP ROW ───────────────────────────────────────────────────────────── */
+.footer-top {
+  padding: 32px 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.footer-top-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+/* Logo */
+.footer-logo {
+  font-family: var(--font-heading);
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--primary-text);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.footer-logo .logo-dot {
+  width: 7px;
+  height: 7px;
+  background-color: #e1306c;
+  border-radius: 50%;
+}
+
+/* Horizontal nav links */
+.footer-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.footer-nav-link {
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--secondary-text);
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.footer-nav-link:hover {
+  color: var(--primary-text);
+  background-color: var(--accent-light);
+}
+
+.footer-nav-link-accent {
+  color: #e1306c;
+}
+
+.footer-nav-link-accent:hover {
+  color: #c1134f;
+  background-color: rgba(225, 48, 108, 0.06);
+}
+
+/* Social icons */
+.footer-socials {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.footer-social-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  color: var(--secondary-text);
+  transition: all var(--transition-fast);
+}
+
+.footer-social-icon:hover {
+  color: var(--primary-text);
+  background-color: var(--accent-light);
+}
+
+/* ── BOTTOM STRIP ──────────────────────────────────────────────────────── */
+.footer-bottom-strip {
+  padding: 20px 0;
+}
+
+.footer-bottom-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.footer-copy {
+  font-size: 0.82rem;
+  color: var(--secondary-text);
+}
+
+.footer-legal-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.footer-legal-link {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--secondary-text);
+  padding: 4px 8px;
+  border-radius: var(--radius-full);
+  transition: color var(--transition-fast);
+}
+
+.footer-legal-link:hover {
+  color: var(--primary-text);
+}
+
+.footer-legal-link-accent {
+  color: #e1306c;
+}
+
+.footer-legal-link-accent:hover {
+  color: #c1134f;
+}
+
+/* ── OLD FOOTER CLASSES (kept for backward compat on other pages) ────── */
 .footer-content {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   flex-wrap: wrap;
   gap: 40px;
-  margin-bottom: 48px;
+  margin-bottom: 32px;
+  padding-top: 48px;
 }
 
-.footer-brand {
-  max-width: 300px;
-}
+.footer-brand { max-width: 300px; }
+.footer-brand .logo { margin-bottom: 16px; }
+.footer-description { font-size: 0.9rem; color: var(--secondary-text); line-height: 1.5; }
+.footer-links-group { display: flex; gap: 64px; }
+.footer-column { display: flex; flex-direction: column; gap: 16px; }
+.footer-title { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--primary-text); }
+.footer-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+.footer-link { font-size: 0.9rem; color: var(--secondary-text); transition: var(--transition-fast); }
+.footer-link:hover { color: var(--primary-text); }
+.footer-bottom { border-top: 1px solid rgba(0,0,0,0.04); padding: 20px 0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+.footer-copy { font-size: 0.85rem; color: var(--secondary-text); }
+.footer-social-link { font-size: 0.85rem; color: var(--secondary-text); transition: var(--transition-fast); }
+.footer-social-link:hover { color: var(--primary-text); }
 
-.footer-brand .logo {
-  margin-bottom: 16px;
-}
-
-.footer-description {
-  font-size: 0.9rem;
-  color: var(--secondary-text);
-  line-height: 1.5;
-}
-
-.footer-links-group {
-  display: flex;
-  gap: 64px;
-}
-
-.footer-column {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.footer-title {
-  font-size: 0.85rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--primary-text);
-}
-
-.footer-list {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.footer-link {
-  font-size: 0.9rem;
-  color: var(--secondary-text);
-  transition: var(--transition-fast);
-}
-
-.footer-link:hover {
-  color: var(--primary-text);
-}
-
-.footer-bottom {
-  border-top: 1px solid rgba(0, 0, 0, 0.04);
-  padding-top: 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 16px;
-}
-
-.footer-copy {
-  font-size: 0.85rem;
-  color: var(--secondary-text);
-}
-
-.footer-socials {
-  display: flex;
-  gap: 16px;
-}
-
-.footer-social-link {
-  font-size: 0.85rem;
-  color: var(--secondary-text);
-  transition: var(--transition-fast);
-}
-
-.footer-social-link:hover {
-  color: var(--primary-text);
-}
-
-/* Responsive Footer */
-@media (max-width: 768px) {
-  .footer-content {
-    flex-direction: column;
-    gap: 32px;
+/* Responsive */
+@media (max-width: 900px) {
+  .footer-nav {
+    display: none;
   }
-  
-  .footer-links-group {
-    width: 100%;
+  .footer-top-inner {
     justify-content: space-between;
-    gap: 20px;
   }
 }
 
-@media (max-width: 480px) {
-  .footer-links-group {
+@media (max-width: 600px) {
+  .footer-bottom-inner {
     flex-direction: column;
-    gap: 24px;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .footer-legal-links {
+    flex-wrap: wrap;
   }
 }

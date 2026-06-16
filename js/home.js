@@ -4,9 +4,10 @@
 
 document.addEventListener('DOMContentLoaded', () => {
   renderHeroActions();
-  renderFeaturedCandidates();
-  setupMarqueeClicks();
-  setupPopularSkillsClicks();
+  renderProjectsShowcase('all');
+  setupProjectFilterTabs();
+  setupSearchBar();
+  setupSearchTabs();
 });
 
 /**
@@ -71,31 +72,244 @@ function renderFeaturedCandidates() {
   }
 }
 
+/* ==========================================================================
+   Dribbble-Style Projects Showcase
+   ========================================================================== */
+
 /**
- * Handle category marquee clicks (Redirect to candidates directory page with role pre-searched)
+ * Renders the Dribbble-style project shot cards.
+ * @param {string} activeFilter - tag to filter by, or 'all'
  */
-function setupMarqueeClicks() {
-  const cards = document.querySelectorAll('.category-card');
-  cards.forEach(card => {
-    card.addEventListener('click', () => {
-      const searchRole = card.getAttribute('data-role');
-      if (searchRole) {
-        window.location.href = `candidates.html?search=${encodeURIComponent(searchRole)}`;
-      }
+function renderProjectsShowcase(activeFilter) {
+  const container = document.getElementById('projects-grid');
+  if (!container) return;
+
+  const allProjects = window.ProjectsDB.getAll();
+  const filtered = activeFilter === 'all'
+    ? allProjects
+    : allProjects.filter(p => p.tags.some(t => t.toLowerCase() === activeFilter.toLowerCase()));
+
+  if (filtered.length === 0) {
+    container.innerHTML = '<p style="text-align:center;color:var(--secondary-text);padding:40px 0;">No projects found for this category.</p>';
+    return;
+  }
+
+  // Retrieve liked state from localStorage
+  const likedProjects = getLikedProjects();
+
+  container.innerHTML = filtered.map((project, idx) => {
+    const isLiked = likedProjects.includes(project.id);
+    const heartFill = isLiked ? '#e1306c' : 'none';
+    const heartStroke = isLiked ? '#e1306c' : 'currentColor';
+
+    return `
+      <a href="project.html?id=${encodeURIComponent(project.id)}"
+         class="project-shot-card fade-in-section"
+         id="project-card-${idx}"
+         data-project-id="${escapeHTML(project.id)}">
+
+        <!-- Thumbnail + Hover Overlay -->
+        <div class="project-shot-thumb">
+          <img
+            src="${escapeHTML(project.thumbnail)}"
+            alt="${escapeHTML(project.title)}"
+            class="project-shot-img"
+            loading="lazy"
+          >
+          <div class="project-shot-overlay">
+            <div class="project-shot-overlay-title">${escapeHTML(project.title)}</div>
+            <div class="project-shot-actions">
+              <button
+                class="project-shot-action-btn${isLiked ? ' liked' : ''}"
+                id="like-btn-${idx}"
+                data-project-id="${escapeHTML(project.id)}"
+                aria-label="Like project"
+                onclick="event.preventDefault(); toggleProjectLike(this, '${escapeHTML(project.id)}', ${idx})"
+              >
+                <svg viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                </svg>
+                Like
+              </button>
+              <button
+                class="project-shot-action-btn"
+                id="save-btn-${idx}"
+                data-project-id="${escapeHTML(project.id)}"
+                aria-label="Save project"
+                onclick="event.preventDefault(); toggleProjectSave(this, '${escapeHTML(project.id)}', ${idx})"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+                </svg>
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="project-shot-footer">
+          <div class="project-shot-author">
+            <img
+              src="${escapeHTML(project.authorAvatar)}"
+              alt="${escapeHTML(project.authorName)}"
+              class="project-shot-avatar"
+            >
+            <span class="project-shot-author-name">${escapeHTML(project.authorName)}</span>
+          </div>
+          <div class="project-shot-stats">
+            <span class="project-shot-stat">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+              </svg>
+              <span id="likes-count-${idx}">${formatCount(project.likes)}</span>
+            </span>
+            <span class="project-shot-stat">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+              ${formatCount(project.views)}
+            </span>
+          </div>
+        </div>
+      </a>
+    `;
+  }).join('');
+
+  // Re-trigger scroll animations for newly injected elements
+  if (typeof initScrollAnimations === 'function') {
+    initScrollAnimations();
+  }
+}
+
+/**
+ * Sets up the filter tab buttons to re-render the grid on click.
+ */
+function setupProjectFilterTabs() {
+  const tabs = document.querySelectorAll('.proj-filter-btn');
+  tabs.forEach(btn => {
+    btn.addEventListener('click', () => {
+      tabs.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const filter = btn.getAttribute('data-filter');
+      renderProjectsShowcase(filter);
     });
   });
 }
 
 /**
- * Handle popular skills tag clicks (Redirect to candidates directory page with skill pre-filtered)
+ * Toggle like state for a project, persisted in localStorage.
  */
-function setupPopularSkillsClicks() {
-  const skillTags = document.querySelectorAll('.skills-cloud .skill-tag');
-  skillTags.forEach(tag => {
-    tag.addEventListener('click', () => {
-      const skillName = tag.getAttribute('data-skill');
-      if (skillName) {
-        window.location.href = `candidates.html?skill=${encodeURIComponent(skillName)}`;
+function toggleProjectLike(btn, projectId, idx) {
+  const liked = getLikedProjects();
+  const isLiked = liked.includes(projectId);
+
+  if (isLiked) {
+    // Unlike
+    const newLiked = liked.filter(id => id !== projectId);
+    localStorage.setItem('skillhire_liked_projects', JSON.stringify(newLiked));
+    btn.classList.remove('liked');
+    btn.querySelector('svg').setAttribute('fill', 'none');
+    btn.querySelector('svg').setAttribute('stroke', 'currentColor');
+  } else {
+    // Like
+    liked.push(projectId);
+    localStorage.setItem('skillhire_liked_projects', JSON.stringify(liked));
+    btn.classList.add('liked');
+    btn.querySelector('svg').setAttribute('fill', '#e1306c');
+    btn.querySelector('svg').setAttribute('stroke', '#e1306c');
+  }
+
+  // Update footer like count display (optimistic)
+  const countEl = document.getElementById(`likes-count-${idx}`);
+  if (countEl) {
+    const project = window.ProjectsDB.getById(projectId);
+    if (project) {
+      const delta = isLiked ? -1 : +1;
+      const newCount = project.likes + delta;
+      countEl.textContent = formatCount(newCount);
+    }
+  }
+}
+
+/**
+ * Toggle save state (visual feedback only — would be tied to auth in prod)
+ */
+function toggleProjectSave(btn, projectId) {
+  const isSaved = btn.dataset.saved === 'true';
+  if (isSaved) {
+    btn.dataset.saved = 'false';
+    btn.querySelector('svg').setAttribute('fill', 'none');
+    btn.style.background = '';
+    btn.style.color = '';
+  } else {
+    btn.dataset.saved = 'true';
+    btn.querySelector('svg').setAttribute('fill', '#111111');
+    btn.style.background = '#f4f4f5';
+    btn.style.color = '#111111';
+  }
+}
+
+/**
+ * Returns the array of liked project IDs from localStorage.
+ */
+function getLikedProjects() {
+  try {
+    return JSON.parse(localStorage.getItem('skillhire_liked_projects')) || [];
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Formats large numbers: 1200 → "1.2k", 18500 → "18.5k"
+ */
+function formatCount(n) {
+  if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
+  return String(n);
+}
+
+/**
+ * Sets up the search bar — Enter key or click navigates to candidates.html
+ */
+function setupSearchBar() {
+  const input = document.getElementById('hero-search-input');
+  const btn   = document.getElementById('hero-search-btn');
+  if (!input || !btn) return;
+
+  function doSearch() {
+    const query = input.value.trim();
+    if (query) {
+      window.location.href = `candidates.html?search=${encodeURIComponent(query)}`;
+    }
+  }
+
+  btn.addEventListener('click', doSearch);
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') doSearch();
+  });
+}
+
+/**
+ * Animates the search tab switcher (visual only — shots / designers / services)
+ */
+function setupSearchTabs() {
+  const tabs = document.querySelectorAll('.search-tab');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      // Update placeholder text based on active tab
+      const input = document.getElementById('hero-search-input');
+      const tabName = tab.getAttribute('data-tab');
+      if (input) {
+        const placeholders = {
+          shots:     'What type of work are you looking for?',
+          designers: 'Search for designers by name or skill…',
+          services:  'Search for services or specialisations…'
+        };
+        input.placeholder = placeholders[tabName] || input.placeholder;
       }
     });
   });
