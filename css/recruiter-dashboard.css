@@ -1,0 +1,292 @@
+/* ==========================================================================
+   SkillHire Recruiter Dashboard Page Styles
+   ========================================================================== */
+
+.dashboard-section {
+  padding: 40px 0 80px 0;
+}
+
+.dashboard-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 48px;
+  align-items: start;
+}
+
+/* Sidebar styling */
+.dashboard-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  box-shadow: var(--shadow-sm);
+}
+
+.recruiter-summary-card {
+  text-align: center;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  padding-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.rec-avatar-icon {
+  font-size: 3rem;
+  line-height: 1;
+  width: 90px;
+  height: 90px;
+  border-radius: var(--radius-full);
+  background-color: rgba(96, 165, 250, 0.1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(96, 165, 250, 0.3);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.recruiter-summary-card h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--primary-text);
+  line-height: 1.2;
+}
+
+.recruiter-summary-card p {
+  font-size: 0.85rem;
+  color: var(--secondary-text);
+  font-weight: 500;
+}
+
+/* Menu items */
+.dashboard-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  border: none;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--secondary-text);
+  cursor: pointer;
+  text-align: left;
+  transition: all var(--transition-fast);
+}
+
+.menu-item:hover {
+  color: var(--primary-text);
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.menu-item.active {
+  color: var(--primary-text);
+  background-color: rgba(0, 0, 0, 0.04);
+  font-weight: 600;
+}
+
+.menu-icon {
+  margin-right: 10px;
+  font-size: 1.05rem;
+}
+
+.count-pill {
+  background-color: var(--primary-text);
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Main Dashboard Panel */
+.dashboard-content {
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  padding: 48px;
+  box-shadow: var(--shadow-sm);
+}
+
+.tab-header {
+  margin-bottom: 36px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  padding-bottom: 20px;
+}
+
+.tab-header h2 {
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--primary-text);
+}
+
+.tab-header p {
+  font-size: 0.95rem;
+  color: var(--secondary-text);
+  margin-top: 4px;
+}
+
+/* Shortlist Candidates Grid */
+.shortlisted-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+/* Reuse main candidate card styles */
+.candidate-card {
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-normal);
+}
+
+.candidate-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--primary-text);
+  box-shadow: var(--shadow-md);
+}
+
+.candidate-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.candidate-avatar-wrapper {
+  position: relative;
+}
+
+.candidate-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-full);
+  object-fit: cover;
+  background-color: var(--bg-color);
+  border: 2px solid var(--surface-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.candidate-header-info h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+  letter-spacing: -0.01em;
+}
+
+.candidate-header-info .role {
+  font-size: 0.9rem;
+  color: var(--secondary-text);
+}
+
+.candidate-badge-row {
+  margin-bottom: 20px;
+}
+
+.candidate-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 28px;
+}
+
+.candidate-footer {
+  margin-top: auto;
+  border-top: 1px solid rgba(0, 0, 0, 0.04);
+  padding-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* History logs table formatting */
+.messages-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.messages-table th {
+  text-align: left;
+  padding: 12px 16px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--secondary-text);
+  border-bottom: 2px solid var(--border-color);
+}
+
+.messages-table td {
+  padding: 16px;
+  border-bottom: 1px solid var(--border-color);
+  vertical-align: middle;
+}
+
+.msg-subj-cell {
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: var(--primary-text);
+}
+
+.msg-meta-text {
+  font-size: 0.85rem;
+  color: var(--secondary-text);
+  margin-bottom: 12px;
+}
+
+/* Responsive Recruiter Dashboard layout */
+@media (max-width: 1200px) {
+  .shortlisted-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 1024px) {
+  .dashboard-layout {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  .shortlisted-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-content {
+    padding: 32px;
+  }
+  .shortlisted-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .dashboard-content {
+    padding: 24px 16px;
+  }
+  .messages-table {
+    display: block;
+    overflow-x: auto;
+  }
+}

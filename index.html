@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkillHire — Fresher Talent Discovery Platform</title>
+  <meta name="description" content="Discover fresh engineering and design talent through real projects, skills, and portfolios instead of resumes or years of experience.">
+  
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/footer.css">
+  <link rel="stylesheet" href="css/home.css">
+</head>
+<body>
+
+  <!-- Floating Glass Navbar -->
+  <header>
+    <div class="nav-container">
+      <a href="index.html" class="logo" id="nav-logo">
+        SkillHire
+        <div class="logo-dot"></div>
+      </a>
+      <ul class="nav-menu" id="nav-menu-list">
+        <li><a href="index.html" class="nav-link" id="nav-link-home">Home</a></li>
+        <li><a href="candidates.html" class="nav-link" id="nav-link-candidates">Candidates</a></li>
+        <li><a href="create-profile.html" class="nav-link" id="nav-link-create">Create Profile</a></li>
+      </ul>
+      <div class="nav-cta">
+        <a href="create-profile.html" class="btn btn-primary" id="nav-btn-start">Get Started</a>
+      </div>
+      <button class="mobile-toggle" id="mobile-hamburger" aria-label="Toggle Menu">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer Overlay and Drawer -->
+  <div class="mobile-drawer-overlay" id="mobile-overlay"></div>
+  <div class="mobile-drawer" id="mobile-drawer-menu">
+    <ul class="mobile-nav-list">
+      <li><a href="index.html" class="mobile-nav-link" id="mob-link-home">Home</a></li>
+      <li><a href="candidates.html" class="mobile-nav-link" id="mob-link-candidates">Candidates</a></li>
+      <li><a href="create-profile.html" class="mobile-nav-link" id="mob-link-create">Create Profile</a></li>
+    </ul>
+    <div class="mobile-nav-cta">
+      <a href="create-profile.html" class="btn btn-primary" id="mob-btn-start">Get Started</a>
+    </div>
+  </div>
+
+  <main>
+    <!-- Hero Section -->
+    <section class="hero container fade-in-section">
+      <div class="hero-badge">
+        <div class="hero-badge-pulse"></div>
+        <span>Over 500+ projects showcased this week</span>
+      </div>
+      <h1>Get Hired For What You Build.</h1>
+      <p>Discover fresh talent through projects, skills, and real work instead of years of experience. The platform acts as an open showcase database.</p>
+      <div class="hero-actions" id="hero-actions-container">
+        <a href="candidates.html" class="btn btn-primary" id="hero-btn-explore">Explore Talent</a>
+        <a href="create-profile.html" class="btn btn-secondary" id="hero-btn-create">Create Profile</a>
+      </div>
+    </section>
+
+    <!-- Infinite Scroll Showcase Carousel Section -->
+    <section class="showcase-carousel-section">
+      <div class="showcase-title">Explore Talents by Specialization</div>
+      <div class="marquee-wrapper">
+        <!-- Duplicate categories for smooth seamless loop scrolling -->
+        <div class="marquee-content">
+          <!-- 1. Frontend -->
+          <div class="category-card" data-role="Frontend Developer">
+            <span class="category-icon">💻</span>
+            <div class="category-info">
+              <h3>Frontend Developer</h3>
+              <p>React, JS, CSS</p>
+            </div>
+            <div class="category-bg-art">
+              <div class="category-art-line"></div>
+              <div class="category-art-line"></div>
+              <div class="category-art-line"></div>
+            </div>
+          </div>
+          <!-- 2. MERN -->
+          <div class="category-card" data-role="MERN Developer">
+            <span class="category-icon">🚀</span>
+            <div class="category-info">
+              <h3>MERN Developer</h3>
+              <p>React, Node, Mongo, Express</p>
+            </div>
+            <div class="category-bg-art">
+              <div class="category-art-line"></div>
+              <div class="category-art-line"></div>
+              <div class="category-art-line"></div>
+            </div>
+          </div>
+          <!-- 3. Java -->
+          <div class="category-card" data-role="Java Developer">
+            <span class="category-icon">☕</span>
+            <div class="category-info">
+              <h3>Java Developer</h3>
+              <p>Java, Spring Boot, SQL</p>
+            </div>
+            <div class="category-bg-art">
+              <div class="category-art-line"></div>
+              <div class="category-art-line"></div>
+              <div class="category-art-line"></div>
+            </div>
+          </div>
+          <!-- 4. Python -->
+          <div class="category-card" data-role="Python Developer">
+            <span class="category-icon">🐍</span>
+            <div class="category-info">
+              <h3>Python Developer</h3>
+              <p>Python, Django, FastAPI</p>
+            </div>
+            <div class="category-bg-art">
+              <div class="category-art-line"></div>
+              <div class="category-art-line"></div>
+              <div class="category-art-line"></div>
+            </div>
+          </div>
+          <!-- 5. UI/UX -->
+          <div class="category-card" data-role="UI/UX Designer">
+            <span class="category-icon">🎨</span>
+            <div class="category-info">
+              <h3>UI/UX Designer</h3>
+              <p>Figma, UI Systems, Interaction</p>
+            </div>
+            <div class="category-bg-art">
+              <div class="category-art-line"></div>
+              <div class="category-art-line"></div>
+              <div class="category-art-line"></div>
+            </div>
+          </div>
+          <!-- 6. Mobile -->
+          <div class="category-card" data-role="Mobile Developer">
+            <span class="category-icon">📱</span>
+            <div class="category-info">
+              <h3>Mobile Developer</h3>
+              <p>Flutter, React Native, Swift</p>
+            </div>
+            <div class="category-bg-art">
+              <div class="category-art-line"></div>
+              <div class="category-art-line"></div>
+              <div class="category-art-line"></div>
+            </div>
+          </div>
+
+          <!-- DUPLICATED COPY FOR LOOP -->
+          <div class="category-card" data-role="Frontend Developer">
+            <span class="category-icon">💻</span>
+            <div class="category-info">
+              <h3>Frontend Developer</h3>
+              <p>React, JS, CSS</p>
+            </div>
+            <div class="category-bg-art">
+              <div class="category-art-line"></div>
+              <div class="category-art-line"></div>
+              <div class="category-art-line"></div>
+            </div>
+          </div>
+          <div class="category-card" data-role="MERN Developer">
+            <span class="category-icon">🚀</span>
+            <div class="category-info">
+              <h3>MERN Developer</h3>
+              <p>React, Node, Mongo, Express</p>
+            </div>
+            <div class="category-bg-art">
+              <div class="category-art-line"></div>
+              <div class="category-art-line"></div>
+              <div class="category-art-line"></div>
+            </div>
+          </div>
+          <div class="category-card" data-role="Java Developer">
+            <span class="category-icon">☕</span>
+            <div class="category-info">
+              <h3>Java Developer</h3>
+              <p>Java, Spring Boot, SQL</p>
+            </div>
+            <div class="category-bg-art">
+              <div class="category-art-line"></div>
+              <div class="category-art-line"></div>
+              <div class="category-art-line"></div>
+            </div>
+          </div>
+          <div class="category-card" data-role="Python Developer">
+            <span class="category-icon">🐍</span>
+            <div class="category-info">
+              <h3>Python Developer</h3>
+              <p>Python, Django, FastAPI</p>
+            </div>
+            <div class="category-bg-art">
+              <div class="category-art-line"></div>
+              <div class="category-art-line"></div>
+              <div class="category-art-line"></div>
+            </div>
+          </div>
+          <div class="category-card" data-role="UI/UX Designer">
+            <span class="category-icon">🎨</span>
+            <div class="category-info">
+              <h3>UI/UX Designer</h3>
+              <p>Figma, UI Systems, Interaction</p>
+            </div>
+            <div class="category-bg-art">
+              <div class="category-art-line"></div>
+              <div class="category-art-line"></div>
+              <div class="category-art-line"></div>
+            </div>
+          </div>
+          <div class="category-card" data-role="Mobile Developer">
+            <span class="category-icon">📱</span>
+            <div class="category-info">
+              <h3>Mobile Developer</h3>
+              <p>Flutter, React Native, Swift</p>
+            </div>
+            <div class="category-bg-art">
+              <div class="category-art-line"></div>
+              <div class="category-art-line"></div>
+              <div class="category-art-line"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- How SkillHire Works Section -->
+    <section class="how-it-works container fade-in-section">
+      <div class="section-header">
+        <h2>How SkillHire Works</h2>
+        <p>Simple, visual discovery built for recruiters who value real competence.</p>
+      </div>
+      <div class="steps-grid">
+        <!-- Step 1 -->
+        <div class="step-card">
+          <div class="step-number">01</div>
+          <h3>Create Profile</h3>
+          <p>Add your skills, contact channels, and portfolio bio. Build your page in minutes.</p>
+        </div>
+        <!-- Step 2 -->
+        <div class="step-card">
+          <div class="step-number">02</div>
+          <h3>Showcase Work</h3>
+          <p>Upload screenshots, descriptions, source repositories, and live URLs of your primary projects.</p>
+        </div>
+        <!-- Step 3 -->
+        <div class="step-card">
+          <div class="step-number">03</div>
+          <h3>Get Discovered</h3>
+          <p>Recruiters search the database by skill or keyword and contact you directly via email or LinkedIn.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Featured Candidates Section -->
+    <section class="featured-candidates container fade-in-section">
+      <div class="featured-header">
+        <div class="section-header">
+          <h2>Featured Candidates</h2>
+          <p>Discover spotlighted freshers with premium portfolio entries.</p>
+        </div>
+        <a href="candidates.html" class="btn btn-secondary" id="featured-btn-all">Browse Directory &rarr;</a>
+      </div>
+      <div class="featured-grid" id="featured-candidates-grid">
+        <!-- Rendered Dynamically from JS -->
+      </div>
+    </section>
+
+    <!-- Popular Skills Section -->
+    <section class="popular-skills container fade-in-section">
+      <div class="section-header">
+        <h2>Explore By Popular Skills</h2>
+        <p>Find candidates matching your project stack immediately.</p>
+      </div>
+      <div class="skills-cloud">
+        <span class="skill-tag" data-skill="React">React</span>
+        <span class="skill-tag" data-skill="JavaScript">JavaScript</span>
+        <span class="skill-tag" data-skill="Node.js">Node.js</span>
+        <span class="skill-tag" data-skill="Java">Java</span>
+        <span class="skill-tag" data-skill="Python">Python</span>
+        <span class="skill-tag" data-skill="MongoDB">MongoDB</span>
+        <span class="skill-tag" data-skill="SQL">SQL</span>
+        <span class="skill-tag" data-skill="UI/UX">UI/UX</span>
+        <span class="skill-tag" data-skill="MERN">MERN</span>
+        <span class="skill-tag" data-skill="Express">Express</span>
+      </div>
+    </section>
+
+    <!-- Call to Action Section -->
+    <section class="cta-banner-section container fade-in-section">
+      <div class="cta-banner">
+        <h2>Your Projects Are Your Experience.</h2>
+        <p>Stop sending resume sheets. Showcase your software products and designs where tech recruiters can review them directly.</p>
+        <a href="create-profile.html" class="btn btn-primary" id="cta-btn-join">Create Your Profile</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer Section -->
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <a href="index.html" class="logo">
+            SkillHire
+            <div class="logo-dot"></div>
+          </a>
+          <p class="footer-description">A curated portfolio directory designed to discover fresher candidates by their projects and technical capabilities instead of resumes.</p>
+        </div>
+        <div class="footer-links-group">
+          <div class="footer-column">
+            <div class="footer-title">Platform</div>
+            <ul class="footer-list">
+              <li><a href="index.html" class="footer-link">Home</a></li>
+              <li><a href="candidates.html" class="footer-link">Explore Talent</a></li>
+              <li><a href="create-profile.html" class="footer-link">Create Profile</a></li>
+            </ul>
+          </div>
+          <div class="footer-column">
+            <div class="footer-title">Inspiration</div>
+            <ul class="footer-list">
+              <li><a href="https://vercel.com" target="_blank" class="footer-link">Vercel</a></li>
+              <li><a href="https://linear.app" target="_blank" class="footer-link">Linear</a></li>
+              <li><a href="https://apple.com" target="_blank" class="footer-link">Apple Design</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div class="footer-copy">&copy; 2026 SkillHire Platform. All rights reserved.</div>
+        <div class="footer-socials">
+          <a href="https://github.com" target="_blank" class="footer-social-link">GitHub</a>
+          <a href="https://linkedin.com" target="_blank" class="footer-social-link">LinkedIn</a>
+          <a href="https://twitter.com" target="_blank" class="footer-social-link">Twitter</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JS Scripts -->
+  <script src="js/db.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/home.js"></script>
+</body>
+</html>

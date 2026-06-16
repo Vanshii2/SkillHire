@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Candidate Dashboard — SkillHire</title>
+  <meta name="description" content="Manage your developer profile, showcase projects, and read inbound recruiter inquiries.">
+  
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/footer.css">
+  <link rel="stylesheet" href="css/candidate-dashboard.css">
+</head>
+<body>
+
+  <!-- Floating Glass Navbar -->
+  <header>
+    <div class="nav-container">
+      <a href="index.html" class="logo" id="nav-logo">
+        SkillHire
+        <div class="logo-dot"></div>
+      </a>
+      <ul class="nav-menu" id="nav-menu-list">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="candidates.html" class="nav-link">Candidates</a></li>
+      </ul>
+      <div class="nav-cta">
+        <!-- Replaced dynamically -->
+      </div>
+      <button class="mobile-toggle" id="mobile-hamburger" aria-label="Toggle Menu">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer Overlay and Drawer -->
+  <div class="mobile-drawer-overlay" id="mobile-overlay"></div>
+  <div class="mobile-drawer" id="mobile-drawer-menu">
+    <ul class="mobile-nav-list">
+      <li><a href="index.html" class="mobile-nav-link">Home</a></li>
+      <li><a href="candidates.html" class="mobile-nav-link">Candidates</a></li>
+    </ul>
+    <div class="mobile-nav-cta">
+      <!-- Replaced dynamically -->
+    </div>
+  </div>
+
+  <main>
+    <section class="dashboard-section container">
+      <div class="dashboard-layout">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="dashboard-sidebar">
+          <div class="candidate-summary-card">
+            <img id="dashboard-avatar" src="assets/images/avatar1.png" alt="Candidate Avatar" class="dashboard-avatar">
+            <h3 id="dashboard-name">Loading...</h3>
+            <p id="dashboard-role">Software Developer</p>
+          </div>
+          <nav class="dashboard-menu">
+            <button class="menu-item active" data-tab="edit-profile">
+              <span class="menu-icon">👤</span> Edit Profile
+            </button>
+            <button class="menu-item" data-tab="manage-projects">
+              <span class="menu-icon">💻</span> Manage Projects
+            </button>
+            <button class="menu-item" data-tab="recruiter-messages">
+              <span class="menu-icon">✉️</span> Recruiter Inquiries
+              <span class="unread-badge" id="messages-count" style="display: none;">0</span>
+            </button>
+          </nav>
+        </aside>
+
+        <!-- Main Dashboard View Panel -->
+        <div class="dashboard-content">
+          
+          <!-- TAB 1: Edit Profile -->
+          <div class="tab-content active" id="tab-edit-profile">
+            <div class="tab-header">
+              <h2>Edit Profile Information</h2>
+              <p>Update your details, tags, and availability status.</p>
+            </div>
+            
+            <form id="profile-edit-form">
+              <div class="form-block">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="edit-name">Full Name *</label>
+                    <input type="text" id="edit-name" placeholder="John Doe" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="edit-role">Professional Title *</label>
+                    <input type="text" id="edit-role" placeholder="e.g. Frontend Developer" required>
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="edit-availability">Availability Status *</label>
+                    <select id="edit-availability">
+                      <option value="Available for Internship">Available for Internship</option>
+                      <option value="Available for Full-Time">Available for Full-Time</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>Profile Avatar *</label>
+                    <input type="hidden" id="edit-avatar-path" value="assets/images/avatar1.png">
+                    <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+                      <div class="avatar-preset-grid">
+                        <div class="avatar-preset-option selected" data-path="assets/images/avatar1.png">
+                          <img src="assets/images/avatar1.png" alt="Male preset">
+                        </div>
+                        <div class="avatar-preset-option" data-path="assets/images/avatar2.png">
+                          <img src="assets/images/avatar2.png" alt="Female preset">
+                        </div>
+                      </div>
+                      <div style="display: flex; flex-direction: column; gap: 6px;">
+                        <span style="font-size:0.8rem; font-weight:600; color:var(--secondary-text);">Or Upload Custom Photo:</span>
+                        <input type="file" id="edit-avatar-file" accept="image/*" style="font-size: 0.8rem; border: none; background: transparent; padding: 0;">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="edit-about">Professional Bio / About Me *</label>
+                  <textarea id="edit-about" rows="5" placeholder="Write something about your goals, favorite stacks, and drive..." required></textarea>
+                </div>
+              </div>
+
+              <div class="form-block">
+                <div class="form-block-title">Technical Skill Tags</div>
+                <div class="form-group">
+                  <label for="edit-skill-input">Add Skills</label>
+                  <div class="skills-input-row">
+                    <input type="text" id="edit-skill-input" placeholder="e.g. React (Press Add or Enter)">
+                    <button type="button" class="btn btn-secondary" id="btn-dashboard-add-skill">Add Tag</button>
+                  </div>
+                  <div class="skills-list" id="dashboard-skills-wrapper">
+                    <!-- Dynamic tag chips -->
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-block">
+                <div class="form-block-title">Contact & Social Links</div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="edit-linkedin">LinkedIn URL</label>
+                    <input type="url" id="edit-linkedin" placeholder="https://linkedin.com/in/username">
+                  </div>
+                  <div class="form-group">
+                    <label for="edit-github">GitHub Profile URL</label>
+                    <input type="url" id="edit-github" placeholder="https://github.com/username">
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <div class="toast-success" id="profile-save-toast" style="display: none;">✓ Profile changes saved!</div>
+              </div>
+            </form>
+          </div>
+
+          <!-- TAB 2: Manage Projects -->
+          <div class="tab-content" id="tab-manage-projects" style="display: none;">
+            <div class="tab-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+              <div>
+                <h2>Manage Showcase Projects</h2>
+                <p>Highlight the top projects you have designed or built.</p>
+              </div>
+              <button class="btn btn-primary" id="btn-open-project-modal">+ Add Showcase Project</button>
+            </div>
+            
+            <div class="projects-dashboard-grid" id="dashboard-projects-grid">
+              <!-- Rendered Dynamically -->
+            </div>
+          </div>
+
+          <!-- TAB 3: Recruiter Messages -->
+          <div class="tab-content" id="tab-recruiter-messages" style="display: none;">
+            <div class="tab-header">
+              <h2>Recruiter Inquiries</h2>
+              <p>Inbound messages sent to you by recruiters reviewing your work.</p>
+            </div>
+            
+            <div class="messages-inbox-container" id="dashboard-messages-inbox">
+              <!-- Rendered Dynamically -->
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- Add/Edit Project Modal Overlay -->
+  <div id="project-modal" class="modal-overlay">
+    <div class="modal-card project-modal-card">
+      <button class="modal-close-btn" id="project-modal-close">&times;</button>
+      <h2 class="modal-title" id="project-modal-title">Add Project Showcase</h2>
+      <p class="modal-subtitle">Add details about your application structure and stack.</p>
+      
+      <form id="dashboard-project-form">
+        <input type="hidden" id="project-edit-index" value="">
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="proj-modal-name">Project Name *</label>
+            <input type="text" id="proj-modal-name" placeholder="e.g. Fintech Edge Dashboard" required>
+          </div>
+          <div class="form-group">
+            <label for="proj-modal-live">Live Demo URL</label>
+            <input type="url" id="proj-modal-live" placeholder="https://myproject.demo.dev">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="proj-modal-github">GitHub Repository URL</label>
+            <input type="url" id="proj-modal-github" placeholder="https://github.com/username/project">
+          </div>
+          <div class="form-group">
+            <label for="proj-modal-tech">Tech Stack * (comma separated)</label>
+            <input type="text" id="proj-modal-tech" placeholder="React, Node.js, CSS" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="proj-modal-screenshot">Project Screenshot Theme</label>
+          <select id="proj-modal-screenshot">
+            <option value="assets/images/project1.png">SaaS Analytics Dashboard (Modern Grid Layout)</option>
+            <option value="assets/images/project2.png">Mobile Application (Apple Minimal Interface)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="proj-modal-description">Project Description *</label>
+          <textarea id="proj-modal-description" rows="5" placeholder="Write a detailed summary explaining the architecture and design decisions..." required></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">Save Project</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Message Detail Overlay Modal -->
+  <div id="message-view-modal" class="modal-overlay">
+    <div class="modal-card">
+      <button class="modal-close-btn" id="message-view-modal-close">&times;</button>
+      <span class="message-rec-company" id="msg-view-company">Company Name</span>
+      <h2 class="modal-title" style="margin-top: 10px;" id="msg-view-subject">Subject</h2>
+      <p class="msg-meta-text" id="msg-view-meta">From Jane Doe (jane@acme.com) on Date</p>
+      
+      <div class="message-body-content" id="msg-view-body" style="white-space: pre-line; background: rgba(0,0,0,0.03); border: 1px solid var(--border-color); padding: 20px; border-radius: var(--radius-sm); margin-top: 20px; max-height: 250px; overflow-y: auto; color: var(--secondary-text); font-size: 0.95rem; line-height: 1.6;">
+        Message content goes here...
+      </div>
+      
+      <div style="margin-top: 24px; text-align: right;">
+        <a href="" id="msg-view-reply-btn" class="btn btn-primary">Reply via Email &rarr;</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer Section -->
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <a href="index.html" class="logo">
+            SkillHire
+            <div class="logo-dot"></div>
+          </a>
+          <p class="footer-description">A curated portfolio directory designed to discover fresher candidates by their projects and technical capabilities instead of resumes.</p>
+        </div>
+        <div class="footer-links-group">
+          <div class="footer-column">
+            <div class="footer-title">Platform</div>
+            <ul class="footer-list">
+              <li><a href="index.html" class="footer-link">Home</a></li>
+              <li><a href="candidates.html" class="footer-link">Explore Talent</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div class="footer-copy">&copy; 2026 SkillHire Platform. All rights reserved.</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JS Scripts -->
+  <script src="js/db.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/candidate-dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,349 @@
+/* ==========================================================================
+   SkillHire Create Profile Form Styling
+   ========================================================================== */
+
+.form-section {
+  padding: 40px 0 80px 0;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.form-header {
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.form-header h1 {
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+}
+
+.form-header p {
+  font-size: 1.05rem;
+  color: var(--secondary-text);
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.profile-form {
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  padding: 48px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.form-block {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 40px;
+}
+
+.form-block:last-of-type {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.form-block-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--primary-text);
+  margin-bottom: 8px;
+}
+
+/* Fields Grid Layout */
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--primary-text);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="url"],
+textarea,
+select {
+  width: 100%;
+  padding: 12px 16px;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background-color: var(--bg-color);
+  color: var(--primary-text);
+  transition: all var(--transition-fast);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--primary-text);
+  background-color: var(--surface-color);
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.03);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* Custom segmented radio selector for availability */
+.availability-selector {
+  display: flex;
+  gap: 16px;
+}
+
+.radio-card {
+  flex: 1;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background-color: var(--bg-color);
+  transition: all var(--transition-fast);
+  user-select: none;
+}
+
+.radio-card input[type="radio"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-full);
+  outline: none;
+  background-color: var(--surface-color);
+  cursor: pointer;
+  position: relative;
+  transition: all var(--transition-fast);
+}
+
+.radio-card input[type="radio"]:checked {
+  border-color: var(--primary-text);
+}
+
+.radio-card input[type="radio"]:checked::after {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background-color: var(--primary-text);
+  border-radius: var(--radius-full);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.radio-card:hover {
+  border-color: var(--border-color-hover);
+}
+
+.radio-card.selected {
+  border-color: var(--primary-text);
+  background-color: var(--surface-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.radio-card-info h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.radio-card-info p {
+  font-size: 0.8rem;
+}
+
+/* Avatar / Image preset selector */
+.preset-selector-grid {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.preset-option {
+  border: 2px solid transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  width: 68px;
+  height: 68px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-fast);
+  background-color: var(--bg-color);
+}
+
+.preset-option.selected {
+  border-color: var(--primary-text);
+  transform: scale(1.05);
+}
+
+.preset-option img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Dynamic Skill Tags Adder input */
+.skills-input-wrapper {
+  display: flex;
+  gap: 12px;
+}
+
+.skills-list-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+  min-height: 38px;
+  padding: 8px 12px;
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-sm);
+  background-color: var(--bg-color);
+}
+
+.skills-list-container:empty::before {
+  content: 'No skills added yet. Use the input field above.';
+  font-size: 0.85rem;
+  color: var(--secondary-text);
+  align-self: center;
+}
+
+.skill-tag-remove {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: default;
+}
+
+.skill-tag-remove-btn {
+  background: none;
+  border: none;
+  color: var(--secondary-text);
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 0.8rem;
+  padding: 0 2px;
+  line-height: 1;
+}
+
+.skill-tag-remove-btn:hover {
+  color: #c5221f;
+}
+
+/* Dynamic Repeatable Projects Layout */
+.projects-container {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.project-form-block {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  background-color: var(--bg-color);
+  position: relative;
+  transition: border-color var(--transition-fast);
+}
+
+.project-form-block:hover {
+  border-color: var(--border-color-hover);
+}
+
+.btn-remove-project {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  background: none;
+  border: none;
+  color: var(--secondary-text);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+
+.btn-remove-project:hover {
+  color: #c5221f;
+  text-decoration: underline;
+}
+
+.project-index-label {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--secondary-text);
+  margin-bottom: 20px;
+}
+
+/* Submit Actions styling */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+}
+
+/* Responsive Form Adapters */
+@media (max-width: 768px) {
+  .profile-form {
+    padding: 32px 24px;
+  }
+  
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .availability-selector {
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-form {
+    padding: 24px 16px;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

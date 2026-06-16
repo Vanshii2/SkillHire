@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Developer Profile — SkillHire Platform</title>
+  <meta name="description" content="Build your custom portfolio display profile on SkillHire. Add your skills, email contact channels, and upload links to your source repositories and live demos.">
+  
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/footer.css">
+  <link rel="stylesheet" href="css/create-profile.css">
+</head>
+<body>
+
+  <!-- Floating Glass Navbar -->
+  <header>
+    <div class="nav-container">
+      <a href="index.html" class="logo" id="nav-logo">
+        SkillHire
+        <div class="logo-dot"></div>
+      </a>
+      <ul class="nav-menu" id="nav-menu-list">
+        <li><a href="index.html" class="nav-link" id="nav-link-home">Home</a></li>
+        <li><a href="candidates.html" class="nav-link" id="nav-link-candidates">Candidates</a></li>
+        <li><a href="create-profile.html" class="nav-link" id="nav-link-create">Create Profile</a></li>
+      </ul>
+      <div class="nav-cta">
+        <a href="create-profile.html" class="btn btn-primary" id="nav-btn-start">Get Started</a>
+      </div>
+      <button class="mobile-toggle" id="mobile-hamburger" aria-label="Toggle Menu">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer Overlay and Drawer -->
+  <div class="mobile-drawer-overlay" id="mobile-overlay"></div>
+  <div class="mobile-drawer" id="mobile-drawer-menu">
+    <ul class="mobile-nav-list">
+      <li><a href="index.html" class="mobile-nav-link" id="mob-link-home">Home</a></li>
+      <li><a href="candidates.html" class="mobile-nav-link" id="mob-link-candidates">Candidates</a></li>
+      <li><a href="create-profile.html" class="mobile-nav-link" id="mob-link-create">Create Profile</a></li>
+    </ul>
+    <div class="mobile-nav-cta">
+      <a href="create-profile.html" class="btn btn-primary" id="mob-btn-start">Get Started</a>
+    </div>
+  </div>
+
+  <main>
+    <section class="form-section container">
+      <div class="form-header fade-in-section is-visible">
+        <h1>Create Your Profile</h1>
+        <p>Showcase your projects and developer capabilities to technical recruiters. Build your portfolio page instantly.</p>
+      </div>
+
+      <form id="create-profile-form" class="profile-form fade-in-section is-visible">
+        
+        <!-- BLOCK 1: Personal Information -->
+        <div class="form-block">
+          <div class="form-block-title">Personal Information</div>
+          
+          <div class="form-row">
+            <!-- Full Name -->
+            <div class="form-group">
+              <label for="user-name">Full Name *</label>
+              <input type="text" id="user-name" placeholder="e.g. Rahul Sharma" required>
+            </div>
+            
+            <!-- Professional Role Title -->
+            <div class="form-group">
+              <label for="user-role">Professional Title *</label>
+              <input type="text" id="user-role" placeholder="e.g. Frontend Developer" required>
+            </div>
+          </div>
+
+          <div class="form-row" style="margin-top: 10px;">
+            <!-- Profile Portrait Preset Selector -->
+            <div class="form-group full-width">
+              <label>Select Profile Avatar Preset *</label>
+              <input type="hidden" id="selected-avatar-path" value="assets/images/avatar1.png">
+              <div class="preset-selector-grid">
+                <div class="preset-option selected" data-path="assets/images/avatar1.png">
+                  <img src="assets/images/avatar1.png" alt="Male Profile Avatar">
+                </div>
+                <div class="preset-option" data-path="assets/images/avatar2.png">
+                  <img src="assets/images/avatar2.png" alt="Female Profile Avatar">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Professional Bio Summary -->
+          <div class="form-group full-width">
+            <label for="user-about">Professional Bio / About Me *</label>
+            <textarea id="user-about" placeholder="Describe your background, what you enjoy coding, and your drive as a developer..." required></textarea>
+          </div>
+        </div>
+
+        <!-- BLOCK 2: Technical Skills Tags -->
+        <div class="form-block">
+          <div class="form-block-title">Technical Capabilities</div>
+          <p style="font-size: 0.9rem; color: var(--secondary-text); margin-top: -12px;">Add specific skills that will display on your profile and help recruiters filter for your page.</p>
+          
+          <div class="form-group full-width">
+            <label for="skills-input">Add Skill Tag</label>
+            <div class="skills-input-wrapper">
+              <input type="text" id="skills-input" placeholder="e.g. React (Press Enter or click Add)">
+              <button type="button" class="btn btn-secondary" id="btn-add-skill" style="padding: 12px 20px;">Add</button>
+            </div>
+            <div class="skills-list-container" id="skills-list-wrapper">
+              <!-- Dynamic tags wrapper -->
+            </div>
+          </div>
+        </div>
+
+        <!-- BLOCK 3: Showcase Projects -->
+        <div class="form-block">
+          <div class="form-block-title" style="margin-bottom: 4px;">Showcase Projects</div>
+          <p style="font-size: 0.9rem; color: var(--secondary-text); margin-top: -8px; margin-bottom: 16px;">Add the details of applications or tools you have built. Showcase what makes your code special.</p>
+          
+          <div class="projects-container" id="projects-container-wrapper">
+            <!-- Dynamic project blocks loaded in JS -->
+          </div>
+
+          <button type="button" class="btn btn-secondary" id="btn-add-project" style="margin-top: 16px; align-self: flex-start;">+ Add Another Project</button>
+        </div>
+
+        <!-- BLOCK 4: Job Availability -->
+        <div class="form-block">
+          <div class="form-block-title">Job Search Availability</div>
+          
+          <div class="availability-selector">
+            <!-- Internship Radio Card -->
+            <label class="radio-card selected">
+              <input type="radio" name="availability" value="Internship" checked>
+              <div class="radio-card-info">
+                <h4>Available for Internship</h4>
+                <p style="color: var(--secondary-text);">Open to short-term learning positions and junior roles.</p>
+              </div>
+            </label>
+
+            <!-- Full-Time Radio Card -->
+            <label class="radio-card">
+              <input type="radio" name="availability" value="Full-Time">
+              <div class="radio-card-info">
+                <h4>Available for Full-Time</h4>
+                <p style="color: var(--secondary-text);">Ready to join full-time positions as a permanent developer.</p>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- BLOCK 5: Contact Information -->
+        <div class="form-block">
+          <div class="form-block-title">Contact & Social Links</div>
+          <p style="font-size: 0.9rem; color: var(--secondary-text); margin-top: -12px;">Provide methods for recruiters to review your work history and contact you directly outside this directory.</p>
+          
+          <div class="form-row">
+            <!-- Email -->
+            <div class="form-group">
+              <label for="user-email">Email Address *</label>
+              <input type="email" id="user-email" placeholder="e.g. name@example.com" required>
+            </div>
+            
+            <!-- LinkedIn -->
+            <div class="form-group">
+              <label for="user-linkedin">LinkedIn Profile URL</label>
+              <input type="url" id="user-linkedin" placeholder="https://linkedin.com/in/username">
+            </div>
+          </div>
+
+          <div class="form-row" style="margin-top: 10px;">
+            <!-- GitHub -->
+            <div class="form-group">
+              <label for="user-github">GitHub Profile URL</label>
+              <input type="url" id="user-github" placeholder="https://github.com/username">
+            </div>
+          </div>
+        </div>
+
+        <!-- Save Button actions -->
+        <div class="form-actions">
+          <a href="candidates.html" class="btn btn-secondary">Cancel</a>
+          <button type="submit" class="btn btn-primary" id="btn-submit-profile">Save & Publish Profile</button>
+        </div>
+
+      </form>
+    </section>
+  </main>
+
+  <!-- Footer Section -->
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <a href="index.html" class="logo">
+            SkillHire
+            <div class="logo-dot"></div>
+          </a>
+          <p class="footer-description">A curated portfolio directory designed to discover fresher candidates by their projects and technical capabilities instead of resumes.</p>
+        </div>
+        <div class="footer-links-group">
+          <div class="footer-column">
+            <div class="footer-title">Platform</div>
+            <ul class="footer-list">
+              <li><a href="index.html" class="footer-link">Home</a></li>
+              <li><a href="candidates.html" class="footer-link">Explore Talent</a></li>
+              <li><a href="create-profile.html" class="footer-link">Create Profile</a></li>
+            </ul>
+          </div>
+          <div class="footer-column">
+            <div class="footer-title">Inspiration</div>
+            <ul class="footer-list">
+              <li><a href="https://vercel.com" target="_blank" class="footer-link">Vercel</a></li>
+              <li><a href="https://linear.app" target="_blank" class="footer-link">Linear</a></li>
+              <li><a href="https://apple.com" target="_blank" class="footer-link">Apple Design</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div class="footer-copy">&copy; 2026 SkillHire Platform. All rights reserved.</div>
+        <div class="footer-socials">
+          <a href="https://github.com" target="_blank" class="footer-social-link">GitHub</a>
+          <a href="https://linkedin.com" target="_blank" class="footer-social-link">LinkedIn</a>
+          <a href="https://twitter.com" target="_blank" class="footer-social-link">Twitter</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JS Scripts -->
+  <script src="js/db.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/create-profile.js"></script>
+</body>
+</html>

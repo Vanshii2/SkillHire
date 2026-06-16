@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Candidate Portfolio Showcase — SkillHire</title>
+  <meta name="description" content="View the candidate's personal portfolio dashboard, containing project screenshots, tech stack capabilities, and direct email and LinkedIn contacts.">
+  
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/footer.css">
+  <link rel="stylesheet" href="css/profile.css">
+</head>
+<body>
+
+  <!-- Floating Glass Navbar -->
+  <header>
+    <div class="nav-container">
+      <a href="index.html" class="logo" id="nav-logo">
+        SkillHire
+        <div class="logo-dot"></div>
+      </a>
+      <ul class="nav-menu" id="nav-menu-list">
+        <li><a href="index.html" class="nav-link" id="nav-link-home">Home</a></li>
+        <li><a href="candidates.html" class="nav-link" id="nav-link-candidates">Candidates</a></li>
+        <li><a href="create-profile.html" class="nav-link" id="nav-link-create">Create Profile</a></li>
+      </ul>
+      <div class="nav-cta">
+        <a href="create-profile.html" class="btn btn-primary" id="nav-btn-start">Get Started</a>
+      </div>
+      <button class="mobile-toggle" id="mobile-hamburger" aria-label="Toggle Menu">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer Overlay and Drawer -->
+  <div class="mobile-drawer-overlay" id="mobile-overlay"></div>
+  <div class="mobile-drawer" id="mobile-drawer-menu">
+    <ul class="mobile-nav-list">
+      <li><a href="index.html" class="mobile-nav-link" id="mob-link-home">Home</a></li>
+      <li><a href="candidates.html" class="mobile-nav-link" id="mob-link-candidates">Candidates</a></li>
+      <li><a href="create-profile.html" class="mobile-nav-link" id="mob-link-create">Create Profile</a></li>
+    </ul>
+    <div class="mobile-nav-cta">
+      <a href="create-profile.html" class="btn btn-primary" id="mob-btn-start">Get Started</a>
+    </div>
+  </div>
+
+  <!-- Main Mount Point for Dynamic Profile Content -->
+  <main id="profile-main-container">
+    <!-- Loader placeholder while Javascript loads -->
+    <div style="text-align: center; padding: 120px 24px; color: var(--secondary-text);">
+      <div class="logo" style="justify-content: center; margin-bottom: 16px;">
+        SkillHire
+        <div class="logo-dot"></div>
+      </div>
+      <p>Loading candidate portfolio profile...</p>
+    </div>
+  </main>
+
+  <!-- Footer Section -->
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <a href="index.html" class="logo">
+            SkillHire
+            <div class="logo-dot"></div>
+          </a>
+          <p class="footer-description">A curated portfolio directory designed to discover fresher candidates by their projects and technical capabilities instead of resumes.</p>
+        </div>
+        <div class="footer-links-group">
+          <div class="footer-column">
+            <div class="footer-title">Platform</div>
+            <ul class="footer-list">
+              <li><a href="index.html" class="footer-link">Home</a></li>
+              <li><a href="candidates.html" class="footer-link">Explore Talent</a></li>
+              <li><a href="create-profile.html" class="footer-link">Create Profile</a></li>
+            </ul>
+          </div>
+          <div class="footer-column">
+            <div class="footer-title">Inspiration</div>
+            <ul class="footer-list">
+              <li><a href="https://vercel.com" target="_blank" class="footer-link">Vercel</a></li>
+              <li><a href="https://linear.app" target="_blank" class="footer-link">Linear</a></li>
+              <li><a href="https://apple.com" target="_blank" class="footer-link">Apple Design</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div class="footer-copy">&copy; 2026 SkillHire Platform. All rights reserved.</div>
+        <div class="footer-socials">
+          <a href="https://github.com" target="_blank" class="footer-social-link">GitHub</a>
+          <a href="https://linkedin.com" target="_blank" class="footer-social-link">LinkedIn</a>
+          <a href="https://twitter.com" target="_blank" class="footer-social-link">Twitter</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JS Scripts -->
+  <script src="js/db.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/profile.js"></script>
+</body>
+</html>
