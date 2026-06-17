@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Browse Fresh Talents — Exhibitly</title>
+  <meta name="description" content="Browse fresh software developers, full-stack engineers, and UI/UX designers by their actual portfolios and tech stacks instead of work history.">
+  
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/candidates.css">
+</head>
+<body>
+
+  <!-- Floating Glass Navbar -->
+  <header>
+    <div class="nav-container">
+      <a href="../index.html" class="logo" id="nav-logo">
+        Exhibitly
+        <div class="logo-dot"></div>
+      </a>
+      <ul class="nav-menu" id="nav-menu-list">
+        <li><a href="../index.html" class="nav-link">Home</a></li>
+        <li><a href="../candidates.html" class="nav-link">Candidates</a></li>
+      </ul>
+      <div class="nav-cta"></div>
+      <button class="mobile-toggle" id="mobile-hamburger" aria-label="Toggle Menu">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer Overlay and Drawer -->
+  <div class="mobile-drawer-overlay" id="mobile-overlay"></div>
+  <div class="mobile-drawer" id="mobile-drawer-menu">
+    <ul class="mobile-nav-list">
+      <li><a href="../index.html" class="mobile-nav-link">Home</a></li>
+      <li><a href="../candidates.html" class="mobile-nav-link">Candidates</a></li>
+    </ul>
+    <div class="mobile-nav-cta"></div>
+  </div>
+
+  <main>
+    <section class="directory-section container" style="padding: 40px 0 80px 0;">
+      <!-- Two-column Layout -->
+      <div class="directory-layout" style="display: grid; grid-template-columns: 280px 1fr; gap: 48px;">
+        
+        <!-- Left Sidebar Filters -->
+        <aside class="sidebar-filters fade-in-section is-visible" style="background: var(--surface-color); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 24px;">
+          <!-- 1. Search Box -->
+          <div class="filter-group" style="margin-bottom: 24px;">
+            <h3 style="font-size: 1rem; margin-bottom: 12px;">Search</h3>
+            <div class="search-wrapper" style="position: relative; display: flex; align-items: center;">
+              <span class="search-icon" style="position: absolute; left: 10px;">🔍</span>
+              <input type="text" id="search-input" class="search-input" placeholder="Search name or skill..." style="width: 100%; padding: 10px 10px 10px 32px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); outline: none;">
+            </div>
+          </div>
+          
+          <!-- 2. Skills Filters -->
+          <div class="filter-group" style="margin-bottom: 24px;">
+            <h3 style="font-size: 1rem; margin-bottom: 12px;">Skills</h3>
+            <div class="filter-options" style="display: flex; flex-direction: column; gap: 10px;">
+              <label class="checkbox-label" style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--secondary-text);">
+                <input type="checkbox" class="skill-filter-checkbox" value="React">
+                React
+              </label>
+              <label class="checkbox-label" style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--secondary-text);">
+                <input type="checkbox" class="skill-filter-checkbox" value="Java">
+                Java
+              </label>
+              <label class="checkbox-label" style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--secondary-text);">
+                <input type="checkbox" class="skill-filter-checkbox" value="Python">
+                Python
+              </label>
+              <label class="checkbox-label" style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--secondary-text);">
+                <input type="checkbox" class="skill-filter-checkbox" value="MERN">
+                MERN
+              </label>
+              <label class="checkbox-label" style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--secondary-text);">
+                <input type="checkbox" class="skill-filter-checkbox" value="Node.js">
+                Node.js
+              </label>
+            </div>
+          </div>
+
+          <!-- 3. Availability Filters -->
+          <div class="filter-group" style="margin-bottom: 24px;">
+            <h3 style="font-size: 1rem; margin-bottom: 12px;">Availability</h3>
+            <div class="filter-options" style="display: flex; flex-direction: column; gap: 10px;">
+              <label class="checkbox-label" style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--secondary-text);">
+                <input type="checkbox" class="availability-filter-checkbox" value="Internship">
+                Internship
+              </label>
+              <label class="checkbox-label" style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--secondary-text);">
+                <input type="checkbox" class="availability-filter-checkbox" value="Full-Time">
+                Full-Time
+              </label>
+            </div>
+          </div>
+
+          <button id="btn-clear-all" class="btn btn-secondary btn-block" style="font-size: 0.85rem; padding: 8px 16px;">Clear All Filters</button>
+        </aside>
+
+        <!-- Right Main Candidates Showcase -->
+        <div class="directory-content fade-in-section is-visible">
+          <div class="directory-meta" style="margin-bottom: 20px;">
+            <div class="results-count" id="results-count-number" style="font-weight: 600; color: var(--secondary-text);">Showing 0 candidates</div>
+          </div>
+          <div class="candidates-grid" id="candidates-list-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px;">
+            <!-- Dynamic Candidate Cards -->
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer Section -->
+  <footer>
+    <div class="container">
+      <div class="footer-bottom" style="border-top: none; padding-top: 0; margin-top: 0;">
+        <div class="footer-copy">&copy; 2026 Exhibitly Platform. All rights reserved.</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JS Scripts -->
+  <script src="../js/db.js"></script>
+  <script src="../js/storage.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/main.js"></script>
+  <script src="../js/candidates.js"></script>
+</body>
+</html>

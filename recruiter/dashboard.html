@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recruiter Dashboard — Exhibitly</title>
+  <meta name="description" content="View shortlisted candidates and contact inquiries history log.">
+  
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body>
+
+  <!-- Floating Glass Navbar -->
+  <header>
+    <div class="nav-container">
+      <a href="../index.html" class="logo" id="nav-logo">
+        Exhibitly
+        <div class="logo-dot"></div>
+      </a>
+      <ul class="nav-menu" id="nav-menu-list">
+        <li><a href="../index.html" class="nav-link">Home</a></li>
+        <li><a href="../candidates.html" class="nav-link">Candidates</a></li>
+      </ul>
+      <div class="nav-cta"></div>
+      <button class="mobile-toggle" id="mobile-hamburger" aria-label="Toggle Menu">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer Overlay and Drawer -->
+  <div class="mobile-drawer-overlay" id="mobile-overlay"></div>
+  <div class="mobile-drawer" id="mobile-drawer-menu">
+    <ul class="mobile-nav-list">
+      <li><a href="../index.html" class="mobile-nav-link">Home</a></li>
+      <li><a href="../candidates.html" class="mobile-nav-link">Candidates</a></li>
+    </ul>
+    <div class="mobile-nav-cta"></div>
+  </div>
+
+  <main>
+    <section class="dashboard-section container">
+      <div class="dashboard-layout">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="dashboard-sidebar">
+          <div class="recruiter-summary-card">
+            <div id="rec-logo-wrapper" class="rec-avatar-icon">🏢</div>
+            <h3 id="rec-dashboard-name">Loading...</h3>
+            <p id="rec-dashboard-company">Company Name</p>
+          </div>
+          <nav class="dashboard-menu">
+            <a href="dashboard.html" class="menu-item active">
+              <span class="menu-icon">⭐</span> Dashboard Hub
+            </a>
+            <a href="contracts.html" class="menu-item">
+              <span class="menu-icon">📄</span> My Contracts
+            </a>
+          </nav>
+        </aside>
+
+        <!-- Main Dashboard View Panel -->
+        <div class="dashboard-content">
+          
+          <!-- Inner Tabs for Recruiter (Shortlists, Messages history, Edit profile) -->
+          <div style="display: flex; gap: 12px; margin-bottom: 30px; border-bottom: 1px solid rgba(0,0,0,0.04); padding-bottom: 12px;">
+            <button class="search-tab active" id="tab-btn-shortlisted" onclick="switchInnerTab('shortlisted')" style="border-radius: var(--radius-sm);">
+              Shortlisted Candidates <span class="count-pill" id="shortlist-count-badge" style="display: none;">0</span>
+            </button>
+            <button class="search-tab" id="tab-btn-history" onclick="switchInnerTab('history')" style="border-radius: var(--radius-sm);">Contact History</button>
+            <button class="search-tab" id="tab-btn-edit-rec" onclick="switchInnerTab('edit-rec')" style="border-radius: var(--radius-sm);">Edit Profile</button>
+          </div>
+
+          <!-- TAB 1: Shortlisted Candidates -->
+          <div class="inner-tab-content" id="tab-shortlisted">
+            <div class="tab-header">
+              <h2>Shortlisted Candidates</h2>
+              <p>Profiles you bookmarked for review or future communication.</p>
+            </div>
+            
+            <div class="shortlisted-grid" id="shortlisted-candidates-grid">
+              <!-- Rendered Dynamically -->
+            </div>
+          </div>
+
+          <!-- TAB 2: Contact History -->
+          <div class="inner-tab-content" id="tab-contact-history" style="display: none;">
+            <div class="tab-header">
+              <h2>Contact Inquiries History</h2>
+              <p>Log of all messages sent to candidates through the platform.</p>
+            </div>
+            
+            <div class="history-list-container" id="recruiter-history-list">
+              <!-- Rendered Dynamically -->
+            </div>
+          </div>
+
+          <!-- TAB 3: Edit Recruiter Profile -->
+          <div class="inner-tab-content" id="tab-edit-rec-profile" style="display: none;">
+            <div class="tab-header">
+              <h2>Edit Company Profile</h2>
+              <p>Update your recruiter details and company information.</p>
+            </div>
+            
+            <form id="recruiter-edit-form">
+              <div class="form-block">
+                <div class="form-row">
+                  <div class="form-group" style="margin-bottom: 16px;">
+                    <label for="edit-rec-name">Full Name *</label>
+                    <input type="text" id="edit-rec-name" placeholder="Jane Doe" required>
+                  </div>
+                  <div class="form-group" style="margin-bottom: 16px;">
+                    <label for="edit-rec-company">Company / Organization *</label>
+                    <input type="text" id="edit-rec-company" placeholder="e.g. Google" required>
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group" style="margin-bottom: 16px;">
+                    <label for="edit-rec-email">Work Email *</label>
+                    <input type="email" id="edit-rec-email" placeholder="jane@company.com" required>
+                  </div>
+                  <div class="form-group" style="margin-bottom: 16px;">
+                    <label>Company Logo / Profile Photo</label>
+                    <input type="hidden" id="edit-rec-logo-path" value="">
+                    <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-top: 4px;">
+                      <div id="edit-rec-logo-preview" style="width: 50px; height: 50px; border-radius: 50%; background: #eee; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; overflow: hidden; border:1px solid var(--border-color); flex-shrink: 0;">🏢</div>
+                      <input type="file" id="edit-rec-logo-file" accept="image/*" style="font-size: 0.8rem; border: none; background: transparent; padding: 0;">
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <div class="toast-success" id="rec-profile-save-toast" style="display: none;">✓ Company profile saved!</div>
+              </div>
+            </form>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- Message Detail View Overlay Modal -->
+  <div id="history-message-modal" class="modal-overlay">
+    <div class="modal-card">
+      <button class="modal-close-btn" id="history-modal-close">&times;</button>
+      <h2 class="modal-title" id="history-msg-subject">Subject</h2>
+      <p class="msg-meta-text" id="history-msg-meta">Sent to Candidate on Date</p>
+      
+      <div class="message-body-content" id="history-msg-body" style="white-space: pre-line; background: rgba(0,0,0,0.03); border: 1px solid var(--border-color); padding: 20px; border-radius: var(--radius-sm); margin-top: 20px; max-height: 250px; overflow-y: auto; color: var(--secondary-text); font-size: 0.95rem; line-height: 1.6;">
+        Message content goes here...
+      </div>
+      
+      <div style="margin-top: 24px; text-align: right;">
+        <button id="history-modal-ok-btn" class="btn btn-primary" style="padding: 8px 24px;">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer Section -->
+  <footer>
+    <div class="container">
+      <div class="footer-bottom" style="border-top: none; padding-top: 0; margin-top: 0;">
+        <div class="footer-copy">&copy; 2026 Exhibitly Platform. All rights reserved.</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JS Scripts -->
+  <script src="../js/db.js"></script>
+  <script src="../js/storage.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/main.js"></script>
+  <script src="../js/recruiter-dashboard.js"></script>
+
+  <script>
+    // Handle switching recruiter inner tabs
+    function switchInnerTab(tab) {
+      document.querySelectorAll('.search-tab').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.inner-tab-content').forEach(t => t.style.display = 'none');
+
+      if (tab === 'shortlisted') {
+        document.getElementById('tab-btn-shortlisted').classList.add('active');
+        document.getElementById('tab-shortlisted').style.display = 'block';
+      } else if (tab === 'history') {
+        document.getElementById('tab-btn-history').classList.add('active');
+        document.getElementById('tab-contact-history').style.display = 'block';
+      } else if (tab === 'edit-rec') {
+        document.getElementById('tab-btn-edit-rec').classList.add('active');
+        document.getElementById('tab-edit-rec-profile').style.display = 'block';
+      }
+    }
+
+    // Fix bookmarks link targets in dynamically rendered lists
+    // Overriding profile links in recruiter-dashboard list cards
+    document.addEventListener('DOMNodeInserted', (e) => {
+      const links = document.querySelectorAll('.candidate-footer a[href^="profile.html"]');
+      links.forEach(link => {
+        const href = link.getAttribute('href');
+        if (href && !href.startsWith('../')) {
+          link.setAttribute('href', '../' + href);
+        }
+      });
+    });
+  </script>
+</body>
+</html>

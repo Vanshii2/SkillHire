@@ -358,12 +358,17 @@ function initAuthModal() {
     const password = document.getElementById('candidate-password').value;
     const errorEl = document.getElementById('candidate-auth-error');
 
+    const inSubdir = window.location.pathname.includes('/candidate/') || 
+                     window.location.pathname.includes('/recruiter/') || 
+                     window.location.pathname.includes('/shared/');
+    const prefix = inSubdir ? '../' : '';
+
     try {
       if (mode === 'login') {
         const session = window.SessionManager.loginCandidate(email, password);
         if (session) {
           modal.classList.remove('active');
-          window.location.href = 'candidate-dashboard.html';
+          window.location.href = prefix + 'candidate/dashboard.html';
         } else {
           errorEl.textContent = 'Invalid candidate email or password. (Hint: Seed accounts use password123)';
         }
@@ -373,7 +378,7 @@ function initAuthModal() {
         const candidate = window.CandidatesDB.signup(name, email, password, role);
         window.SessionManager.loginCandidate(email, password);
         modal.classList.remove('active');
-        window.location.href = 'candidate-dashboard.html';
+        window.location.href = prefix + 'candidate/dashboard.html';
       }
     } catch (err) {
       errorEl.textContent = err.message;
@@ -388,12 +393,17 @@ function initAuthModal() {
     const password = document.getElementById('recruiter-password').value;
     const errorEl = document.getElementById('recruiter-auth-error');
 
+    const inSubdir = window.location.pathname.includes('/candidate/') || 
+                     window.location.pathname.includes('/recruiter/') || 
+                     window.location.pathname.includes('/shared/');
+    const prefix = inSubdir ? '../' : '';
+
     try {
       if (mode === 'login') {
         const session = window.SessionManager.loginRecruiter(email, password);
         if (session) {
           modal.classList.remove('active');
-          window.location.href = 'recruiter-dashboard.html';
+          window.location.href = prefix + 'recruiter/dashboard.html';
         } else {
           errorEl.textContent = 'Invalid recruiter email or password. (Hint: Try jane@acme.com with password123)';
         }
@@ -403,7 +413,7 @@ function initAuthModal() {
         const recruiter = window.RecruitersDB.signup(name, email, password, company);
         window.SessionManager.loginRecruiter(email, password);
         modal.classList.remove('active');
-        window.location.href = 'recruiter-dashboard.html';
+        window.location.href = prefix + 'recruiter/dashboard.html';
       }
     } catch (err) {
       errorEl.textContent = err.message;
@@ -583,6 +593,11 @@ function updateNavbarState() {
 
   if (!desktopNavMenu || !desktopCtaContainer) return;
 
+  const inSubdir = window.location.pathname.includes('/candidate/') || 
+                   window.location.pathname.includes('/recruiter/') || 
+                   window.location.pathname.includes('/shared/');
+  const prefix = inSubdir ? '../' : '';
+
   if (session) {
     // Shared Logout Actions
     const handleLogoutHtml = `
@@ -592,9 +607,9 @@ function updateNavbarState() {
     if (session.role === 'recruiter') {
       // Update links for recruiter
       const recruiterLinks = `
-        <li><a href="index.html" class="nav-link">Home</a></li>
-        <li><a href="candidates.html" class="nav-link">Candidates</a></li>
-        <li><a href="recruiter-dashboard.html" class="nav-link" style="color: #60A5FA;">Dashboard</a></li>
+        <li><a href="${prefix}index.html" class="nav-link">Home</a></li>
+        <li><a href="${prefix}candidates.html" class="nav-link">Candidates</a></li>
+        <li><a href="${prefix}recruiter/dashboard.html" class="nav-link" style="color: #60A5FA;">Dashboard</a></li>
       `;
       desktopNavMenu.innerHTML = recruiterLinks;
       desktopCtaContainer.innerHTML = `
@@ -604,9 +619,9 @@ function updateNavbarState() {
 
       if (mobileNavMenu) {
         mobileNavMenu.innerHTML = `
-          <li><a href="index.html" class="mobile-nav-link">Home</a></li>
-          <li><a href="candidates.html" class="mobile-nav-link">Candidates</a></li>
-          <li><a href="recruiter-dashboard.html" class="mobile-nav-link" style="color: #60A5FA;">Dashboard</a></li>
+          <li><a href="${prefix}index.html" class="mobile-nav-link">Home</a></li>
+          <li><a href="${prefix}candidates.html" class="mobile-nav-link">Candidates</a></li>
+          <li><a href="${prefix}recruiter/dashboard.html" class="mobile-nav-link" style="color: #60A5FA;">Dashboard</a></li>
         `;
       }
       if (mobileCtaContainer) {
@@ -618,22 +633,22 @@ function updateNavbarState() {
     } else {
       // Update links for candidate
       const candidateLinks = `
-        <li><a href="index.html" class="nav-link">Home</a></li>
-        <li><a href="candidates.html" class="nav-link">Candidates</a></li>
-        <li><a href="profile.html?id=${session.user.id}" class="nav-link">My Public Profile</a></li>
+        <li><a href="${prefix}index.html" class="nav-link">Home</a></li>
+        <li><a href="${prefix}candidates.html" class="nav-link">Candidates</a></li>
+        <li><a href="${prefix}profile.html?id=${session.user.id}" class="nav-link">My Public Profile</a></li>
       `;
       desktopNavMenu.innerHTML = candidateLinks;
       desktopCtaContainer.innerHTML = `
-        <a href="candidate-dashboard.html" class="btn btn-primary">My Dashboard</a>
+        <a href="${prefix}candidate/dashboard.html" class="btn btn-primary">My Dashboard</a>
         ${handleLogoutHtml}
       `;
 
       if (mobileNavMenu) {
         mobileNavMenu.innerHTML = `
-          <li><a href="index.html" class="mobile-nav-link">Home</a></li>
-          <li><a href="candidates.html" class="mobile-nav-link">Candidates</a></li>
-          <li><a href="profile.html?id=${session.user.id}" class="mobile-nav-link">My Public Profile</a></li>
-          <li><a href="candidate-dashboard.html" class="mobile-nav-link" style="color: var(--primary-color);">My Dashboard</a></li>
+          <li><a href="${prefix}index.html" class="mobile-nav-link">Home</a></li>
+          <li><a href="${prefix}candidates.html" class="mobile-nav-link">Candidates</a></li>
+          <li><a href="${prefix}profile.html?id=${session.user.id}" class="mobile-nav-link">My Public Profile</a></li>
+          <li><a href="${prefix}candidate/dashboard.html" class="mobile-nav-link" style="color: var(--primary-color);">My Dashboard</a></li>
         `;
       }
       if (mobileCtaContainer) {
@@ -648,7 +663,7 @@ function updateNavbarState() {
     if (logOutBtn) {
       logOutBtn.addEventListener('click', () => {
         window.SessionManager.logout();
-        window.location.href = 'index.html';
+        window.location.href = `${prefix}index.html`;
       });
     }
 
@@ -657,15 +672,15 @@ function updateNavbarState() {
       mobLogOutBtn.addEventListener('click', () => {
         window.closeMobileMenu();
         window.SessionManager.logout();
-        window.location.href = 'index.html';
+        window.location.href = `${prefix}index.html`;
       });
     }
 
   } else {
     // Guest User - update navbar links and setup modal action triggers
     desktopNavMenu.innerHTML = `
-      <li><a href="index.html" class="nav-link" id="nav-link-home">Home</a></li>
-      <li><a href="candidates.html" class="nav-link" id="nav-link-candidates">Candidates</a></li>
+      <li><a href="${prefix}index.html" class="nav-link" id="nav-link-home">Home</a></li>
+      <li><a href="${prefix}candidates.html" class="nav-link" id="nav-link-candidates">Candidates</a></li>
       <li><a href="#" class="nav-link" id="nav-link-candidate-reg">Join as Candidate</a></li>
     `;
 
@@ -675,8 +690,8 @@ function updateNavbarState() {
 
     if (mobileNavMenu) {
       mobileNavMenu.innerHTML = `
-        <li><a href="index.html" class="mobile-nav-link">Home</a></li>
-        <li><a href="candidates.html" class="mobile-nav-link">Candidates</a></li>
+        <li><a href="${prefix}index.html" class="mobile-nav-link">Home</a></li>
+        <li><a href="${prefix}candidates.html" class="mobile-nav-link">Candidates</a></li>
         <li><a href="#" class="mobile-nav-link" id="mob-link-candidate-reg">Join as Candidate</a></li>
       `;
     }

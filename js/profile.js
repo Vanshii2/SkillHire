@@ -1,10 +1,25 @@
 /* ==========================================================================
-   SkillHire Candidate Profile Page Controller
+   Exhibitly Candidate Profile Page Controller
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
   renderProfile();
 });
+
+// Helper to resolve asset path prefix depending on current subdirectory depth
+function resolveAssetPath(path) {
+  if (!path) return '';
+  const inSubdir = window.location.pathname.includes('/candidate/') || 
+                   window.location.pathname.includes('/recruiter/') || 
+                   window.location.pathname.includes('/shared/');
+  
+  // Clean up leading ../ or duplicate prefixes
+  let cleanPath = path.replace(/^\.\.\//, '');
+  if (cleanPath.startsWith('assets/')) {
+    return (inSubdir ? '../' : '') + cleanPath;
+  }
+  return path;
+}
 
 /**
  * Loads candidate info by URL ?id=slug and dynamically populates the profile layout.
@@ -28,8 +43,13 @@ function renderProfile() {
     return;
   }
 
+  const inSubdir = window.location.pathname.includes('/candidate/') || 
+                   window.location.pathname.includes('/recruiter/') || 
+                   window.location.pathname.includes('/shared/');
+  const prefix = inSubdir ? '../' : '';
+
   // Set page HTML title dynamic
-  document.title = `${candidate.name} — ${candidate.role} | SkillHire`;
+  document.title = `${candidate.name} — ${candidate.role} | Exhibitly`;
 
   // Require active session to view candidate full profile
   const session = window.SessionManager.getActiveUser();
@@ -78,7 +98,7 @@ function renderProfile() {
     return `
       <div class="project-card fade-in-section is-visible">
         <div class="project-img-wrapper">
-          <img src="${escapeHTML(proj.screenshot)}" alt="${escapeHTML(proj.name)}" class="project-img" onerror="this.src='assets/images/project1.png'">
+          <img src="${resolveAssetPath(proj.screenshot)}" alt="${escapeHTML(proj.name)}" class="project-img" onerror="this.src='${prefix}assets/images/project1.png'">
         </div>
         <div class="project-info">
           <h3>${escapeHTML(proj.name)}</h3>
@@ -95,6 +115,51 @@ function renderProfile() {
     `;
   }).join('');
 
+  // Get Reviews from database
+  let reviewsHtml = '';
+  if (window.ReviewsController) {
+    const reviews = window.ReviewsController.getReviewsForCandidate(candidateId) || [];
+    if (reviews.length > 0) {
+      reviewsHtml = `
+        <div class="sidebar-card" style="margin-top: 32px; grid-column: 1 / -1;">
+          <h2 style="margin-bottom: 20px;">Client Reviews & Feedback</h2>
+          <div style="display: flex; flex-direction: column; gap: 20px;">
+            ${reviews.map(rev => {
+              const starsHtml = window.ReviewsController.renderStarsHTML(rev.rating);
+              return `
+                <div style="border-bottom: 1px solid rgba(0,0,0,0.03); padding-bottom: 16px; margin-bottom: 16px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <div>${starsHtml}</div>
+                    <span style="font-size: 0.75rem; color: var(--secondary-text);">${new Date(rev.createdAt).toLocaleDateString()}</span>
+                  </div>
+                  <p style="font-size: 0.9rem; font-style: italic; color: var(--secondary-text); line-height: 1.5;">
+                    "${escapeHTML(rev.review)}"
+                  </p>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  // Get Average rating badge details
+  let ratingBadgeHtml = '';
+  if (window.ReviewsController) {
+    const stats = window.ReviewsController.getAverageRating(candidateId);
+    if (stats.count > 0) {
+      const ratingStars = window.ReviewsController.renderStarsHTML(stats.average);
+      ratingBadgeHtml = `
+        <div style="display: flex; align-items: center; gap: 6px; font-size: 0.9rem; margin-top: 6px;">
+          <span>${ratingStars}</span>
+          <strong style="color: var(--primary-text);">${stats.average}</strong>
+          <span style="color: var(--secondary-text);">(${stats.count} ${stats.count === 1 ? 'review' : 'reviews'})</span>
+        </div>
+      `;
+    }
+  }
+
   let actionButtonsHtml = '';
 
   if (session) {
@@ -104,13 +169,16 @@ function renderProfile() {
         <button class="btn btn-secondary ${isSaved ? 'active' : ''}" id="profile-btn-shortlist" style="padding: 10px 20px; font-size: 0.9rem;">
           ${isSaved ? '★ Shortlisted' : '☆ Save to Shortlist'}
         </button>
-        <button class="btn btn-primary" id="profile-btn-contact" style="padding: 10px 20px; font-size: 0.9rem;">
+        <button class="btn btn-secondary" id="profile-btn-contact" style="padding: 10px 20px; font-size: 0.9rem;">
           Contact Candidate
+        </button>
+        <button class="btn btn-primary" id="profile-btn-hire" style="padding: 10px 20px; font-size: 0.9rem; background-color: var(--accent-color); border-color: var(--accent-color);">
+          💼 Hire Candidate
         </button>
       `;
     } else if (session.role === 'candidate' && session.user.id === candidate.id) {
       actionButtonsHtml = `
-        <a href="candidate-dashboard.html" class="btn btn-primary" style="padding: 10px 20px; font-size: 0.9rem;">
+        <a href="${prefix}candidate/dashboard.html" class="btn btn-primary" style="padding: 10px 20px; font-size: 0.9rem;">
           Edit My Profile
         </a>
       `;
@@ -131,12 +199,13 @@ function renderProfile() {
       <div class="profile-hero fade-in-section is-visible" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 24px;">
         <div style="display: flex; align-items: center; gap: 40px; flex-wrap: wrap;">
           <div class="profile-hero-avatar-wrapper">
-            <img src="${escapeHTML(candidate.avatar)}" alt="${escapeHTML(candidate.name)}" class="profile-hero-avatar">
+            <img src="${resolveAssetPath(candidate.avatar)}" alt="${escapeHTML(candidate.name)}" class="profile-hero-avatar">
           </div>
           <div class="profile-hero-info">
             <span class="badge ${badgeClass}">${escapeHTML(candidate.availability)}</span>
-            <h1>${escapeHTML(candidate.name)}</h1>
+            <h1 style="margin-top: 4px;">${escapeHTML(candidate.name)}</h1>
             <div class="role">${escapeHTML(candidate.role)}</div>
+            ${ratingBadgeHtml}
           </div>
         </div>
         
@@ -184,6 +253,9 @@ function renderProfile() {
           </div>
         </div>
 
+        <!-- Render Reviews Section -->
+        ${reviewsHtml}
+
       </div>
 
     </div>
@@ -192,6 +264,7 @@ function renderProfile() {
   // Bind Recruiter Actions Events
   const btnShortlist = document.getElementById('profile-btn-shortlist');
   const btnContact = document.getElementById('profile-btn-contact');
+  const btnHire = document.getElementById('profile-btn-hire');
 
   if (btnShortlist && session) {
     btnShortlist.addEventListener('click', () => {
@@ -212,18 +285,29 @@ function renderProfile() {
       window.openContactModal(candidate.id, candidate.name);
     });
   }
+
+  if (btnHire) {
+    btnHire.addEventListener('click', () => {
+      window.RequestsController.openHireModal(candidate.id, candidate.name);
+    });
+  }
 }
 
 /**
  * Renders a clean error card if profile load fails
  */
 function renderError(container, title, message) {
+  const inSubdir = window.location.pathname.includes('/candidate/') || 
+                   window.location.pathname.includes('/recruiter/') || 
+                   window.location.pathname.includes('/shared/');
+  const prefix = inSubdir ? '../' : '';
+
   container.innerHTML = `
     <div class="profile-error-card">
       <span style="font-size: 3rem;">⚠️</span>
       <h1>${escapeHTML(title)}</h1>
       <p>${escapeHTML(message)}</p>
-      <a href="candidates.html" class="btn btn-primary">Browse Candidates Directory</a>
+      <a href="${prefix}candidates.html" class="btn btn-primary">Browse Candidates Directory</a>
     </div>
   `;
 }
@@ -264,6 +348,11 @@ function escapeHTML(str) {
  * Renders a glassmorphic block wall overlay indicating the profile is locked
  */
 function renderLockedProfile(container) {
+  const inSubdir = window.location.pathname.includes('/candidate/') || 
+                   window.location.pathname.includes('/recruiter/') || 
+                   window.location.pathname.includes('/shared/');
+  const prefix = inSubdir ? '../' : '';
+
   container.innerHTML = `
     <div class="profile-section container" style="max-width: 900px; margin: 40px auto 80px auto;">
       <!-- Blurred Hero Skeleton -->
@@ -290,7 +379,7 @@ function renderLockedProfile(container) {
         <div style="display: flex; flex-direction: column; gap: 14px; max-width: 280px; margin: 0 auto;">
           <button class="btn btn-primary btn-block" onclick="window.openAuthModal('recruiter', 'login')">Login as Recruiter</button>
           <button class="btn btn-secondary btn-block" onclick="window.openAuthModal('candidate', 'login')">Login as Candidate</button>
-          <a href="candidates.html" class="btn btn-text" style="color: var(--secondary-text); font-size: 0.9rem; margin-top: 10px;">&larr; Back to Directory</a>
+          <a href="${prefix}candidates.html" class="btn btn-text" style="color: var(--secondary-text); font-size: 0.9rem; margin-top: 10px;">&larr; Back to Directory</a>
         </div>
       </div>
     </div>

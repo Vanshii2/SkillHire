@@ -1,0 +1,394 @@
+/* ==========================================================================
+   Exhibitly Contracts, Escrow & Timelines Stylesheet
+   ========================================================================== */
+
+/* Contract List Boards */
+.contracts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.contract-card {
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: all var(--transition-normal);
+}
+
+.contract-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent-color);
+  box-shadow: var(--shadow-md);
+}
+
+.contract-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.contract-card-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--primary-text);
+  line-height: 1.3;
+}
+
+.contract-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.9rem;
+  color: var(--secondary-text);
+  border-top: 1px solid rgba(0, 0, 0, 0.04);
+  padding-top: 12px;
+}
+
+.contract-meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.contract-budget {
+  font-weight: 700;
+  color: var(--primary-text);
+  font-size: 1.1rem;
+}
+
+/* Detail View Layout */
+.contract-detail-layout {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 40px;
+  align-items: start;
+}
+
+@media (max-width: 1024px) {
+  .contract-detail-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.contract-main-panel, .contract-sidebar-panel {
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  padding: 32px;
+  box-shadow: var(--shadow-sm);
+}
+
+.contract-title-area {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  padding-bottom: 24px;
+  margin-bottom: 24px;
+}
+
+.contract-title-area h2 {
+  font-size: 1.8rem;
+  margin-bottom: 12px;
+  line-height: 1.2;
+}
+
+.contract-badge-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.section-block {
+  margin-bottom: 32px;
+}
+
+.section-block:last-child {
+  margin-bottom: 0;
+}
+
+.section-block-title {
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: var(--primary-text);
+}
+
+.contract-description-text {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--secondary-text);
+}
+
+/* Escrow Portal Widget & Form */
+.escrow-status-card {
+  background: rgba(234, 88, 12, 0.03);
+  border: 1px solid rgba(234, 88, 12, 0.15);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.escrow-status-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.escrow-amount {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--accent-color);
+}
+
+/* Card Mockup */
+.credit-card-mockup {
+  background: linear-gradient(135deg, #1e293b, #0f172a);
+  color: #ffffff;
+  border-radius: var(--radius-md);
+  padding: 24px;
+  aspect-ratio: 1.58 / 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: var(--shadow-lg);
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.credit-card-mockup::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.08), transparent 50%);
+  pointer-events: none;
+}
+
+.card-logo {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 1.2rem;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.card-chip {
+  width: 40px;
+  height: 30px;
+  background: #fbbf24;
+  border-radius: var(--radius-xs);
+  opacity: 0.85;
+}
+
+.card-number-display {
+  font-size: 1.3rem;
+  font-family: monospace;
+  letter-spacing: 2px;
+  margin: 16px 0;
+}
+
+.card-footer-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+}
+
+.card-holder-display {
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.checkout-modal-card {
+  max-width: 480px;
+}
+
+/* Timeline Custom Styles */
+.contract-timeline {
+  list-style: none;
+  position: relative;
+  padding-left: 28px;
+}
+
+.contract-timeline::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  background-color: var(--border-color);
+}
+
+.contract-timeline-item {
+  position: relative;
+  margin-bottom: 24px;
+}
+
+.contract-timeline-item:last-child {
+  margin-bottom: 0;
+}
+
+.contract-timeline-dot {
+  position: absolute;
+  left: -24px;
+  top: 4px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: var(--secondary-text);
+  border: 2px solid var(--surface-color);
+  box-shadow: 0 0 0 2px var(--border-color);
+}
+
+.contract-timeline-item.active .contract-timeline-dot {
+  background-color: var(--accent-color);
+  box-shadow: 0 0 0 2px rgba(234, 88, 12, 0.3);
+}
+
+.contract-timeline-content {
+  background: var(--bg-color);
+  border-radius: var(--radius-sm);
+  padding: 14px 18px;
+  border: 1px solid var(--border-color);
+}
+
+.contract-timeline-time {
+  font-size: 0.75rem;
+  color: var(--secondary-text);
+  font-weight: 500;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.contract-timeline-body {
+  font-size: 0.9rem;
+  color: var(--primary-text);
+}
+
+/* Submission Box / Deliverables */
+.deliverable-box {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: var(--radius-md);
+  padding: 20px;
+  margin-top: 20px;
+}
+
+.deliverable-title {
+  font-weight: 700;
+  color: #166534;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.deliverable-links {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.deliverable-link-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: #1b4332;
+  font-weight: 600;
+}
+
+.deliverable-link-item a {
+  border-bottom: 1px solid #166534;
+}
+
+.deliverable-notes {
+  font-size: 0.85rem;
+  color: #2d6a4f;
+  margin-top: 8px;
+  background: rgba(255, 255, 255, 0.6);
+  padding: 10px;
+  border-radius: var(--radius-xs);
+  border: 1px dashed rgba(22, 101, 52, 0.2);
+}
+
+/* Review Form stars rating */
+.rating-stars-container {
+  display: flex;
+  gap: 8px;
+  margin: 16px 0;
+  font-size: 2rem;
+}
+
+.star-rating-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #cbd5e1; /* slate 300 */
+  transition: color var(--transition-fast);
+}
+
+.star-rating-btn:hover,
+.star-rating-btn.active,
+.star-rating-btn.hover {
+  color: #fbbf24; /* yellow 400 */
+}
+
+.review-display-card {
+  background: rgba(251, 191, 36, 0.05);
+  border: 1px solid rgba(251, 191, 36, 0.2);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  margin-top: 24px;
+}
+
+.review-card-stars {
+  color: #fbbf24;
+  font-size: 1.1rem;
+  margin-bottom: 6px;
+}
+
+.review-card-text {
+  font-size: 0.9rem;
+  font-style: italic;
+  color: var(--secondary-text);
+  line-height: 1.5;
+}
+
+/* Action forms / Revision controls styling */
+.revision-request-box {
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  border-radius: var(--radius-md);
+  padding: 20px;
+  margin-top: 20px;
+}
+
+.revision-title {
+  font-weight: 700;
+  color: #991b1b;
+  margin-bottom: 8px;
+}
+
+.revision-notes {
+  font-size: 0.9rem;
+  color: #7f1d1d;
+  background: rgba(255, 255, 255, 0.6);
+  padding: 10px;
+  border-radius: var(--radius-xs);
+  border: 1px solid rgba(153, 27, 27, 0.1);
+}

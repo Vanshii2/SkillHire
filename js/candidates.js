@@ -134,12 +134,25 @@ function filterAndRender() {
       </button>
     ` : '';
 
+    const inSubdir = window.location.pathname.includes('/candidate/') || 
+                     window.location.pathname.includes('/recruiter/') || 
+                     window.location.pathname.includes('/shared/');
+    const prefix = inSubdir ? '../' : '';
+    
+    // Resolve avatar path
+    let avatarSrc = candidate.avatar;
+    if (avatarSrc && avatarSrc.startsWith('assets/')) {
+      avatarSrc = prefix + avatarSrc;
+    } else if (avatarSrc && avatarSrc.startsWith('../assets/')) {
+      avatarSrc = (inSubdir ? '../' : '') + avatarSrc.replace(/^\.\.\//, '');
+    }
+
     return `
       <div class="candidate-card fade-in-section is-visible" style="position: relative;">
         ${bookmarkHtml}
         <div class="candidate-header">
           <div class="candidate-avatar-wrapper">
-            <img src="${escapeHTML(candidate.avatar)}" alt="${escapeHTML(candidate.name)}" class="candidate-avatar">
+            <img src="${escapeHTML(avatarSrc)}" alt="${escapeHTML(candidate.name)}" class="candidate-avatar">
             <div class="candidate-status-indicator"></div>
           </div>
           <div class="candidate-header-info">
@@ -159,7 +172,7 @@ function filterAndRender() {
         
         <div class="candidate-footer">
           <div class="candidate-projects-count">${candidate.projects.length} Project${candidate.projects.length === 1 ? '' : 's'}</div>
-          <a href="profile.html?id=${escapeHTML(candidate.id)}" class="btn btn-secondary btn-text" style="padding: 6px 12px; font-size: 0.85rem;">View Profile &rarr;</a>
+          <a href="${prefix}profile.html?id=${escapeHTML(candidate.id)}" class="btn btn-secondary btn-text" style="padding: 6px 12px; font-size: 0.85rem;">View Profile &rarr;</a>
         </div>
       </div>
     `;

@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contract Workspace — Exhibitly</title>
+  <meta name="description" content="Manage contract details, milestones, payments, and deliverables.">
+  
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+  <link rel="stylesheet" href="../css/contracts.css">
+</head>
+<body>
+
+  <!-- Floating Glass Navbar -->
+  <header>
+    <div class="nav-container">
+      <a href="../index.html" class="logo" id="nav-logo">
+        Exhibitly
+        <div class="logo-dot"></div>
+      </a>
+      <ul class="nav-menu" id="nav-menu-list">
+        <li><a href="../index.html" class="nav-link">Home</a></li>
+        <li><a href="../candidates.html" class="nav-link">Candidates</a></li>
+      </ul>
+      <div class="nav-cta"></div>
+      <button class="mobile-toggle" id="mobile-hamburger" aria-label="Toggle Menu">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer Overlay and Drawer -->
+  <div class="mobile-drawer-overlay" id="mobile-overlay"></div>
+  <div class="mobile-drawer" id="mobile-drawer-menu">
+    <ul class="mobile-nav-list">
+      <li><a href="../index.html" class="mobile-nav-link">Home</a></li>
+      <li><a href="../candidates.html" class="mobile-nav-link">Candidates</a></li>
+    </ul>
+    <div class="mobile-nav-cta"></div>
+  </div>
+
+  <main style="padding: 40px 0 80px 0;">
+    <div class="container" id="details-main-container">
+      
+      <!-- Loading Placeholder -->
+      <div style="text-align: center; padding: 120px 24px; color: var(--secondary-text);">
+        <h3>Loading contract workspace...</h3>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer Section -->
+  <footer>
+    <div class="container">
+      <div class="footer-bottom" style="border-top: none; padding-top: 0; margin-top: 0;">
+        <div class="footer-copy">&copy; 2026 Exhibitly Platform. All rights reserved.</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JS Scripts -->
+  <script src="../js/db.js"></script>
+  <script src="../js/storage.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/main.js"></script>
+  <script src="../js/requests.js"></script>
+  <script src="../js/contracts.js"></script>
+  <script src="../js/escrow.js"></script>
+  <script src="../js/reviews.js"></script>
+
+  <script>
+    let activeContract = null;
+    let activeSession = null;
+    let ratingScore = 5; // Default review rating
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Session check
+      activeSession = window.SessionManager.getActiveUser();
+      if (!activeSession) {
+        window.location.href = '../index.html';
+        return;
+      }
+
+      // 2. Query URL params
+      const urlParams = new URLSearchParams(window.location.search);
+      const contractId = urlParams.get('id');
+
+      if (!contractId) {
+        renderWorkspaceError('Contract ID is missing.', 'Please go back to your dashboard list and select a contract.');
+        return;
+      }
+
+      // 3. Load contract
+      const contracts = window.Storage.get(window.KEYS.contracts) || [];
+      activeContract = contracts.find(c => c.id === contractId);
+
+      if (!activeContract) {
+        renderWorkspaceError('Contract Not Found.', 'The contract record may have been deleted or is invalid.');
+        return;
+      }
+
+      // 4. Verify access permission (must be candidate or recruiter of this contract)
+      const isCandidate = activeSession.role === 'candidate' && activeContract.candidateId === activeSession.user.id;
+      const isRecruiter = activeSession.role === 'recruiter' && activeContract.recruiterId === activeSession.user.id;
+
+      if (!isCandidate && !isRecruiter) {
+        renderWorkspaceError('Access Denied.', 'You do not have permission to view this contract workspace.');
+        return;
+      }
+
+      // 5. Render details
+      renderWorkspaceDetails();
+    });
+
+    function renderWorkspaceError(title, msg) {
+      document.getElementById('details-main-container').innerHTML = `
+        <div class="profile-error-card">
+          <span style="font-size: 3rem;">⚠️</span>
+          <h1>${escapeHTML(title)}</h1>
+          <p>${escapeHTML(msg)}</p>
+          <a href="../index.html" class="btn btn-primary">Go to Home</a>
+        </div>
+      `;
+    }
+
+    function renderWorkspaceDetails() {
+      const mainContainer = document.getElementById('details-main-container');
+
+      // Fetch escrow state
+      const escrows = window.Storage.get(window.KEYS.escrows) || [];
+      const escrow = escrows.find(e => e.contractId === activeContract.id);
+      const escrowStatus = escrow ? escrow.status : 'pending';
+
+      // Status badges configurations
+      let statusClass = 'badge-pending';
+      let statusText = activeContract.status.toUpperCase().replace('-', ' ');
+
+      if (activeContract.status === 'completed') statusClass = 'badge-fulltime';
+      if (activeContract.status === 'in-progress') statusClass = 'badge-internship';
+      if (activeContract.status === 'delivered') statusClass = 'badge-internship';
+      if (activeContract.status === 'revision-requested') statusClass = 'badge-pending';
+
+      let escrowClass = 'badge-pending';
+      if (escrowStatus === 'held') escrowClass = 'badge-internship';
+      if (escrowStatus === 'released') escrowClass = 'badge-fulltime';
+
+      // Build Back Link
+      const backLink = activeSession.role === 'recruiter' ? '../recruiter/contracts.html' : '../candidate/contracts.html';
+
+      mainContainer.innerHTML = `
+        <div style="margin-bottom: 24px;">
+          <a href="${backLink}" style="font-size: 0.9rem; color: var(--secondary-text); font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+            &larr; Back to Contracts list
+          </a>
+        </div>
+
+        <div class="contract-detail-layout">
+          
+          <!-- Left Main Panel -->
+          <div class="contract-main-panel">
+            <div class="contract-title-area">
+              <div class="contract-badge-group">
+                <span class="badge ${statusClass}">${statusText}</span>
+                <span class="badge ${escrowClass}" style="background-color: var(--badge-orange-bg); color: var(--badge-orange-text);">SafePay: ${escrowStatus.toUpperCase()}</span>
+              </div>
+              <h2 style="margin-top: 14px;">${escapeHTML(activeContract.title)}</h2>
+              <div style="font-size: 0.9rem; color: var(--secondary-text);">
+                <span>Contract ID: ${activeContract.id}</span> &bull; 
+                <span>Created: ${new Date(activeContract.createdAt).toLocaleDateString()}</span>
+              </div>
+            </div>
+
+            <!-- Description -->
+            <div class="section-block">
+              <h3 class="section-block-title">Project Scope Details</h3>
+              <p class="contract-description-text">${escapeHTML(activeContract.description)}</p>
+            </div>
+
+            <!-- Dynamic Workflow Panel based on role & status -->
+            <div class="section-block" style="border-top: 1px solid rgba(0,0,0,0.04); padding-top: 24px;">
+              <h3 class="section-block-title">Action Panel</h3>
+              <div id="interactive-action-pane">
+                <!-- Populated dynamically -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Sidebar Panel -->
+          <div class="contract-sidebar-panel" style="display: flex; flex-direction: column; gap: 32px;">
+            
+            <!-- Escrow Info block -->
+            <div class="escrow-status-card">
+              <div class="escrow-status-header">
+                <span style="font-size: 0.85rem; font-weight: 600; color: var(--secondary-text);">SAFEPLAY ESCROW</span>
+                <span class="badge ${escrowClass}">${escrowStatus.toUpperCase()}</span>
+              </div>
+              <div class="escrow-amount">$${activeContract.budget}</div>
+              <p style="font-size: 0.8rem; color: var(--secondary-text); line-height: 1.4;">
+                ${escrowStatus === 'pending' ? 'Escrow payment is required by the recruiter to activate candidate work.' : ''}
+                ${escrowStatus === 'held' ? 'Funds are securely held by SafePay and will be released when recruiter accepts deliverables.' : ''}
+                ${escrowStatus === 'released' ? 'Funds have been released and sent directly to candidate wallet.' : ''}
+              </p>
+              ${escrow && escrow.transactionId ? `<div style="font-size:0.75rem; color:var(--secondary-text); word-break:break-all;"><strong>TXN:</strong> ${escrow.transactionId}</div>` : ''}
+            </div>
+
+            <!-- Milestone Details -->
+            <div>
+              <h3 style="font-family: var(--font-heading); font-size: 1.1rem; font-weight: 700; margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid rgba(0,0,0,0.04);">Milestone Summary</h3>
+              <div style="font-size: 0.9rem; display: flex; flex-direction: column; gap: 8px;">
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: var(--secondary-text);">Contractor:</span>
+                  <strong>${escapeHTML(activeContract.candidateName)}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: var(--secondary-text);">Client:</span>
+                  <strong>${escapeHTML(activeContract.recruiterName)}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="color: var(--secondary-text);">Target Deadline:</span>
+                  <strong>${activeContract.deadline}</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- Progress Timeline Feed -->
+            <div>
+              <h3 style="font-family: var(--font-heading); font-size: 1.1rem; font-weight: 700; margin-bottom: 16px; padding-bottom: 6px; border-bottom: 1px solid rgba(0,0,0,0.04);">Workspace Activity</h3>
+              <ul class="contract-timeline" id="milestones-timeline-feed">
+                <!-- Rendered dynamically -->
+              </ul>
+            </div>
+
+          </div>
+
+        </div>
+      `;
+
+      renderInteractiveActionPane(escrowStatus);
+      renderTimelineFeed();
+    }
+
+    function renderInteractiveActionPane(escrowStatus) {
+      const pane = document.getElementById('interactive-action-pane');
+      const isCandidate = activeSession.role === 'candidate';
+      const isRecruiter = activeSession.role === 'recruiter';
+      const status = activeContract.status;
+
+      // 1. Pending Escrow Payment
+      if (status === 'pending-payment') {
+        if (isRecruiter) {
+          pane.innerHTML = `
+            <div style="background: rgba(234,88,12,0.03); border: 1px dashed var(--accent-color); border-radius: var(--radius-sm); padding: 20px; text-align: center;">
+              <p style="font-weight: 600; margin-bottom: 14px;">This contract is locked until the escrow budget of <strong>$${activeContract.budget}</strong> is funded.</p>
+              <button onclick="window.EscrowController.openEscrowCheckout('${activeContract.id}')" class="btn btn-primary">💳 Fund Escrow Safely</button>
+            </div>
+          `;
+        } else {
+          pane.innerHTML = `
+            <div style="color: var(--secondary-text); font-style: italic; background: rgba(0,0,0,0.02); border: 1px solid var(--border-color); padding: 16px; border-radius: var(--radius-sm);">
+              ⌛ Awaiting escrow funding deposit from client recruiter (${escapeHTML(activeContract.recruiterName)}) to start development.
+            </div>
+          `;
+        }
+        return;
+      }
+
+      // 2. In Progress / Revision Requested
+      if (status === 'in-progress' || status === 'revision-requested') {
+        if (isCandidate) {
+          // Fetch last delivery if any (for inputs presets)
+          const deliveries = window.Storage.get(window.KEYS.deliveries) || [];
+          const lastDel = deliveries.find(d => d.contractId === activeContract.id) || { githubUrl: '', liveUrl: '', notes: '' };
+
+          pane.innerHTML = `
+            <!-- Form to Post Timeline update -->
+            <form id="timeline-update-form" style="margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid rgba(0,0,0,0.04);">
+              <div class="form-group">
+                <label for="post-update-text">Share Progress Milestone Update</label>
+                <div style="display: flex; gap: 8px;">
+                  <input type="text" id="post-update-text" placeholder="e.g. Finished routing structures and homepage layout draft" required style="flex-grow: 1;">
+                  <button type="submit" class="btn btn-secondary" style="padding: 10px 20px;">Share Update</button>
+                </div>
+              </div>
+            </form>
+
+            <!-- Deliverables Submission Form -->
+            <form id="deliverables-submission-form" style="background: rgba(34,197,94,0.02); border: 1px solid rgba(34,197,94,0.15); border-radius: var(--radius-md); padding: 20px;">
+              <h4 style="font-family: var(--font-heading); color: #15803d; font-weight: 700; margin-bottom: 12px;">Submit Final Project Deliverables</h4>
+              
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="submit-github">GitHub Repository Link</label>
+                  <input type="url" id="submit-github" placeholder="https://github.com/username/repo" value="${escapeHTML(lastDel.githubUrl)}" required>
+                </div>
+                <div class="form-group">
+                  <label for="submit-live">Live Demo Link</label>
+                  <input type="url" id="submit-live" placeholder="https://myproject.demo.dev" value="${escapeHTML(lastDel.liveUrl)}">
+                </div>
+              </div>
+
+              <div class="form-group" style="margin-top: 10px;">
+                <label for="submit-notes">Deployment / Technical Notes</label>
+                <textarea id="submit-notes" rows="3" placeholder="Instructions, login presets, or comments for client review..." required style="resize: vertical;">${escapeHTML(lastDel.notes)}</textarea>
+              </div>
+
+              <button type="submit" class="btn btn-primary" style="margin-top: 10px; background-color:#22c55e; border-color:#22c55e;">
+                🚀 Submit Work for Review
+              </button>
+            </form>
+          `;
+
+          // Bind event listeners
+          document.getElementById('timeline-update-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const input = document.getElementById('post-update-text');
+            const text = input.value.trim();
+            if (window.ContractsController.postProgressUpdate(activeContract.id, text)) {
+              alert('Timeline update shared successfully!');
+              input.value = '';
+              location.reload();
+            }
+          });
+
+          document.getElementById('deliverables-submission-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const github = document.getElementById('submit-github').value.trim();
+            const live = document.getElementById('submit-live').value.trim();
+            const notes = document.getElementById('submit-notes').value.trim();
+
+            if (window.ContractsController.submitDeliverable(activeContract.id, github, live, notes)) {
+              alert('Project deliverables submitted successfully for client review!');
+              location.reload();
+            }
+          });
+
+        } else {
+          // Recruiter perspective (Waiting on candidate)
+          pane.innerHTML = `
+            <div style="background: rgba(0,0,0,0.02); border: 1px solid var(--border-color); padding: 18px; border-radius: var(--radius-sm); color: var(--secondary-text);">
+              💻 Candidate <strong>${escapeHTML(activeContract.candidateName)}</strong> is currently working on this project. Progress milestone updates will show on the right timeline feed.
+            </div>
+          `;
+        }
+        return;
+      }
+
+      // 3. Delivered (Review Required)
+      if (status === 'delivered') {
+        // Fetch submission details
+        const deliveries = window.Storage.get(window.KEYS.deliveries) || [];
+        const delivery = deliveries.find(d => d.contractId === activeContract.id) || { githubUrl: '#', liveUrl: '#', notes: 'No notes provided.' };
+
+        if (isRecruiter) {
+          pane.innerHTML = `
+            <div class="deliverable-box" style="margin-top: 0; margin-bottom: 24px;">
+              <h4 class="deliverable-title">📋 Candidate Deliverables Received</h4>
+              <div class="deliverable-links">
+                <div class="deliverable-link-item">
+                  GitHub Repository: <a href="${escapeHTML(delivery.githubUrl)}" target="_blank">${escapeHTML(delivery.githubUrl)}</a>
+                </div>
+                ${delivery.liveUrl ? `
+                <div class="deliverable-link-item">
+                  Live Preview: <a href="${escapeHTML(delivery.liveUrl)}" target="_blank">${escapeHTML(delivery.liveUrl)}</a>
+                </div>` : ''}
+              </div>
+              <div class="deliverable-notes" style="margin-top: 12px;">
+                <strong>Developer Submission Notes:</strong><br>
+                ${escapeHTML(delivery.notes)}
+              </div>
+            </div>
+
+            <!-- Recruiter Actions Decision -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+              
+              <!-- Review Star / Approval Form -->
+              <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--radius-md); padding: 20px;">
+                <h4 style="font-family: var(--font-heading); color: #166534; margin-bottom: 10px;">Accept & Release Funds</h4>
+                <p style="font-size: 0.8rem; color: #166534; margin-bottom: 12px;">This completes the contract, releases escrow funds, and adds this project to their public gallery.</p>
+                
+                <form id="approval-review-form">
+                  <div class="form-group">
+                    <label>Select Rating</label>
+                    <div class="rating-stars-container" id="stars-selector-wrap">
+                      <button type="button" class="star-rating-btn active" data-rating="1">★</button>
+                      <button type="button" class="star-rating-btn active" data-rating="2">★</button>
+                      <button type="button" class="star-rating-btn active" data-rating="3">★</button>
+                      <button type="button" class="star-rating-btn active" data-rating="4">★</button>
+                      <button type="button" class="star-rating-btn active" data-rating="5">★</button>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="approval-review-text">Review / Feedback</label>
+                    <textarea id="approval-review-text" rows="3" placeholder="Describe the quality of delivery, speed, and communication..." required></textarea>
+                  </div>
+                  <button type="submit" class="btn btn-primary btn-block" style="background:#22c55e; border-color:#22c55e;">Approve Project & Pay</button>
+                </form>
+              </div>
+
+              <!-- Revision Request Form -->
+              <div style="background: #fef2f2; border: 1px solid #fca5a5; border-radius: var(--radius-md); padding: 20px;">
+                <h4 style="font-family: var(--font-heading); color: #991b1b; margin-bottom: 10px;">Request Project Revision</h4>
+                <p style="font-size: 0.8rem; color: #991b1b; margin-bottom: 12px;">Send notes detailing modifications or additions needed before approval.</p>
+                
+                <form id="revision-request-form">
+                  <div class="form-group">
+                    <label for="revision-notes-text">Requested Modifications</label>
+                    <textarea id="revision-notes-text" rows="4" placeholder="Detail the bugs, adjustments, or requirements missing..." required style="min-height: 104px;"></textarea>
+                  </div>
+                  <button type="submit" class="btn btn-secondary btn-block" style="color:#ef4444; border-color:rgba(239,68,68,0.2);">Request Revision</button>
+                </form>
+              </div>
+
+            </div>
+          `;
+
+          // Bind stars selectors
+          const starsBtns = document.querySelectorAll('.star-rating-btn');
+          starsBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+              ratingScore = parseInt(btn.getAttribute('data-rating'));
+              // Reset all stars active states
+              starsBtns.forEach(b => {
+                const bVal = parseInt(b.getAttribute('data-rating'));
+                if (bVal <= ratingScore) {
+                  b.classList.add('active');
+                } else {
+                  b.classList.remove('active');
+                }
+              });
+            });
+          });
+
+          // Bind Forms Submits
+          document.getElementById('approval-review-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const text = document.getElementById('approval-review-text').value.trim();
+            if (window.ContractsController.approveAndCompleteContract(activeContract.id, ratingScore, text)) {
+              alert('Contract approved successfully! Project marked completed, escrow released, and review logged.');
+              location.reload();
+            }
+          });
+
+          document.getElementById('revision-request-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const text = document.getElementById('revision-notes-text').value.trim();
+            if (window.ContractsController.requestRevision(activeContract.id, text)) {
+              alert('Revision request logged successfully. Developer has been notified.');
+              location.reload();
+            }
+          });
+
+        } else {
+          // Candidate perspective
+          pane.innerHTML = `
+            <div class="deliverable-box" style="margin-top:0;">
+              <h4 class="deliverable-title">🚀 Work Submitted Successfully</h4>
+              <p style="font-size: 0.9rem; color: #1b4332; line-height: 1.5; margin-bottom: 12px;">
+                Your deliverables are pending review from the recruiter. Escrow funds will remain held by Exhibitly SafePay until acceptance.
+              </p>
+              <div class="deliverable-links">
+                <div class="deliverable-link-item">GitHub: <a href="${escapeHTML(delivery.githubUrl)}" target="_blank">${escapeHTML(delivery.githubUrl)}</a></div>
+                ${delivery.liveUrl ? `<div class="deliverable-link-item">Live Demo: <a href="${escapeHTML(delivery.liveUrl)}" target="_blank">${escapeHTML(delivery.liveUrl)}</a></div>` : ''}
+              </div>
+            </div>
+          `;
+        }
+        return;
+      }
+
+      // 4. Completed
+      if (status === 'completed') {
+        // Fetch review details
+        const reviews = window.Storage.get(window.KEYS.reviews) || [];
+        const review = reviews.find(r => r.contractId === activeContract.id) || { rating: 5, review: 'Great job!' };
+
+        let ratingStarsHtml = '';
+        for (let i = 1; i <= 5; i++) {
+          ratingStarsHtml += i <= review.rating ? '<span style="color:#fbbf24; font-size:1.4rem;">★</span>' : '<span style="color:#cbd5e1; font-size:1.4rem;">★</span>';
+        }
+
+        pane.innerHTML = `
+          <div style="background: rgba(34,197,94,0.03); border: 1px solid #bbf7d0; border-radius: var(--radius-md); padding: 24px; text-align: center;">
+            <span style="font-size: 3.5rem; display: block; margin-bottom: 12px; filter: drop-shadow(0 4px 8px rgba(34,197,94,0.1));">🏆</span>
+            <h4 style="font-family: var(--font-heading); font-size: 1.3rem; color: #166534; font-weight: 800; margin-bottom: 6px;">Contract Successfully Completed</h4>
+            <p style="font-size: 0.9rem; color: #166534; max-width: 440px; margin: 0 auto 20px auto;">
+              Escrow payment has been fully released to the contractor, and the project is now publicly displayed inside their Exhibitly project showcase gallery.
+            </p>
+
+            <div class="review-display-card" style="text-align: left; background: white; margin-top: 10px;">
+              <div style="font-weight: 700; font-size: 0.8rem; text-transform: uppercase; color: var(--secondary-text); margin-bottom: 6px;">Client Feedback & Review</div>
+              <div style="margin-bottom: 8px;">${ratingStarsHtml}</div>
+              <div class="review-card-text">${escapeHTML(review.review)}</div>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    function renderTimelineFeed() {
+      const feed = document.getElementById('milestones-timeline-feed');
+      const allUpdates = window.Storage.get(window.KEYS.updates) || [];
+      const contractUpdates = allUpdates.filter(u => u.contractId === activeContract.id);
+
+      // Sort by newest first
+      contractUpdates.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+      if (contractUpdates.length === 0) {
+        feed.innerHTML = `
+          <li style="font-size: 0.85rem; color: var(--secondary-text); font-style: italic; text-align: center; padding: 20px 0;">
+            No activities logged.
+          </li>
+        `;
+        return;
+      }
+
+      let html = '';
+      contractUpdates.forEach((update, idx) => {
+        // Set first/newest item as active dot
+        const activeClass = idx === 0 ? 'active' : '';
+        html += `
+          <li class="contract-timeline-item ${activeClass}">
+            <div class="contract-timeline-dot"></div>
+            <div class="contract-timeline-content">
+              <span class="contract-timeline-time">${new Date(update.createdAt).toLocaleString()}</span>
+              <div class="contract-timeline-body">${escapeHTML(update.text)}</div>
+            </div>
+          </li>
+        `;
+      });
+
+      feed.innerHTML = html;
+    }
+
+    function escapeHTML(str) {
+      if (!str) return '';
+      return str.replace(/[&<>'"]/g, 
+        tag => ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          "'": '&#39;',
+          '"': '&quot;'
+        }[tag] || tag)
+      );
+    }
+  </script>
+</body>
+</html>

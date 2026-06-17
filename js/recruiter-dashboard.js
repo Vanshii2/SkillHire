@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const session = window.SessionManager.getActiveUser();
   if (!session || session.role !== 'recruiter') {
     alert('Please log in as a Recruiter to access this dashboard.');
-    window.location.href = 'index.html';
+    window.location.href = '../index.html';
     return;
   }
 
@@ -90,6 +90,11 @@ function renderShortlistedCandidates() {
     const isInternship = candidate.availability.toLowerCase().includes('internship');
     const badgeClass = isInternship ? 'badge-internship' : 'badge-fulltime';
 
+    let avatarSrc = candidate.avatar;
+    if (avatarSrc && avatarSrc.startsWith('assets/')) {
+      avatarSrc = '../' + avatarSrc;
+    }
+
     return `
       <div class="candidate-card" style="position: relative;">
         <!-- Remove star shortcut button -->
@@ -101,7 +106,7 @@ function renderShortlistedCandidates() {
 
         <div class="candidate-header">
           <div class="candidate-avatar-wrapper">
-            <img src="${escapeHTML(candidate.avatar)}" alt="${escapeHTML(candidate.name)}" class="candidate-avatar">
+            <img src="${escapeHTML(avatarSrc)}" alt="${escapeHTML(candidate.name)}" class="candidate-avatar">
           </div>
           <div class="candidate-header-info">
             <h3>${escapeHTML(candidate.name)}</h3>
@@ -119,7 +124,7 @@ function renderShortlistedCandidates() {
         </div>
         
         <div class="candidate-footer" style="gap: 10px;">
-          <a href="profile.html?id=${escapeHTML(candidate.id)}" class="btn btn-secondary btn-text" style="font-size: 0.8rem; padding: 6px 12px;">View Profile</a>
+          <a href="../profile.html?id=${escapeHTML(candidate.id)}" class="btn btn-secondary btn-text" style="font-size: 0.8rem; padding: 6px 12px;">View Profile</a>
           <button class="btn btn-primary btn-contact-shortcut" data-id="${candidate.id}" data-name="${candidate.name}" style="font-size: 0.8rem; padding: 6px 12px;">Contact</button>
         </div>
       </div>

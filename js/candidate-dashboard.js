@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const session = window.SessionManager.getActiveUser();
   if (!session || session.role !== 'candidate') {
     alert('Please log in as a Candidate to access this dashboard.');
-    window.location.href = 'index.html';
+    window.location.href = '../index.html';
     return;
   }
   
@@ -58,7 +58,12 @@ function loadProfileData() {
   // Header display
   document.getElementById('dashboard-name').textContent = activeCandidate.name;
   document.getElementById('dashboard-role').textContent = activeCandidate.role;
-  document.getElementById('dashboard-avatar').src = activeCandidate.avatar;
+
+  let avatarSrc = activeCandidate.avatar;
+  if (avatarSrc && avatarSrc.startsWith('assets/')) {
+    avatarSrc = '../' + avatarSrc;
+  }
+  document.getElementById('dashboard-avatar').src = avatarSrc;
 
   // Form inputs
   document.getElementById('edit-name').value = activeCandidate.name;
@@ -230,19 +235,25 @@ function renderProjects() {
     return;
   }
 
-  grid.innerHTML = activeCandidate.projects.map((proj, idx) => `
-    <div class="dashboard-project-card">
-      <img src="${escapeHTML(proj.screenshot)}" alt="${escapeHTML(proj.name)}" class="dash-proj-img" onerror="this.src='assets/images/project1.png'">
-      <div class="dash-proj-info">
-        <h3>${escapeHTML(proj.name)}</h3>
-        <p>${escapeHTML(proj.description.substring(0, 100))}${proj.description.length > 100 ? '...' : ''}</p>
-        <div style="margin-top: 12px; display: flex; gap: 8px;">
-          <button class="btn btn-secondary btn-edit-proj" data-index="${idx}" style="font-size:0.8rem; padding:6px 12px;">Edit</button>
-          <button class="btn btn-secondary btn-delete-proj" data-index="${idx}" style="font-size:0.8rem; padding:6px 12px; border-color: rgba(239, 68, 68, 0.2); color:#EF4444;">Delete</button>
+  grid.innerHTML = activeCandidate.projects.map((proj, idx) => {
+    let screenshotSrc = proj.screenshot;
+    if (screenshotSrc && screenshotSrc.startsWith('assets/')) {
+      screenshotSrc = '../' + screenshotSrc;
+    }
+    return `
+      <div class="dashboard-project-card">
+        <img src="${escapeHTML(screenshotSrc)}" alt="${escapeHTML(proj.name)}" class="dash-proj-img" onerror="this.src='../assets/images/project1.png'">
+        <div class="dash-proj-info">
+          <h3>${escapeHTML(proj.name)}</h3>
+          <p>${escapeHTML(proj.description.substring(0, 100))}${proj.description.length > 100 ? '...' : ''}</p>
+          <div style="margin-top: 12px; display: flex; gap: 8px;">
+            <button class="btn btn-secondary btn-edit-proj" data-index="${idx}" style="font-size:0.8rem; padding:6px 12px;">Edit</button>
+            <button class="btn btn-secondary btn-delete-proj" data-index="${idx}" style="font-size:0.8rem; padding:6px 12px; border-color: rgba(239, 68, 68, 0.2); color:#EF4444;">Delete</button>
+          </div>
         </div>
       </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 
   // Bind project actions
   grid.querySelectorAll('.btn-edit-proj').forEach(btn => {
