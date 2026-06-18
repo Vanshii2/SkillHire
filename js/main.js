@@ -4,6 +4,7 @@
 
 document.addEventListener('DOMContentLoaded', () => {
   initNavbar();
+  initNavDropdown();
   initActiveLinks();
   initScrollAnimations();
   initAuthModal();
@@ -85,6 +86,74 @@ function initNavbar() {
   }
 
   window.closeMobileMenu = closeMobileMenu;
+}
+
+/**
+ * Hire Talent dropdown toggle + Post a Job auth gate
+ */
+function initNavDropdown() {
+  const wrap    = document.getElementById('nav-hire-talent-wrap');
+  const trigger = document.getElementById('nav-hire-talent-btn');
+  if (!wrap || !trigger) return;
+
+  // Toggle open/close
+  trigger.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = wrap.classList.toggle('open');
+    trigger.setAttribute('aria-expanded', String(isOpen));
+  });
+
+  // Close when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!wrap.contains(e.target)) {
+      wrap.classList.remove('open');
+      trigger.setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  // Close on Escape
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      wrap.classList.remove('open');
+      trigger.setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  // Post a Job: auth gate — if not logged in → open recruiter login modal
+  function handlePostJobClick(e) {
+    e.preventDefault();
+    wrap.classList.remove('open');
+    const session = window.SessionManager && window.SessionManager.getActiveUser();
+    if (session && session.role === 'recruiter') {
+      // Logged in recruiter → go to posts page
+      window.location.href = 'posts.html';
+    } else {
+      // Not logged in → open recruiter login/signup modal
+      if (typeof window.openAuthModal === 'function') {
+        window.openAuthModal('recruiter', 'login');
+      }
+    }
+  }
+
+  const ddPostJob = document.getElementById('nav-dd-post-job');
+  if (ddPostJob) ddPostJob.addEventListener('click', handlePostJobClick);
+
+  // Mobile Post a Job link
+  const mobPostJob = document.getElementById('mob-link-post-job');
+  if (mobPostJob) {
+    mobPostJob.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (typeof window.closeMobileMenu === 'function') window.closeMobileMenu();
+      const session = window.SessionManager && window.SessionManager.getActiveUser();
+      if (session && session.role === 'recruiter') {
+        window.location.href = 'posts.html';
+      } else {
+        if (typeof window.openAuthModal === 'function') {
+          window.openAuthModal('recruiter', 'login');
+        }
+      }
+    });
+  }
 }
 
 /**
@@ -680,8 +749,8 @@ function updateNavbarState() {
     // Guest User - update navbar links and setup modal action triggers
     desktopNavMenu.innerHTML = `
       <li><a href="${prefix}index.html" class="nav-link" id="nav-link-home">Home</a></li>
-      <li><a href="${prefix}candidates.html" class="nav-link" id="nav-link-candidates">Candidates</a></li>
-      <li><a href="${prefix}posts.html" class="nav-link" id="nav-link-posts">Posts</a></li>
+      <li><a href="${prefix}candidates.html" class="nav-link" id="nav-link-get-hired">Get Hired</a></li>
+      <li><a href="${prefix}hire-talent.html" class="nav-link" id="nav-link-hire-talent">Hire Talent</a></li>
     `;
 
     desktopCtaContainer.innerHTML = `
@@ -692,8 +761,8 @@ function updateNavbarState() {
     if (mobileNavMenu) {
       mobileNavMenu.innerHTML = `
         <li><a href="${prefix}index.html" class="mobile-nav-link">Home</a></li>
-        <li><a href="${prefix}candidates.html" class="mobile-nav-link">Candidates</a></li>
-        <li><a href="${prefix}posts.html" class="mobile-nav-link">Posts</a></li>
+        <li><a href="${prefix}candidates.html" class="mobile-nav-link">Get Hired</a></li>
+        <li><a href="${prefix}hire-talent.html" class="mobile-nav-link">Hire Talent</a></li>
       `;
     }
 
@@ -703,6 +772,7 @@ function updateNavbarState() {
         <button class="btn btn-primary btn-block" id="mob-btn-portal-trigger" style="margin-top: 10px;">Log in</button>
       `;
     }
+
 
     // Bind triggers to open Modal
     document.getElementById('nav-btn-portal-trigger').addEventListener('click', () => {

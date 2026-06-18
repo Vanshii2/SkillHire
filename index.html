@@ -25,8 +25,8 @@
       </a>
       <ul class="nav-menu" id="nav-menu-list">
         <li><a href="index.html" class="nav-link active" id="nav-link-home">Home</a></li>
-        <li><a href="candidates.html" class="nav-link" id="nav-link-candidates">Candidates</a></li>
-        <li><a href="posts.html" class="nav-link" id="nav-link-posts">Posts</a></li>
+        <li><a href="candidates.html" class="nav-link" id="nav-link-get-hired">Get Hired</a></li>
+        <li><a href="hire-talent.html" class="nav-link" id="nav-link-hire-talent">Hire Talent</a></li>
       </ul>
       <div class="nav-cta">
         <button class="btn btn-secondary" id="nav-btn-signup" style="margin-right: 8px;">Sign Up</button>
@@ -43,8 +43,8 @@
   <div class="mobile-drawer" id="mobile-drawer-menu">
     <ul class="mobile-nav-list">
       <li><a href="index.html" class="mobile-nav-link active" id="mob-link-home">Home</a></li>
-      <li><a href="candidates.html" class="mobile-nav-link" id="mob-link-candidates">Candidates</a></li>
-      <li><a href="posts.html" class="mobile-nav-link" id="mob-link-posts">Posts</a></li>
+      <li><a href="candidates.html" class="mobile-nav-link" id="mob-link-get-hired">Get Hired</a></li>
+      <li><a href="hire-talent.html" class="mobile-nav-link" id="mob-link-hire-talent">Hire Talent</a></li>
     </ul>
     <div class="mobile-nav-cta">
       <button class="btn btn-secondary btn-block" id="mob-btn-signup">Sign Up</button>
@@ -109,121 +109,128 @@
 
 
     <!-- ================================================================
-         HOW IT WORKS SECTION
+         HOW IT WORKS SECTION — Tabbed
          ================================================================ -->
     <section class="how-it-works-section" id="how-it-works">
       <div class="container">
-        <h2 class="hiw-section-title">How it works</h2>
-        <div class="hiw-grid">
-          <!-- Card 1 -->
+        <div class="hiw-header-row">
+          <h2 class="hiw-section-title">How it works</h2>
+          <div class="hiw-toggle-pill" id="hiw-toggle">
+            <button class="hiw-toggle-btn active" id="hiw-btn-hiring" data-mode="hiring">For hiring</button>
+            <button class="hiw-toggle-btn" id="hiw-btn-work" data-mode="work">For finding work</button>
+          </div>
+        </div>
+
+        <!-- For Hiring Cards -->
+        <div class="hiw-grid" id="hiw-panel-hiring">
           <div class="hiw-card">
             <div class="hiw-icon">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                <polyline points="14 2 14 8 20 8"></polyline>
-                <line x1="16" y1="13" x2="8" y2="13"></line>
-                <line x1="16" y1="17" x2="8" y2="17"></line>
-                <polyline points="10 9 9 9 8 9"></polyline>
-                <path d="M19 3l-6 6"></path>
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+            </div>
+            <h3 class="hiw-title">Post a job for free</h3>
+            <p class="hiw-desc">Describe the role, skills you need, and budget. Your listing goes live instantly — no fees, no waiting.</p>
+          </div>
+          <div class="hiw-card">
+            <div class="hiw-icon">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+            </div>
+            <h3 class="hiw-title">Browse & shortlist talent</h3>
+            <p class="hiw-desc">Filter candidates by skills, availability, and real project work. No resumes — just verified portfolios and live demos.</p>
+          </div>
+          <div class="hiw-card">
+            <div class="hiw-icon">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/>
+              </svg>
+            </div>
+            <h3 class="hiw-title">Pay when work is done</h3>
+            <p class="hiw-desc">Funds are held in escrow and released only when milestones are completed — so you always get what you paid for.</p>
+          </div>
+        </div>
+
+        <!-- For Finding Work Cards -->
+        <div class="hiw-grid" id="hiw-panel-work" style="display:none;">
+          <div class="hiw-card">
+            <div class="hiw-icon">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
               </svg>
             </div>
             <h3 class="hiw-title">Create your profile<br>(it's free)</h3>
-            <p class="hiw-desc">An eye-catching title and client-focused overview help us match you to the work you
-              want. Include your work history, your skills, and your photo.</p>
-
+            <p class="hiw-desc">Showcase your skills, live projects, and experience. Let your work speak louder than any resume ever could.</p>
           </div>
-          <!-- Card 2 -->
           <div class="hiw-card">
             <div class="hiw-icon">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                <polyline points="14 2 14 8 20 8"></polyline>
-                <circle cx="10" cy="13" r="2"></circle>
-                <line x1="11.5" y1="14.5" x2="16" y2="19"></line>
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
               </svg>
             </div>
-            <h3 class="hiw-title">Find Opportunities</h3>
-            <p class="hiw-desc">
-              Create your profile, showcase your skills, and connect directly with recruiters hiring for roles that
-              match your expertise.
-            </p>
+            <h3 class="hiw-title">Find clients & remote jobs</h3>
+            <p class="hiw-desc">Browse live job posts, submit proposals, and connect directly with hiring companies across every industry.</p>
           </div>
-          <!-- Card 3 -->
           <div class="hiw-card">
             <div class="hiw-icon">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                <rect x="10" y="10" width="4" height="6" rx="1"></rect>
-                <circle cx="12" cy="11.5" r="1"></circle>
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
               </svg>
             </div>
-            <h3 class="hiw-title">Get paid securely</h3>
-            <p class="hiw-desc">
-              Spend less time chasing, more earning.</p>
+            <h3 class="hiw-title">Get paid as you deliver</h3>
+            <p class="hiw-desc">Receive secure milestone payments straight to your account. No chasing invoices — just focus on your craft.</p>
           </div>
         </div>
-      </div>
-    </section>
 
-    <!-- ================================================================
-         TOP SKILLS SECTION
-         ================================================================ -->
-    <section class="top-skills-section" id="top-skills">
-      <div class="container">
-        <div class="top-skills-header">
-          <h2>Hire for where work is headed</h2>
-          <p>From AI engineering to brand design, select the key skills driving growth across every vertical</p>
-        </div>
-
-        <div class="top-skills-grid" id="skills-grid">
-          <div class="skill-box" data-skill="React">React</div>
-          <div class="skill-box" data-skill="Node.js">Node.js</div>
-          <div class="skill-box" data-skill="Python">Python</div>
-          <div class="skill-box" data-skill="UI/UX Design">UI/UX Design</div>
-          <div class="skill-box" data-skill="Machine Learning">Machine Learning</div>
-          <div class="skill-box" data-skill="TypeScript">TypeScript</div>
-          <div class="skill-box" data-skill="Data Science">Data Science</div>
-          <div class="skill-box" data-skill="DevOps">DevOps</div>
-          <div class="skill-box" data-skill="AWS">AWS</div>
-          <div class="skill-box" data-skill="Blockchain">Blockchain</div>
-        </div>
-
-        <div class="top-skills-actions">
-          <button class="btn btn-primary" id="btn-browse-skills">Browse Talent with selected skills</button>
-        </div>
       </div>
     </section>
 
 
+
+
+
+
     <!-- ================================================================
-         Dribbble-Style Projects Showcase
+         Shots / Designers Two-Tab Showcase
          ================================================================ -->
     <section class="projects-showcase container fade-in-section" id="projects-showcase-section">
       <div class="projects-showcase-header">
         <div class="section-header" style="text-align:left; margin-bottom:0;">
-          <h2>Explore by Projects</h2>
-          <p>Browse real work from talented creators — hover to interact.</p>
+          <h2 id="showcase-heading">Shots</h2>
+          <p id="showcase-subtext">Browse real work from talented creators — hover to interact.</p>
         </div>
         <div class="projects-filter-tabs" id="projects-filter-tabs">
-          <button class="proj-filter-btn active" data-filter="all" id="filter-btn-all">All</button>
-          <button class="proj-filter-btn" data-filter="UI/UX" id="filter-btn-uiux">UI/UX</button>
-          <button class="proj-filter-btn" data-filter="Dashboard" id="filter-btn-dashboard">Dashboard</button>
-          <button class="proj-filter-btn" data-filter="Branding" id="filter-btn-branding">Branding</button>
-          <button class="proj-filter-btn" data-filter="Mobile App" id="filter-btn-mobile">Mobile</button>
+          <button class="proj-filter-btn active" data-view="shots" id="filter-btn-shots">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            Shots
+          </button>
+          <button class="proj-filter-btn" data-view="designers" id="filter-btn-designers">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Designers
+          </button>
         </div>
       </div>
 
-      <div class="projects-grid" id="projects-grid">
-        <!-- Rendered dynamically by home.js -->
+      <!-- Shots Panel -->
+      <div id="panel-shots">
+        <div class="projects-grid" id="projects-grid">
+          <!-- Rendered dynamically by home.js -->
+        </div>
+      </div>
+
+      <!-- Designers Panel -->
+      <div id="panel-designers" style="display:none;">
+        <div class="designers-grid" id="designers-grid">
+          <!-- Rendered dynamically by home.js -->
+        </div>
       </div>
 
       <div class="projects-load-more">
         <a href="candidates.html" class="btn btn-secondary" id="projects-browse-all">Browse All Talent &rarr;</a>
       </div>
     </section>
+
 
   </main>
 

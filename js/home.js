@@ -90,9 +90,10 @@ function initHeroToggle() {
 document.addEventListener('DOMContentLoaded', () => {
   initTopSkills();
   initHeroToggle();
+  initHIWToggle();
   renderHeroActions();
   renderProjectsShowcase('all');
-  setupProjectFilterTabs();
+  setupShowcaseTabs();
   setupSearchBar();
   setupSearchTabs();
 });
@@ -271,18 +272,110 @@ function renderProjectsShowcase(activeFilter) {
 }
 
 /**
- * Sets up the filter tab buttons to re-render the grid on click.
+ * Initialises the How It Works section toggle (For Hiring / For Finding Work).
  */
-function setupProjectFilterTabs() {
-  const tabs = document.querySelectorAll('.proj-filter-btn');
+function initHIWToggle() {
+  const btnHiring = document.getElementById('hiw-btn-hiring');
+  const btnWork   = document.getElementById('hiw-btn-work');
+  const panelHiring = document.getElementById('hiw-panel-hiring');
+  const panelWork   = document.getElementById('hiw-panel-work');
+  if (!btnHiring || !btnWork) return;
+
+  btnHiring.addEventListener('click', () => {
+    btnHiring.classList.add('active');
+    btnWork.classList.remove('active');
+    panelHiring.style.display = '';
+    panelWork.style.display = 'none';
+  });
+
+  btnWork.addEventListener('click', () => {
+    btnWork.classList.add('active');
+    btnHiring.classList.remove('active');
+    panelWork.style.display = '';
+    panelHiring.style.display = 'none';
+  });
+}
+
+/**
+ * Sets up the Shots / Designers two-tab switcher.
+ */
+function setupShowcaseTabs() {
+  const tabs = document.querySelectorAll('.proj-filter-btn[data-view]');
+  const heading  = document.getElementById('showcase-heading');
+  const subtext  = document.getElementById('showcase-subtext');
+  const panelShots     = document.getElementById('panel-shots');
+  const panelDesigners = document.getElementById('panel-designers');
+  const browseAll      = document.getElementById('projects-browse-all');
+
+  if (!tabs.length) return;
+
   tabs.forEach(btn => {
     btn.addEventListener('click', () => {
       tabs.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      const filter = btn.getAttribute('data-filter');
-      renderProjectsShowcase(filter);
+      const view = btn.getAttribute('data-view');
+
+      if (view === 'shots') {
+        heading.textContent  = 'Shots';
+        subtext.textContent  = 'Browse real work from talented creators — hover to interact.';
+        panelShots.style.display     = '';
+        panelDesigners.style.display = 'none';
+        if (browseAll) { browseAll.textContent = 'Browse All Talent →'; browseAll.href = 'candidates.html'; }
+      } else {
+        heading.textContent  = 'Designers';
+        subtext.textContent  = 'Discover skilled designers and developers ready to work with you.';
+        panelShots.style.display     = 'none';
+        panelDesigners.style.display = '';
+        renderDesigners();
+        if (browseAll) { browseAll.textContent = 'Browse All Designers →'; browseAll.href = 'candidates.html'; }
+      }
     });
   });
+}
+
+/**
+ * Renders candidate profile cards in the Designers panel.
+ */
+function renderDesigners() {
+  const container = document.getElementById('designers-grid');
+  if (!container || container.dataset.rendered) return;
+
+  const candidates = window.CandidatesDB.getAll();
+
+  if (!candidates || candidates.length === 0) {
+    container.innerHTML = '<p style="text-align:center;color:var(--secondary-text);padding:40px 0;">No designers found.</p>';
+    return;
+  }
+
+  container.innerHTML = candidates.map((c, idx) => {
+    const skillsHtml = c.skills.slice(0, 3).map(s =>
+      `<span class="skill-tag">${escapeHTML(s)}</span>`
+    ).join('');
+    const extra = c.skills.length > 3 ? `<span class="skill-tag">+${c.skills.length - 3}</span>` : '';
+    const isInternship = c.availability.toLowerCase().includes('internship');
+    const badgeClass = isInternship ? 'badge-internship' : 'badge-fulltime';
+
+    return `
+      <div class="designer-card fade-in-section" id="designer-card-${idx}">
+        <div class="designer-card-top">
+          <img src="${escapeHTML(c.avatar)}" alt="${escapeHTML(c.name)}" class="designer-avatar">
+          <div class="designer-info">
+            <h3 class="designer-name">${escapeHTML(c.name)}</h3>
+            <div class="designer-role">${escapeHTML(c.role)}</div>
+          </div>
+        </div>
+        <span class="badge ${badgeClass}" style="margin-bottom:12px;display:inline-block;">${escapeHTML(c.availability)}</span>
+        <div class="designer-skills">${skillsHtml}${extra}</div>
+        <div class="designer-footer">
+          <span class="designer-projects-count">${c.projects.length} Project${c.projects.length === 1 ? '' : 's'}</span>
+          <a href="profile.html?id=${escapeHTML(c.id)}" class="btn btn-secondary" style="padding:6px 14px;font-size:0.82rem;">View Profile →</a>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  container.dataset.rendered = 'true';
+  if (typeof initScrollAnimations === 'function') initScrollAnimations();
 }
 
 /**

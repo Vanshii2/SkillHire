@@ -958,9 +958,54 @@ main {
 .hiw-section-title {
   font-size: 2.5rem;
   font-weight: 700;
-  margin-bottom: 48px;
+  margin-bottom: 0;
   color: #111;
 }
+
+/* Header row: title + toggle */
+.hiw-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-bottom: 48px;
+}
+
+/* HIW toggle pill */
+.hiw-toggle-pill {
+  display: inline-flex;
+  background: #f3f3f3;
+  border: 1px solid #e0e0e0;
+  border-radius: 99px;
+  padding: 4px;
+  gap: 0;
+}
+
+.hiw-toggle-btn {
+  background: transparent;
+  border: none;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: #555;
+  padding: 10px 24px;
+  border-radius: 99px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+
+.hiw-toggle-btn.active {
+  background: #111;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.hiw-toggle-btn:not(.active):hover {
+  color: #111;
+}
+
 
 .hiw-cards-grid,
 .hiw-grid {
@@ -1156,4 +1201,92 @@ main {
   border-radius: 99px;
   padding: 14px 28px;
   font-weight: 600;
+}
+
+/* ==========================================================================
+   DESIGNERS GRID (Shots/Designers tab)
+   ========================================================================== */
+.designers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 24px;
+  margin-bottom: 0;
+}
+
+.designer-card {
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 20px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  cursor: pointer;
+}
+
+.designer-card:hover {
+  box-shadow: 0 12px 32px rgba(0,0,0,0.08);
+  transform: translateY(-4px);
+}
+
+.designer-card-top {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.designer-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #e8e8e8;
+  flex-shrink: 0;
+}
+
+.designer-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 2px;
+}
+
+.designer-role {
+  font-size: 0.82rem;
+  color: #777;
+  font-weight: 500;
+}
+
+.designer-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 18px;
+}
+
+.designer-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.designer-projects-count {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #888;
+}
+
+@media (max-width: 640px) {
+  .hiw-header-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .designers-grid {
+    grid-template-columns: 1fr;
+  }
 }
