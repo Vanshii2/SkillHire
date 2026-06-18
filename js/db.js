@@ -2,7 +2,7 @@
    SkillHire Database Wrapper (LocalStorage-based)
    ========================================================================== */
 
-const STORAGE_KEY = 'skillhire_candidates';
+const STORAGE_KEY = 'skillhire_candidates_v2';
 
 /* ==========================================================================
    Static Projects Showcase Data (Dribbble-style feed)
@@ -246,6 +246,7 @@ const SEED_CANDIDATES = [
     role: 'Frontend Developer',
     avatar: 'assets/images/avatar1.png',
     availability: 'Available for Internship',
+    hourlyRate: 850,
     password: 'password123',
     about: 'Passionate frontend developer focused on building modern web applications using React and JavaScript. Obsessed with micro-animations, glassmorphic UI elements, and performance optimization.',
     skills: ['React', 'JavaScript', 'Node.js', 'CSS', 'HTML', 'Git'],
@@ -279,6 +280,7 @@ const SEED_CANDIDATES = [
     role: 'MERN Developer',
     avatar: 'assets/images/avatar2.png',
     availability: 'Available for Full-Time',
+    hourlyRate: 1200,
     password: 'password123',
     about: 'Full-stack developer focused on building scalable, type-safe REST APIs and blending them with premium user experiences. Love engineering clean architectures and optimization.',
     skills: ['MERN', 'React', 'Node.js', 'Express', 'MongoDB', 'JavaScript'],
@@ -304,6 +306,7 @@ const SEED_CANDIDATES = [
     role: 'Frontend Developer',
     avatar: 'assets/images/avatar1.png',
     availability: 'Available for Internship',
+    hourlyRate: 700,
     password: 'password123',
     about: 'Creative frontend developer with a background in digital design. Specializes in custom animations, SVG manipulation, and building state-driven interactive user interfaces.',
     skills: ['React', 'JavaScript', 'Node.js', 'CSS', 'Redux'],
@@ -329,6 +332,7 @@ const SEED_CANDIDATES = [
     role: 'Python Developer',
     avatar: 'assets/images/avatar1.png',
     availability: 'Available for Full-Time',
+    hourlyRate: 950,
     password: 'password123',
     about: 'Data-driven backend engineer specialized in RESTful API services, serverless microservices, and database performance. Passionate about clean code, robust unit tests, and performance optimization.',
     skills: ['Python', 'Django', 'SQL', 'PostgreSQL', 'JavaScript'],
@@ -354,6 +358,7 @@ const SEED_CANDIDATES = [
     role: 'UI/UX Designer',
     avatar: 'assets/images/avatar2.png',
     availability: 'Available for Internship',
+    hourlyRate: 1500,
     password: 'password123',
     about: 'Visual designer and prototype developer bridging the gap between aesthetics and engineering. Crafting clean Design Systems, complex Figma tokens, and high-fidelity HTML/CSS layouts.',
     skills: ['UI/UX', 'Figma', 'HTML', 'CSS', 'JavaScript'],
@@ -449,7 +454,7 @@ class CandidatesDB {
     return newCandidate;
   }
 
-  static query({ search = '', skills = [], availability = [] } = {}) {
+  static query({ search = '', skills = [], sortBy = '' } = {}) {
     let candidates = this.getAll();
 
     // 1. Search filter (Name or Skill match)
@@ -469,15 +474,13 @@ class CandidatesDB {
       );
     }
 
-    // 3. Availability filter
-    if (availability.length > 0) {
-      candidates = candidates.filter(c => {
-        return availability.some(avail => {
-          const formattedAvail = avail.toLowerCase();
-          const candidateAvail = c.availability.toLowerCase();
-          return candidateAvail.includes(formattedAvail);
-        });
-      });
+    // 3. Sort
+    if (sortBy === 'price') {
+      candidates.sort((a, b) => (a.hourlyRate || 0) - (b.hourlyRate || 0));
+    } else if (sortBy === 'projects') {
+      candidates.sort((a, b) => b.projects.length - a.projects.length);
+    } else if (sortBy === 'skills') {
+      candidates.sort((a, b) => b.skills.length - a.skills.length);
     }
 
     return candidates;

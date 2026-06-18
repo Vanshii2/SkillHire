@@ -92,7 +92,7 @@ function initNavbar() {
  * Hire Talent dropdown toggle + Post a Job auth gate
  */
 function initNavDropdown() {
-  const wrap    = document.getElementById('nav-hire-talent-wrap');
+  const wrap = document.getElementById('nav-hire-talent-wrap');
   const trigger = document.getElementById('nav-hire-talent-btn');
   if (!wrap || !trigger) return;
 
@@ -166,7 +166,7 @@ function initActiveLinks() {
   navLinks.forEach(link => {
     const href = link.getAttribute('href');
     if (!href) return;
-    
+
     // Exact match or matches directory root index.html
     const isHome = (currentPath === '/' || currentPath.endsWith('index.html')) && (href === 'index.html' || href === '/');
     const matchesHref = currentPath.endsWith(href) && href !== 'index.html' && href !== '/';
@@ -325,10 +325,10 @@ function initAuthModal() {
   const closeBtn = document.getElementById('auth-modal-close');
   const tabCandidate = document.getElementById('tab-candidate');
   const tabRecruiter = document.getElementById('tab-recruiter');
-  
+
   const candFormWrapper = document.getElementById('candidate-form-wrapper');
   const recFormWrapper = document.getElementById('recruiter-form-wrapper');
-  
+
   const candToggleBtn = document.getElementById('candidate-toggle-btn');
   const recToggleBtn = document.getElementById('recruiter-toggle-btn');
 
@@ -427,9 +427,9 @@ function initAuthModal() {
     const password = document.getElementById('candidate-password').value;
     const errorEl = document.getElementById('candidate-auth-error');
 
-    const inSubdir = window.location.pathname.includes('/candidate/') || 
-                     window.location.pathname.includes('/recruiter/') || 
-                     window.location.pathname.includes('/shared/');
+    const inSubdir = window.location.pathname.includes('/candidate/') ||
+      window.location.pathname.includes('/recruiter/') ||
+      window.location.pathname.includes('/shared/');
     const prefix = inSubdir ? '../' : '';
 
     try {
@@ -462,9 +462,9 @@ function initAuthModal() {
     const password = document.getElementById('recruiter-password').value;
     const errorEl = document.getElementById('recruiter-auth-error');
 
-    const inSubdir = window.location.pathname.includes('/candidate/') || 
-                     window.location.pathname.includes('/recruiter/') || 
-                     window.location.pathname.includes('/shared/');
+    const inSubdir = window.location.pathname.includes('/candidate/') ||
+      window.location.pathname.includes('/recruiter/') ||
+      window.location.pathname.includes('/shared/');
     const prefix = inSubdir ? '../' : '';
 
     try {
@@ -490,7 +490,7 @@ function initAuthModal() {
   });
 
   // Export open trigger to window
-  window.openAuthModal = function(role = 'candidate', mode = 'login') {
+  window.openAuthModal = function (role = 'candidate', mode = 'login') {
     modal.classList.add('active');
     if (role === 'candidate') {
       tabCandidate.click();
@@ -611,7 +611,7 @@ function initContactModal() {
     const email = candidate.contact.email || 'no-email@example.com';
     revealEmail.textContent = email;
     mailLink.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    
+
     // Hide form elements and show email reveal section
     contactForm.style.display = 'none';
     revealSection.style.display = 'block';
@@ -628,7 +628,7 @@ function initContactModal() {
     });
   });
 
-  window.openContactModal = function(candidateId, candidateName) {
+  window.openContactModal = function (candidateId, candidateName) {
     const session = window.SessionManager.getActiveUser();
     if (!session || session.role !== 'recruiter') {
       // Prompt recruiter to log in
@@ -640,7 +640,7 @@ function initContactModal() {
     contactForm.reset();
     contactForm.style.display = 'block';
     revealSection.style.display = 'none';
-    
+
     document.getElementById('contact-candidate-id').value = candidateId;
     document.getElementById('contact-candidate-name').value = candidateName;
 
@@ -662,9 +662,9 @@ function updateNavbarState() {
 
   if (!desktopNavMenu || !desktopCtaContainer) return;
 
-  const inSubdir = window.location.pathname.includes('/candidate/') || 
-                   window.location.pathname.includes('/recruiter/') || 
-                   window.location.pathname.includes('/shared/');
+  const inSubdir = window.location.pathname.includes('/candidate/') ||
+    window.location.pathname.includes('/recruiter/') ||
+    window.location.pathname.includes('/shared/');
   const prefix = inSubdir ? '../' : '';
 
   if (session) {
@@ -749,7 +749,6 @@ function updateNavbarState() {
     // Guest User - update navbar links and setup modal action triggers
     desktopNavMenu.innerHTML = `
       <li><a href="${prefix}index.html" class="nav-link" id="nav-link-home">Home</a></li>
-      <li><a href="${prefix}candidates.html" class="nav-link" id="nav-link-get-hired">Get Hired</a></li>
       <li><a href="${prefix}hire-talent.html" class="nav-link" id="nav-link-hire-talent">Hire Talent</a></li>
     `;
 
@@ -761,7 +760,6 @@ function updateNavbarState() {
     if (mobileNavMenu) {
       mobileNavMenu.innerHTML = `
         <li><a href="${prefix}index.html" class="mobile-nav-link">Home</a></li>
-        <li><a href="${prefix}candidates.html" class="mobile-nav-link">Get Hired</a></li>
         <li><a href="${prefix}hire-talent.html" class="mobile-nav-link">Hire Talent</a></li>
       `;
     }
@@ -778,7 +776,7 @@ function updateNavbarState() {
     document.getElementById('nav-btn-portal-trigger').addEventListener('click', () => {
       window.openAuthModal('candidate', 'login');
     });
-    
+
     document.getElementById('nav-btn-signup').addEventListener('click', () => {
       window.openAuthModal('candidate', 'signup');
     });
@@ -790,7 +788,7 @@ function updateNavbarState() {
         window.openAuthModal('candidate', 'login');
       });
     }
-    
+
     const mobSignupTrigger = document.getElementById('mob-btn-signup');
     if (mobSignupTrigger) {
       mobSignupTrigger.addEventListener('click', () => {

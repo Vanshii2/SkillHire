@@ -347,32 +347,75 @@ function renderDesigners() {
     return;
   }
 
-  container.innerHTML = candidates.map((c, idx) => {
-    const skillsHtml = c.skills.slice(0, 3).map(s =>
-      `<span class="skill-tag">${escapeHTML(s)}</span>`
+  container.innerHTML = candidates.map((candidate, idx) => {
+    // Same UI logic as candidates.js
+    const showCount = 3;
+    const initialSkills = candidate.skills.slice(0, showCount);
+    const hiddenSkills = candidate.skills.slice(showCount);
+    
+    let skillsHtml = initialSkills.map(skill => 
+      `<span class="skill-tag">${escapeHTML(skill)}</span>`
     ).join('');
-    const extra = c.skills.length > 3 ? `<span class="skill-tag">+${c.skills.length - 3}</span>` : '';
-    const isInternship = c.availability.toLowerCase().includes('internship');
-    const badgeClass = isInternship ? 'badge-internship' : 'badge-fulltime';
 
+    if (hiddenSkills.length > 0) {
+      skillsHtml += `
+        <span class="skill-tag-more" id="more-skills-home-${idx}">+${hiddenSkills.length}</span>
+        <span class="hidden-skills" id="hidden-skills-home-${idx}" style="display:none;">
+          ${hiddenSkills.map(skill => `<span class="skill-tag">${escapeHTML(skill)}</span>`).join('')}
+        </span>
+      `;
+    }
+
+    const hourlyRateHtml = candidate.hourlyRate 
+      ? `<div class="hourly-rate-text">${candidate.hourlyRate}/hr</div>` 
+      : '';
+
+    // No bookmark logic for home page guests, keeping it clean
+    const bookmarkHtml = '';
+    
     return `
-      <div class="designer-card fade-in-section" id="designer-card-${idx}">
-        <div class="designer-card-top">
-          <img src="${escapeHTML(c.avatar)}" alt="${escapeHTML(c.name)}" class="designer-avatar">
-          <div class="designer-info">
-            <h3 class="designer-name">${escapeHTML(c.name)}</h3>
-            <div class="designer-role">${escapeHTML(c.role)}</div>
+      <div class="candidate-card fade-in-section is-visible">
+        ${bookmarkHtml}
+        <div class="candidate-header">
+          <div class="candidate-avatar-wrapper">
+            <img src="${escapeHTML(candidate.avatar)}" alt="${escapeHTML(candidate.name)}" class="candidate-avatar">
+            <div class="candidate-status-indicator"></div>
+          </div>
+          <div class="candidate-header-info">
+            <h3>${escapeHTML(candidate.name)}</h3>
+            <div class="role">${escapeHTML(candidate.role)}</div>
           </div>
         </div>
-        <span class="badge ${badgeClass}" style="margin-bottom:12px;display:inline-block;">${escapeHTML(c.availability)}</span>
-        <div class="designer-skills">${skillsHtml}${extra}</div>
-        <div class="designer-footer">
-          <span class="designer-projects-count">${c.projects.length} Project${c.projects.length === 1 ? '' : 's'}</span>
-          <a href="profile.html?id=${escapeHTML(c.id)}" class="btn btn-secondary" style="padding:6px 14px;font-size:0.82rem;">View Profile →</a>
+        
+        <div class="candidate-skills" id="skills-container-home-${idx}">
+          ${skillsHtml}
+        </div>
+        
+        <div class="candidate-footer">
+          <div class="footer-stats">
+            <div class="candidate-projects-count">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+              ${candidate.projects.length} Project${candidate.projects.length === 1 ? '' : 's'}
+            </div>
+            ${hourlyRateHtml}
+          </div>
+          <a href="profile.html?id=${escapeHTML(candidate.id)}" class="btn-view-profile">View Profile &rarr;</a>
         </div>
       </div>
     `;
   }).join('');
+
+  // Setup expanding skills
+  candidates.forEach((candidate, idx) => {
+    const moreBtn = document.getElementById(`more-skills-home-${idx}`);
+    const hiddenSkills = document.getElementById(`hidden-skills-home-${idx}`);
+    if (moreBtn && hiddenSkills) {
+      moreBtn.addEventListener('click', () => {
+        moreBtn.style.display = 'none';
+        hiddenSkills.style.display = 'inline';
+      });
+    }
+  });
 
   container.dataset.rendered = 'true';
   if (typeof initScrollAnimations === 'function') initScrollAnimations();

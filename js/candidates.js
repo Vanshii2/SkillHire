@@ -1,12 +1,12 @@
 /* ==========================================================================
-   SkillHire Candidate Directory Page Logic
+   SkillHire Candidate Directory Page Logic - Premium Edition
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
   // Bind UI Elements
   const searchInput = document.getElementById('search-input');
   const skillCheckboxes = document.querySelectorAll('.skill-filter-checkbox');
-  const availabilityCheckboxes = document.querySelectorAll('.availability-filter-checkbox');
+  const sortSelect = document.getElementById('sort-select');
   const clearFiltersBtn = document.getElementById('btn-clear-all');
   
   // Parse URL Parameters for initial search/filters
@@ -24,15 +24,16 @@ document.addEventListener('DOMContentLoaded', () => {
     cb.addEventListener('change', filterAndRender);
   });
 
-  availabilityCheckboxes.forEach(cb => {
-    cb.addEventListener('change', filterAndRender);
-  });
+  if (sortSelect) {
+    sortSelect.addEventListener('change', filterAndRender);
+  }
 
   if (clearFiltersBtn) {
-    clearFiltersBtn.addEventListener('click', () => {
+    clearFiltersBtn.addEventListener('click', (e) => {
+      e.preventDefault();
       if (searchInput) searchInput.value = '';
       skillCheckboxes.forEach(cb => cb.checked = false);
-      availabilityCheckboxes.forEach(cb => cb.checked = false);
+      if (sortSelect) sortSelect.value = '';
       // Re-render
       filterAndRender();
     });
@@ -75,7 +76,7 @@ function parseUrlParams() {
 function filterAndRender() {
   const searchInput = document.getElementById('search-input');
   const skillCheckboxes = document.querySelectorAll('.skill-filter-checkbox');
-  const availabilityCheckboxes = document.querySelectorAll('.availability-filter-checkbox');
+  const sortSelect = document.getElementById('sort-select');
   const gridContainer = document.getElementById('candidates-list-grid');
   const countDisplay = document.getElementById('results-count-number');
 
@@ -89,16 +90,13 @@ function filterAndRender() {
     if (cb.checked) selectedSkills.push(cb.value);
   });
 
-  const selectedAvailability = [];
-  availabilityCheckboxes.forEach(cb => {
-    if (cb.checked) selectedAvailability.push(cb.value);
-  });
+  const sortVal = sortSelect ? sortSelect.value : '';
 
   // Query LocalStorage database
   const matches = window.CandidatesDB.query({
     search: searchVal,
     skills: selectedSkills,
-    availability: selectedAvailability
+    sortBy: sortVal
   });
 
   // Update counter
@@ -110,7 +108,7 @@ function filterAndRender() {
   if (matches.length === 0) {
     gridContainer.innerHTML = `
       <div class="empty-state">
-        <span class="empty-state-icon">🔍</span>
+        <div class="empty-state-icon">🔍</div>
         <h3>No candidates found</h3>
         <p>Try clearing some filters or searching for another keyword or skill tag.</p>
       </div>
@@ -118,24 +116,37 @@ function filterAndRender() {
     return;
   }
 
-  const session = window.SessionManager.getActiveUser();
+  const session = window.SessionManager && window.SessionManager.getActiveUser();
   const isRecruiter = session && session.role === 'recruiter';
 
   // Render cards
-  gridContainer.innerHTML = matches.map(candidate => {
-    // Skills HTML
-    const skillsHtml = candidate.skills.slice(0, 3).map(skill => 
+  gridContainer.innerHTML = matches.map((candidate, idx) => {
+    // Determine how many skills to show initially
+    const showCount = 3;
+    const initialSkills = candidate.skills.slice(0, showCount);
+    const hiddenSkills = candidate.skills.slice(showCount);
+    
+    let skillsHtml = initialSkills.map(skill => 
       `<span class="skill-tag">${escapeHTML(skill)}</span>`
     ).join('');
 
-    // Availability classification
-    const isInternship = candidate.availability.toLowerCase().includes('internship');
-    const badgeClass = isInternship ? 'badge-internship' : 'badge-fulltime';
+    if (hiddenSkills.length > 0) {
+      skillsHtml += `
+        <span class="skill-tag-more" id="more-skills-${idx}">+${hiddenSkills.length}</span>
+        <span class="hidden-skills" id="hidden-skills-${idx}" style="display:none;">
+          ${hiddenSkills.map(skill => `<span class="skill-tag">${escapeHTML(skill)}</span>`).join('')}
+        </span>
+      `;
+    }
 
-    const isSaved = isRecruiter && window.RecruitersDB.isSaved(session.user.id, candidate.id);
+    const hourlyRateHtml = candidate.hourlyRate 
+      ? `<div class="hourly-rate-text">${candidate.hourlyRate}/hr</div>` 
+      : '';
+
+    const isSaved = isRecruiter && window.RecruitersDB && window.RecruitersDB.isSaved(session.user.id, candidate.id);
     const bookmarkHtml = isRecruiter ? `
-      <button class="bookmark-btn ${isSaved ? 'active' : ''}" data-id="${candidate.id}" title="${isSaved ? 'Remove from shortlist' : 'Save to shortlist'}" style="position: absolute; top: 16px; right: 16px; z-index: 10;">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="${isSaved ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <button class="bookmark-btn ${isSaved ? 'active' : ''}" data-id="${candidate.id}" title="${isSaved ? 'Remove from shortlist' : 'Save to shortlist'}">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="${isSaved ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
         </svg>
       </button>
@@ -155,7 +166,7 @@ function filterAndRender() {
     }
 
     return `
-      <div class="candidate-card fade-in-section is-visible" style="position: relative;">
+      <div class="candidate-card fade-in-section is-visible">
         ${bookmarkHtml}
         <div class="candidate-header">
           <div class="candidate-avatar-wrapper">
@@ -168,22 +179,35 @@ function filterAndRender() {
           </div>
         </div>
         
-        <div class="candidate-badge-row">
-          <span class="badge ${badgeClass}">${escapeHTML(candidate.availability)}</span>
-        </div>
-        
-        <div class="candidate-skills">
+        <div class="candidate-skills" id="skills-container-${idx}">
           ${skillsHtml}
-          ${candidate.skills.length > 3 ? `<span class="skill-tag">+${candidate.skills.length - 3}</span>` : ''}
         </div>
         
         <div class="candidate-footer">
-          <div class="candidate-projects-count">${candidate.projects.length} Project${candidate.projects.length === 1 ? '' : 's'}</div>
-          <a href="${prefix}profile.html?id=${escapeHTML(candidate.id)}" class="btn btn-secondary btn-text" style="padding: 6px 12px; font-size: 0.85rem;">View Profile &rarr;</a>
+          <div class="footer-stats">
+            <div class="candidate-projects-count">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+              ${candidate.projects.length} Project${candidate.projects.length === 1 ? '' : 's'}
+            </div>
+            ${hourlyRateHtml}
+          </div>
+          <a href="${prefix}profile.html?id=${escapeHTML(candidate.id)}" class="btn-view-profile">View Profile &rarr;</a>
         </div>
       </div>
     `;
   }).join('');
+
+  // Expand skills functionality
+  matches.forEach((candidate, idx) => {
+    const moreBtn = document.getElementById(`more-skills-${idx}`);
+    const hiddenSkills = document.getElementById(`hidden-skills-${idx}`);
+    if (moreBtn && hiddenSkills) {
+      moreBtn.addEventListener('click', () => {
+        moreBtn.style.display = 'none';
+        hiddenSkills.style.display = 'inline';
+      });
+    }
+  });
 
   // Bind click event listeners for bookmark buttons
   if (isRecruiter) {

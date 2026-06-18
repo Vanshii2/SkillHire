@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,7 +11,11 @@
   <link rel="stylesheet" href="css/navbar.css">
   <link rel="stylesheet" href="css/footer.css">
   <style>
-    main { padding-top: 64px; min-height: 100vh; background: #f7f7f7; }
+    main {
+      padding-top: 64px;
+      min-height: 100vh;
+      background: #f7f7f7;
+    }
 
     .pj-wrapper {
       max-width: 760px;
@@ -42,6 +47,7 @@
       letter-spacing: -0.03em;
       margin-bottom: 10px;
     }
+
     .pj-sub {
       font-size: 1rem;
       color: #666;
@@ -55,7 +61,12 @@
       gap: 20px;
       margin-bottom: 40px;
     }
-    @media (max-width: 600px) { .plan-grid { grid-template-columns: 1fr; } }
+
+    @media (max-width: 600px) {
+      .plan-grid {
+        grid-template-columns: 1fr;
+      }
+    }
 
     .plan-card {
       background: #fff;
@@ -66,18 +77,22 @@
       transition: border-color 0.2s, box-shadow 0.2s;
       position: relative;
     }
+
     .plan-card:hover,
     .plan-card.selected {
       border-color: #1dbf73;
-      box-shadow: 0 0 0 4px rgba(29,191,115,0.1);
+      box-shadow: 0 0 0 4px rgba(29, 191, 115, 0.1);
     }
+
     .plan-card.selected .plan-radio {
       background: #1dbf73;
       border-color: #1dbf73;
     }
+
     .plan-card.selected .plan-radio::after {
       opacity: 1;
     }
+
     .plan-popular {
       position: absolute;
       top: -12px;
@@ -92,12 +107,14 @@
       padding: 4px 14px;
       border-radius: 99px;
     }
+
     .plan-header {
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
       margin-bottom: 16px;
     }
+
     .plan-radio {
       width: 20px;
       height: 20px;
@@ -108,6 +125,7 @@
       position: relative;
       transition: all 0.2s;
     }
+
     .plan-radio::after {
       content: '';
       position: absolute;
@@ -121,23 +139,27 @@
       opacity: 0;
       transition: opacity 0.2s;
     }
+
     .plan-name {
       font-size: 1rem;
       font-weight: 700;
       color: #111;
       margin-bottom: 4px;
     }
+
     .plan-price {
       font-size: 2rem;
       font-weight: 800;
       color: #111;
       line-height: 1;
     }
+
     .plan-price span {
       font-size: 0.9rem;
       font-weight: 500;
       color: #888;
     }
+
     .plan-features {
       list-style: none;
       margin-top: 16px;
@@ -145,6 +167,7 @@
       flex-direction: column;
       gap: 8px;
     }
+
     .plan-features li {
       display: flex;
       align-items: center;
@@ -152,7 +175,11 @@
       font-size: 0.88rem;
       color: #444;
     }
-    .plan-features li svg { color: #1dbf73; flex-shrink: 0; }
+
+    .plan-features li svg {
+      color: #1dbf73;
+      flex-shrink: 0;
+    }
 
     /* Job form */
     .pj-form-card {
@@ -162,6 +189,7 @@
       padding: 36px;
       margin-bottom: 28px;
     }
+
     .pj-form-card h3 {
       font-size: 1.1rem;
       font-weight: 700;
@@ -170,23 +198,32 @@
       padding-bottom: 16px;
       border-bottom: 1px solid #f0f0f0;
     }
+
     .form-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 16px;
     }
-    @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+
+    @media (max-width: 600px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
     .form-group {
       display: flex;
       flex-direction: column;
       gap: 6px;
       margin-bottom: 18px;
     }
+
     .form-group label {
       font-size: 0.85rem;
       font-weight: 600;
       color: #333;
     }
+
     .form-group input,
     .form-group select,
     .form-group textarea {
@@ -200,13 +237,18 @@
       outline: none;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
+
     .form-group input:focus,
     .form-group select:focus,
     .form-group textarea:focus {
       border-color: #1dbf73;
-      box-shadow: 0 0 0 3px rgba(29,191,115,0.12);
+      box-shadow: 0 0 0 3px rgba(29, 191, 115, 0.12);
     }
-    .form-group textarea { resize: vertical; min-height: 120px; }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 120px;
+    }
 
     /* Payment section */
     .payment-card {
@@ -216,6 +258,7 @@
       padding: 36px;
       margin-bottom: 28px;
     }
+
     .payment-card h3 {
       font-size: 1.1rem;
       font-weight: 700;
@@ -224,12 +267,14 @@
       padding-bottom: 16px;
       border-bottom: 1px solid #f0f0f0;
     }
+
     .order-summary {
       background: #f9f9f9;
       border-radius: 12px;
       padding: 20px;
       margin-bottom: 24px;
     }
+
     .order-row {
       display: flex;
       justify-content: space-between;
@@ -238,6 +283,7 @@
       color: #555;
       padding: 6px 0;
     }
+
     .order-row.total {
       border-top: 1px solid #e0e0e0;
       margin-top: 8px;
@@ -253,13 +299,19 @@
       grid-template-columns: 1fr auto auto;
       gap: 16px;
     }
-    @media (max-width: 600px) { .card-input-row { grid-template-columns: 1fr; } }
+
+    @media (max-width: 600px) {
+      .card-input-row {
+        grid-template-columns: 1fr;
+      }
+    }
 
     .card-icons {
       display: flex;
       gap: 8px;
       margin-bottom: 16px;
     }
+
     .card-icon-pill {
       background: #f3f3f3;
       border: 1px solid #e0e0e0;
@@ -285,13 +337,14 @@
       justify-content: center;
       gap: 8px;
       transition: all 0.25s ease;
-      box-shadow: 0 4px 20px rgba(29,191,115,0.3);
+      box-shadow: 0 4px 20px rgba(29, 191, 115, 0.3);
       margin-top: 8px;
     }
+
     .btn-pay:hover {
       background: #15a060;
       transform: translateY(-1px);
-      box-shadow: 0 8px 28px rgba(29,191,115,0.4);
+      box-shadow: 0 8px 28px rgba(29, 191, 115, 0.4);
     }
 
     .secure-note {
@@ -304,7 +357,10 @@
       justify-content: center;
       gap: 6px;
     }
-    .secure-note svg { color: #aaa; }
+
+    .secure-note svg {
+      color: #aaa;
+    }
 
     /* Success state */
     .success-screen {
@@ -312,7 +368,11 @@
       text-align: center;
       padding: 60px 20px;
     }
-    .success-screen.show { display: block; }
+
+    .success-screen.show {
+      display: block;
+    }
+
     .success-icon {
       width: 72px;
       height: 72px;
@@ -323,10 +383,21 @@
       justify-content: center;
       margin: 0 auto 24px;
     }
-    .success-screen h2 { font-size: 1.8rem; font-weight: 800; color: #111; margin-bottom: 12px; }
-    .success-screen p { color: #666; margin-bottom: 28px; }
+
+    .success-screen h2 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: #111;
+      margin-bottom: 12px;
+    }
+
+    .success-screen p {
+      color: #666;
+      margin-bottom: 28px;
+    }
   </style>
 </head>
+
 <body>
 
   <header id="site-header">
@@ -334,7 +405,7 @@
       <a href="index.html" class="logo" id="nav-logo">Exhibitly</a>
       <ul class="nav-menu" id="nav-menu-list">
         <li><a href="index.html" class="nav-link" id="nav-link-home">Home</a></li>
-        <li><a href="candidates.html" class="nav-link" id="nav-link-get-hired">Get Hired</a></li>
+        <!-- <li><a href="candidates.html" class="nav-link" id="nav-link-get-hired">Get Hired</a></li> -->
         <li><a href="hire-talent.html" class="nav-link" id="nav-link-hire-talent">Hire Talent</a></li>
       </ul>
       <div class="nav-cta">
@@ -352,7 +423,7 @@
   <div class="mobile-drawer" id="mobile-drawer-menu">
     <ul class="mobile-nav-list">
       <li><a href="index.html" class="mobile-nav-link" id="mob-link-home">Home</a></li>
-      <li><a href="candidates.html" class="mobile-nav-link" id="mob-link-get-hired">Get Hired</a></li>
+      <!-- <li><a href="candidates.html" class="mobile-nav-link" id="mob-link-get-hired">Get Hired</a></li> -->
       <li><a href="hire-talent.html" class="mobile-nav-link" id="mob-link-hire-talent">Hire Talent</a></li>
     </ul>
     <div class="mobile-nav-cta">
@@ -365,7 +436,10 @@
     <div class="pj-wrapper" id="pj-main">
 
       <div class="pj-badge">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12" />
+        </svg>
         Recruiter Portal
       </div>
       <h1 class="pj-heading">Post a Job Listing</h1>
@@ -382,9 +456,18 @@
             <div class="plan-radio"></div>
           </div>
           <ul class="plan-features">
-            <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> 30-day active listing</li>
-            <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Up to 50 applicants</li>
-            <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Basic candidate filter</li>
+            <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg> 30-day active listing</li>
+            <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg> Up to 50 applicants</li>
+            <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg> Basic candidate filter</li>
           </ul>
         </div>
 
@@ -398,10 +481,22 @@
             <div class="plan-radio"></div>
           </div>
           <ul class="plan-features">
-            <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> 60-day active listing</li>
-            <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Unlimited applicants</li>
-            <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Priority placement</li>
-            <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> AI-matched suggestions</li>
+            <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg> 60-day active listing</li>
+            <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg> Unlimited applicants</li>
+            <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg> Priority placement</li>
+            <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg> AI-matched suggestions</li>
           </ul>
         </div>
       </div>
@@ -440,7 +535,8 @@
         </div>
         <div class="form-group">
           <label for="job-desc">Job Description *</label>
-          <textarea id="job-desc" placeholder="Describe the role, responsibilities, and what you're looking for..."></textarea>
+          <textarea id="job-desc"
+            placeholder="Describe the role, responsibilities, and what you're looking for..."></textarea>
         </div>
       </div>
 
@@ -472,7 +568,8 @@
 
         <div class="form-group">
           <label for="card-number">Card Number</label>
-          <input type="text" id="card-number" placeholder="1234 5678 9012 3456" maxlength="19" oninput="formatCard(this)">
+          <input type="text" id="card-number" placeholder="1234 5678 9012 3456" maxlength="19"
+            oninput="formatCard(this)">
         </div>
         <div class="card-input-row">
           <div class="form-group" style="margin-bottom:0">
@@ -490,11 +587,19 @@
         </div>
 
         <button class="btn-pay" id="btn-pay-now">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <rect x="1" y="4" width="22" height="16" rx="2" />
+            <line x1="1" y1="10" x2="23" y2="10" />
+          </svg>
           Pay &amp; Publish Job
         </button>
         <div class="secure-note">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+          </svg>
           Secured by 256-bit SSL encryption
         </div>
       </div>
@@ -504,11 +609,15 @@
     <!-- Success Screen -->
     <div class="pj-wrapper success-screen" id="success-screen">
       <div class="success-icon">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12" />
+        </svg>
       </div>
       <h2>Job Posted Successfully! 🎉</h2>
       <p>Your listing is now live. Candidates who match your skills will see your post immediately.</p>
-      <a href="hire-talent.html" class="btn btn-primary" style="display:inline-block;padding:14px 32px;border-radius:99px;">Browse Candidate Profiles →</a>
+      <a href="hire-talent.html" class="btn btn-primary"
+        style="display:inline-block;padding:14px 32px;border-radius:99px;">Browse Candidate Profiles →</a>
     </div>
   </main>
 
@@ -528,7 +637,7 @@
     function selectPlan(el) {
       document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
       el.classList.add('selected');
-      const plan  = el.dataset.plan;
+      const plan = el.dataset.plan;
       const price = parseInt(el.dataset.price);
       selectedPlan = {
         name: plan,
@@ -536,8 +645,8 @@
         duration: plan === 'pro' ? '60 days' : '30 days'
       };
       document.getElementById('order-plan-label').textContent = plan.charAt(0).toUpperCase() + plan.slice(1) + ' listing';
-      document.getElementById('order-duration').textContent   = selectedPlan.duration;
-      document.getElementById('order-total').textContent      = '₹' + price;
+      document.getElementById('order-duration').textContent = selectedPlan.duration;
+      document.getElementById('order-total').textContent = '₹' + price;
     }
 
     function formatCard(el) {
@@ -552,8 +661,8 @@
     }
 
     document.getElementById('btn-pay-now').addEventListener('click', () => {
-      const title   = document.getElementById('job-title').value.trim();
-      const desc    = document.getElementById('job-desc').value.trim();
+      const title = document.getElementById('job-title').value.trim();
+      const desc = document.getElementById('job-desc').value.trim();
       const cardNum = document.getElementById('card-number').value.trim();
 
       if (!title || !desc) { alert('Please fill in at least Job Title and Description.'); return; }
@@ -587,4 +696,5 @@
     });
   </script>
 </body>
+
 </html>

@@ -51,64 +51,47 @@
 
 
   <main>
-    <section class="directory-section container">
-      <!-- Two-column Layout -->
-      <div class="directory-layout">
+    <section class="directory-section">
+      <div class="ht-page-wrap">
         
         <!-- Left Sidebar Filters -->
         <aside class="sidebar-filters fade-in-section is-visible">
-          <!-- 1. Search Box -->
-          <div class="filter-group">
-            <h3>Search</h3>
-            <div class="search-wrapper">
-              <span class="search-icon">🔍</span>
-              <input type="text" id="search-input" class="search-input" placeholder="Search name or skill...">
-            </div>
-          </div>
-          
-          <!-- 2. Skills Filters -->
-          <div class="filter-group">
-            <h3>Skills</h3>
-            <div class="filter-options">
-              <label class="checkbox-label">
-                <input type="checkbox" class="skill-filter-checkbox" value="React">
-                React
-              </label>
-              <label class="checkbox-label">
-                <input type="checkbox" class="skill-filter-checkbox" value="Java">
-                Java
-              </label>
-              <label class="checkbox-label">
-                <input type="checkbox" class="skill-filter-checkbox" value="Python">
-                Python
-              </label>
-              <label class="checkbox-label">
-                <input type="checkbox" class="skill-filter-checkbox" value="MERN">
-                MERN
-              </label>
-              <label class="checkbox-label">
-                <input type="checkbox" class="skill-filter-checkbox" value="Node.js">
-                Node.js
-              </label>
-            </div>
+          <div class="sidebar-top">
+            <h2>Filters</h2>
+            <button id="btn-clear-all" class="btn-clear-all">Clear All</button>
           </div>
 
-          <!-- 3. Availability Filters -->
-          <div class="filter-group">
-            <h3>Availability</h3>
-            <div class="filter-options">
-              <label class="checkbox-label">
-                <input type="checkbox" class="availability-filter-checkbox" value="Internship">
-                Internship
-              </label>
-              <label class="checkbox-label">
-                <input type="checkbox" class="availability-filter-checkbox" value="Full-Time">
-                Full-Time
-              </label>
-            </div>
+          <div class="search-wrapper">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="search-input" class="search-input" placeholder="Search name or skill...">
           </div>
 
-          <button id="btn-clear-all" class="btn-clear-filters">Clear All Filters</button>
+          <div class="sidebar-divider"></div>
+
+          <div class="filter-group">
+            <span class="filter-group-label">Sort By</span>
+            <select class="sort-select" id="sort-select">
+              <option value="">Best Match</option>
+              <option value="price">Lowest Price / Hr</option>
+              <option value="projects">Most Projects</option>
+              <option value="skills">Most Skills</option>
+            </select>
+          </div>
+
+          <div class="sidebar-divider"></div>
+
+          <div class="filter-group" style="margin-bottom:0;">
+            <span class="filter-group-label">Skills</span>
+            <div class="filter-options">
+              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="React"> <span>React</span></label>
+              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="Java"> <span>Java</span></label>
+              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="Python"> <span>Python</span></label>
+              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="MERN"> <span>MERN</span></label>
+              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="Node.js"> <span>Node.js</span></label>
+              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="UI/UX"> <span>UI/UX</span></label>
+              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="Figma"> <span>Figma</span></label>
+            </div>
+          </div>
         </aside>
 
         <!-- Right Main Candidates Showcase -->
