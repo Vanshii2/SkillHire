@@ -38,7 +38,7 @@ footer {
 .footer-logo .logo-dot {
   width: 7px;
   height: 7px;
-  background-color: #e1306c;
+  background-color: #1dbf73;
   border-radius: 50%;
 }
 
@@ -66,7 +66,7 @@ footer {
 }
 
 .footer-nav-link-accent {
-  color: #e1306c;
+  color: #1dbf73;
 }
 
 .footer-nav-link-accent:hover {
@@ -137,7 +137,7 @@ footer {
 }
 
 .footer-legal-link-accent {
-  color: #e1306c;
+  color: #1dbf73;
 }
 
 .footer-legal-link-accent:hover {

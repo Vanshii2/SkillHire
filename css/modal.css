@@ -1,0 +1,219 @@
+/* Fiverr-style Onboarding Modal */
+
+.fiverr-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.fiverr-modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.fiverr-modal-container {
+  background-color: #ffffff;
+  width: 100%;
+  max-width: 600px;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  position: relative;
+  transform: translateY(20px) scale(0.98);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.fiverr-modal-overlay.active .fiverr-modal-container {
+  transform: translateY(0) scale(1);
+}
+
+.fiverr-modal-header {
+  padding: 24px 32px 16px;
+  text-align: center;
+  position: relative;
+}
+
+.fiverr-modal-close {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #74767e;
+  font-size: 24px;
+}
+
+.fiverr-modal-close:hover {
+  color: #404145;
+}
+
+.fiverr-modal-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #404145;
+  margin-bottom: 8px;
+  font-family: var(--font-heading);
+}
+
+.fiverr-modal-subtitle {
+  font-size: 1rem;
+  color: #74767e;
+}
+
+.fiverr-modal-body {
+  padding: 16px 32px 32px;
+}
+
+/* Choice Grid */
+.fiverr-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.fiverr-choice-card {
+  border: 1.5px solid #e4e5e7;
+  border-radius: 8px;
+  padding: 24px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+}
+
+.fiverr-choice-card:hover {
+  border-color: #1dbf73;
+}
+
+.fiverr-choice-card.selected {
+  border-color: #1dbf73;
+  background-color: #f7fcf9;
+}
+
+.fiverr-choice-card-icon {
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.fiverr-choice-card-icon svg {
+  width: 48px;
+  height: 48px;
+}
+
+.fiverr-choice-card-title {
+  font-weight: 700;
+  color: #404145;
+  margin-bottom: 8px;
+  font-size: 1.05rem;
+}
+
+.fiverr-choice-card-desc {
+  font-size: 0.9rem;
+  color: #74767e;
+  line-height: 1.4;
+}
+
+.fiverr-choice-checkbox {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #c5c6c9;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fiverr-choice-card.selected .fiverr-choice-checkbox {
+  background-color: #1dbf73;
+  border-color: #1dbf73;
+}
+
+.fiverr-choice-checkbox::after {
+  content: '';
+  width: 10px;
+  height: 5px;
+  border-left: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  transform: rotate(-45deg);
+  margin-top: -2px;
+  opacity: 0;
+}
+
+.fiverr-choice-card.selected .fiverr-choice-checkbox::after {
+  opacity: 1;
+}
+
+.fiverr-modal-footer {
+  padding: 16px 32px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #e4e5e7;
+}
+
+.fiverr-btn-back {
+  background: none;
+  border: none;
+  font-weight: 600;
+  color: #404145;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fiverr-btn-back:hover {
+  text-decoration: underline;
+}
+
+.fiverr-btn-next {
+  background-color: #1dbf73;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.fiverr-btn-next:hover {
+  background-color: #19a463;
+}
+
+.fiverr-btn-next:disabled {
+  background-color: #e4e5e7;
+  color: #c5c6c9;
+  cursor: not-allowed;
+}
+
+/* Step visibility */
+.fiverr-step {
+  display: none;
+}
+
+.fiverr-step.active {
+  display: block;
+}

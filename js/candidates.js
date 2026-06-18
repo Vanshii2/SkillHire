@@ -46,16 +46,23 @@ function parseUrlParams() {
   const urlParams = new URLSearchParams(window.location.search);
   const searchParam = urlParams.get('search');
   const skillParam = urlParams.get('skill');
+  const skillsParam = urlParams.get('skills');
 
   if (searchParam) {
     const searchInput = document.getElementById('search-input');
     if (searchInput) searchInput.value = searchParam;
   }
 
-  if (skillParam) {
+  const skillsToMatch = [];
+  if (skillParam) skillsToMatch.push(skillParam.toLowerCase());
+  if (skillsParam) {
+    skillsParam.split(',').forEach(s => skillsToMatch.push(s.toLowerCase()));
+  }
+
+  if (skillsToMatch.length > 0) {
     const skillCheckboxes = document.querySelectorAll('.skill-filter-checkbox');
     skillCheckboxes.forEach(cb => {
-      if (cb.value.toLowerCase() === skillParam.toLowerCase()) {
+      if (skillsToMatch.includes(cb.value.toLowerCase())) {
         cb.checked = true;
       }
     });

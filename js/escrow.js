@@ -24,7 +24,7 @@ class EscrowController {
           <!-- Credit Card Mockup -->
           <div class="credit-card-mockup">
             <div style="display: flex; justify-content: space-between; align-items: center;">
-              <div class="card-logo">SafePay<div class="logo-dot"></div></div>
+              <div class="card-logo">SafePay</div>
               <div class="card-chip"></div>
             </div>
             <div class="card-number-display" id="cc-mock-number">•••• •••• •••• ••••</div>

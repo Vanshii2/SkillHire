@@ -681,49 +681,49 @@ function updateNavbarState() {
     desktopNavMenu.innerHTML = `
       <li><a href="${prefix}index.html" class="nav-link" id="nav-link-home">Home</a></li>
       <li><a href="${prefix}candidates.html" class="nav-link" id="nav-link-candidates">Candidates</a></li>
-      <li><a href="#" class="nav-link" id="nav-link-candidate-reg">Join as Candidate</a></li>
+      <li><a href="${prefix}posts.html" class="nav-link" id="nav-link-posts">Posts</a></li>
     `;
 
     desktopCtaContainer.innerHTML = `
-      <button class="btn btn-primary" id="nav-btn-portal-trigger">Recruiter Login</button>
+      <button class="btn btn-secondary" id="nav-btn-signup" style="margin-right: 8px;">Sign Up</button>
+      <button class="btn btn-primary" id="nav-btn-portal-trigger">Log in</button>
     `;
 
     if (mobileNavMenu) {
       mobileNavMenu.innerHTML = `
         <li><a href="${prefix}index.html" class="mobile-nav-link">Home</a></li>
         <li><a href="${prefix}candidates.html" class="mobile-nav-link">Candidates</a></li>
-        <li><a href="#" class="mobile-nav-link" id="mob-link-candidate-reg">Join as Candidate</a></li>
+        <li><a href="${prefix}posts.html" class="mobile-nav-link">Posts</a></li>
       `;
     }
 
     if (mobileCtaContainer) {
       mobileCtaContainer.innerHTML = `
-        <button class="btn btn-primary btn-block" id="mob-btn-portal-trigger">Recruiter Login</button>
+        <button class="btn btn-secondary btn-block" id="mob-btn-signup">Sign Up</button>
+        <button class="btn btn-primary btn-block" id="mob-btn-portal-trigger" style="margin-top: 10px;">Log in</button>
       `;
     }
 
     // Bind triggers to open Modal
     document.getElementById('nav-btn-portal-trigger').addEventListener('click', () => {
-      window.openAuthModal('recruiter', 'login');
+      window.openAuthModal('candidate', 'login');
+    });
+    
+    document.getElementById('nav-btn-signup').addEventListener('click', () => {
+      window.openAuthModal('candidate', 'signup');
     });
 
     const mobPortalTrigger = document.getElementById('mob-btn-portal-trigger');
     if (mobPortalTrigger) {
       mobPortalTrigger.addEventListener('click', () => {
         window.closeMobileMenu();
-        window.openAuthModal('recruiter', 'login');
+        window.openAuthModal('candidate', 'login');
       });
     }
-
-    document.getElementById('nav-link-candidate-reg').addEventListener('click', (e) => {
-      e.preventDefault();
-      window.openAuthModal('candidate', 'signup');
-    });
-
-    const mobCandReg = document.getElementById('mob-link-candidate-reg');
-    if (mobCandReg) {
-      mobCandReg.addEventListener('click', (e) => {
-        e.preventDefault();
+    
+    const mobSignupTrigger = document.getElementById('mob-btn-signup');
+    if (mobSignupTrigger) {
+      mobSignupTrigger.addEventListener('click', () => {
         window.closeMobileMenu();
         window.openAuthModal('candidate', 'signup');
       });

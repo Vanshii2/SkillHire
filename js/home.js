@@ -1,8 +1,95 @@
+
+// Top Skills Section Logic
+function initTopSkills() {
+  const skillBoxes = document.querySelectorAll('.skill-box');
+  const btnBrowse = document.getElementById('btn-browse-skills');
+  let selectedSkills = new Set();
+
+  if (!skillBoxes.length || !btnBrowse) return;
+
+  skillBoxes.forEach(box => {
+    box.addEventListener('click', () => {
+      const skill = box.getAttribute('data-skill');
+      if (selectedSkills.has(skill)) {
+        selectedSkills.delete(skill);
+        box.classList.remove('selected');
+      } else {
+        selectedSkills.add(skill);
+        box.classList.add('selected');
+      }
+    });
+  });
+
+  btnBrowse.addEventListener('click', () => {
+    if (selectedSkills.size > 0) {
+      const skillsQuery = Array.from(selectedSkills).map(encodeURIComponent).join(',');
+      window.location.href = `candidates.html?skills=${skillsQuery}`;
+    } else {
+      window.location.href = 'candidates.html';
+    }
+  });
+}
+
+// Toggle Logic for Hero Section
+function initHeroToggle() {
+  const btnHire = document.getElementById('btn-toggle-hire');
+  const btnWork = document.getElementById('btn-toggle-work');
+  
+  const heading = document.getElementById('hero-dynamic-heading');
+  const subtext = document.getElementById('hero-dynamic-subtext');
+  
+  const ctaHire = document.getElementById('hero-cta-hire');
+  const ctaWork = document.getElementById('hero-cta-work');
+  
+  if(!btnHire || !btnWork) return;
+
+  btnHire.addEventListener('click', () => {
+    btnHire.classList.add('active');
+    btnWork.classList.remove('active');
+    
+    heading.innerHTML = 'Grow at the speed<br>of your ambition';
+    subtext.innerHTML = 'Hire experts who use AI to amplify their skills<br>and impact — turning complex work into results';
+    
+    ctaHire.style.display = 'flex';
+    ctaWork.style.display = 'none';
+  });
+
+  btnWork.addEventListener('click', () => {
+    btnWork.classList.add('active');
+    btnHire.classList.remove('active');
+    
+    heading.innerHTML = 'The future of work<br>is yours';
+    subtext.innerHTML = 'The freelance platform designed for the<br>highly-skilled, highly-ambitious, and AI-fluent';
+    
+    ctaHire.style.display = 'none';
+    ctaWork.style.display = 'flex';
+  });
+  
+  // Wire buttons
+  const btnFindTalent = document.getElementById('hero-btn-find-talent');
+  if(btnFindTalent) {
+    btnFindTalent.addEventListener('click', () => {
+      window.location.href = 'candidates.html';
+    });
+  }
+  
+  const btnFindOpp = document.getElementById('hero-btn-find-opportunities');
+  if(btnFindOpp) {
+    btnFindOpp.addEventListener('click', () => {
+      if (window.openAuthModal) {
+        window.openAuthModal('candidate', 'login');
+      }
+    });
+  }
+}
+
 /* ==========================================================================
    SkillHire Homepage Logic
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
+  initTopSkills();
+  initHeroToggle();
   renderHeroActions();
   renderProjectsShowcase('all');
   setupProjectFilterTabs();
@@ -99,8 +186,8 @@ function renderProjectsShowcase(activeFilter) {
 
   container.innerHTML = filtered.map((project, idx) => {
     const isLiked = likedProjects.includes(project.id);
-    const heartFill = isLiked ? '#e1306c' : 'none';
-    const heartStroke = isLiked ? '#e1306c' : 'currentColor';
+    const heartFill = isLiked ? '#1dbf73' : 'none';
+    const heartStroke = isLiked ? '#1dbf73' : 'currentColor';
 
     return `
       <a href="project.html?id=${encodeURIComponent(project.id)}"
@@ -217,8 +304,8 @@ function toggleProjectLike(btn, projectId, idx) {
     liked.push(projectId);
     localStorage.setItem('skillhire_liked_projects', JSON.stringify(liked));
     btn.classList.add('liked');
-    btn.querySelector('svg').setAttribute('fill', '#e1306c');
-    btn.querySelector('svg').setAttribute('stroke', '#e1306c');
+    btn.querySelector('svg').setAttribute('fill', '#1dbf73');
+    btn.querySelector('svg').setAttribute('stroke', '#1dbf73');
   }
 
   // Update footer like count display (optimistic)
@@ -373,3 +460,36 @@ function renderHeroActions() {
     });
   }
 }
+
+// Skills Grid Logic
+function initSkillsGrid() {
+  const skillBoxes = document.querySelectorAll('.sg-box');
+  const findCandidatesBtn = document.getElementById('btn-find-candidates');
+
+  if (!skillBoxes.length || !findCandidatesBtn) return;
+
+  skillBoxes.forEach(box => {
+    box.addEventListener('click', () => {
+      box.classList.toggle('active');
+    });
+  });
+
+  findCandidatesBtn.addEventListener('click', () => {
+    const activeBoxes = document.querySelectorAll('.sg-box.active');
+    const selectedSkills = Array.from(activeBoxes).map(box => box.getAttribute('data-skill'));
+    
+    if (selectedSkills.length > 0) {
+      const queryParam = encodeURIComponent(selectedSkills.join(','));
+      window.location.href = `candidates.html?skills=${queryParam}`;
+    } else {
+      // If no skills selected, just go to candidates
+      window.location.href = 'candidates.html';
+    }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  initTopSkills();
+  initSkillsGrid();
+});
+
