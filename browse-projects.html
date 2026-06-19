@@ -12,12 +12,12 @@
     main { padding-top: 64px; }
 
     .bp-hero {
-      background: linear-gradient(135deg, #0f0f0f 0%, #1a1a2e 100%);
+      background: linear-gradient(135deg, #0d1b2a 0%, #0a2617 100%);
       padding: 56px 0 44px;
       color: white;
     }
-    .bp-hero h1 { font-size: clamp(1.8rem,4vw,2.6rem); font-weight:800; letter-spacing:-0.03em; color:white; margin-bottom:8px; }
-    .bp-hero p { color:rgba(255,255,255,0.7); font-size:1rem; max-width:500px; }
+    .bp-hero h1 { font-size: clamp(1.8rem,4vw,2.6rem); font-weight:800; letter-spacing:-0.03em; color:#fff; margin-bottom:8px; }
+    .bp-hero p { color:rgba(255,255,255,0.85); font-size:1rem; max-width:500px; }
 
     .bp-body {
       max-width: 1100px;
@@ -184,7 +184,7 @@
     .btn-apply.applied:hover { transform: none; }
 
     .post-cta-banner {
-      background: linear-gradient(135deg, #1dbf73 0%, #16a060 100%);
+      background: linear-gradient(135deg, #0d1b2a 0%, #0a2617 100%);
       border-radius: 16px;
       padding: 32px;
       margin-top: 24px;
@@ -199,6 +199,7 @@
       .bp-sidebar { position: static; }
     }
   </style>
+  <link rel="stylesheet" href="css/responsive.css">
 </head>
 <body>
 
@@ -311,7 +312,47 @@
   <script>
   document.addEventListener('DOMContentLoaded', () => {
     if (window.initProposalModal) window.initProposalModal();
+
+    // Hide "Post a Project" CTA for freelancers — it's only relevant for clients
+    const ctaBanner = document.getElementById('post-project-cta');
+    const ctaSession = window.SessionManager.getActiveUser();
+    if (ctaBanner && ctaSession && ctaSession.role === 'candidate') {
+      ctaBanner.style.display = 'none';
+    }
+
+    // Gate: freelancers must have at least 1 project to browse/apply
+    const gateSession = window.SessionManager.getActiveUser();
+    if (gateSession && gateSession.role === 'candidate') {
+      const me = window.CandidatesDB.getById(gateSession.user.id);
+      if (!me || !me.projects || me.projects.length === 0) {
+        document.querySelector('.bp-body').innerHTML = `
+          <div style="grid-column:1/-1;text-align:center;padding:80px 20px;">
+            <div style="font-size:3rem;margin-bottom:16px;">📁</div>
+            <h2 style="font-size:1.5rem;font-weight:800;margin-bottom:10px;">Add a Project First</h2>
+            <p style="color:#888;max-width:420px;margin:0 auto 24px;">You need at least one project in your profile before you can browse and apply for jobs. This helps clients see your work.</p>
+            <a href="edit-profile.html" class="btn btn-primary" style="padding:12px 28px;font-size:0.95rem;">Add Your First Project</a>
+          </div>
+        `;
+        return;
+      }
+    }
+
     renderJobs();
+
+    // Auto-open proposal modal for a specific job (from ?job= param — direct hire invite)
+    const urlJob = new URLSearchParams(window.location.search).get('job');
+    if (urlJob) {
+      setTimeout(() => {
+        const jobCard = document.querySelector(`.job-card[data-job-id="${urlJob}"]`);
+        if (jobCard) {
+          jobCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          jobCard.style.boxShadow = '0 0 0 2.5px #1dbf73';
+          setTimeout(() => { jobCard.style.boxShadow = ''; }, 2500);
+          const applyBtn = jobCard.querySelector('.bp-apply-btn:not(.applied)');
+          if (applyBtn) setTimeout(() => applyBtn.click(), 600);
+        }
+      }, 500);
+    }
 
     // Search
     document.getElementById('proj-search').addEventListener('input', renderJobs);
@@ -367,8 +408,10 @@
       const posterName = posterRecord ? posterRecord.name : (job.clientName || 'Unknown');
       const posterInitial = posterName.charAt(0).toUpperCase();
 
+      const isInvite = job.directHire && job.invitedFreelancerId && session && job.invitedFreelancerId === session.user.id;
       return `
-        <div class="job-card">
+        <div class="job-card" data-job-id="${job.id}">
+          ${isInvite ? `<div style="font-size:0.72rem;font-weight:800;color:#1dbf73;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">★ Direct Invite — from ${posterName}</div>` : ''}
           <div class="job-header">
             <div>
               <div class="job-title">${job.title}</div>
@@ -400,10 +443,11 @@
                 ${job.proposals} proposals
               </span>
             </div>
-            <button class="btn-apply ${applied ? 'applied' : ''}"
+            <button class="btn-apply bp-apply-btn ${applied ? 'applied' : ''}"
+              data-job-id="${job.id}"
               onclick="${applied ? '' : `applyToJob('${job.id}', '${job.title.replace(/'/g, "\\'")}')`}"
               ${applied ? 'disabled' : ''}>
-              ${applied ? 'Applied' : 'Submit Proposal'}
+              ${applied ? 'Applied ✓' : 'Submit Proposal'}
             </button>
           </div>
         </div>`;
@@ -412,10 +456,21 @@
 
   function applyToJob(jobId, jobTitle) {
     const session = window.SessionManager.getActiveUser();
-    if (!session) {
-      window.openAuthModal('login');
+    if (!session) { window.openAuthModal('login'); return; }
+
+    // Guard: directHire jobs are only open to the invited freelancer
+    const job = window.JobsDB && window.JobsDB.getById(jobId);
+    if (job && job.directHire && job.invitedFreelancerId && job.invitedFreelancerId !== session.user.id) {
+      alert('This is a private invitation for a specific freelancer and is not open for general applications.');
       return;
     }
+
+    // Guard: job must still be open
+    if (job && job.status !== 'open') {
+      alert('This project is no longer accepting proposals.');
+      return;
+    }
+
     if (window.openProposalModal) {
       window.openProposalModal(jobId, jobTitle);
     }

@@ -147,6 +147,7 @@
     .setup-complete h2 { font-size: 1.6rem; font-weight: 800; margin-bottom: 10px; }
     .setup-complete p { color: var(--secondary-text); max-width: 380px; margin: 0 auto 28px; }
   </style>
+  <link rel="stylesheet" href="css/responsive.css">
 </head>
 <body>
 
@@ -226,7 +227,7 @@
         <p>Write a short bio to help clients understand who you are.</p>
         <div class="form-group">
           <label for="s-about">Bio / About</label>
-          <textarea id="s-about" placeholder="I'm a frontend developer with 3+ years of experience building React apps...">${currentData().about || ''}</textarea>
+          <textarea id="s-about" placeholder="I'm a frontend developer with 3+ years of experience building React apps..."></textarea>
         </div>
       `,
       save: () => ({ about: document.getElementById('s-about').value.trim() })
@@ -237,7 +238,7 @@
       desc: 'Add skills to help clients find you.',
       required: false,
       render: () => {
-        stepSkills = [...(currentData().skills || [])];
+        stepSkills = [];
         return `
           <h2>Your Skills</h2>
           <p>Add skills to help clients find the right freelancer.</p>
@@ -311,6 +312,59 @@
         const existing = currentData().contact || {};
         return { contact: { ...existing, linkedin, github } };
       }
+    },
+    {
+      id: 'photo',
+      title: 'Profile Photo',
+      desc: 'Upload a photo so clients can recognise you.',
+      required: true,
+      render: () => `
+        <h2>Upload Your Profile Photo</h2>
+        <p>A real photo builds trust. This is required to complete your profile.</p>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:20px;padding:12px 0;">
+          <div id="photo-preview-wrap" style="width:110px;height:110px;border-radius:50%;background:#f0f0f0;overflow:hidden;display:flex;align-items:center;justify-content:center;border:3px dashed #d0d0d0;position:relative;">
+            <svg id="photo-placeholder-icon" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <img id="photo-preview-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:50%;">
+          </div>
+          <label for="s-photo-input" style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:10px;background:rgba(29,191,115,0.08);color:#16a060;border:1.5px solid rgba(29,191,115,0.25);font-weight:700;font-size:0.88rem;cursor:pointer;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Choose Photo
+          </label>
+          <input type="file" id="s-photo-input" accept="image/*" style="display:none;">
+          <p id="photo-hint" style="font-size:0.78rem;color:#aaa;text-align:center;margin:0;">JPG, PNG or WEBP · Max 4MB</p>
+          <p id="photo-name" style="font-size:0.82rem;color:#1dbf73;font-weight:600;display:none;"></p>
+        </div>
+      `,
+      afterRender: () => {
+        const input = document.getElementById('s-photo-input');
+        input.addEventListener('change', () => {
+          const file = input.files[0];
+          if (!file) return;
+          if (file.size > 4 * 1024 * 1024) {
+            document.getElementById('photo-hint').textContent = 'File too large. Please choose an image under 4MB.';
+            document.getElementById('photo-hint').style.color = '#e53e3e';
+            return;
+          }
+          const reader = new FileReader();
+          reader.onload = e => {
+            const src = e.target.result;
+            document.getElementById('photo-preview-img').src = src;
+            document.getElementById('photo-preview-img').style.display = 'block';
+            document.getElementById('photo-placeholder-icon').style.display = 'none';
+            document.getElementById('photo-preview-wrap').style.borderColor = '#1dbf73';
+            document.getElementById('photo-name').textContent = file.name;
+            document.getElementById('photo-name').style.display = 'block';
+          };
+          reader.readAsDataURL(file);
+        });
+      },
+      save: () => {
+        const img = document.getElementById('photo-preview-img');
+        if (img && img.src && img.src.startsWith('data:')) {
+          return { avatar: img.src };
+        }
+        return {};
+      }
     }
   ];
 
@@ -340,10 +394,63 @@
         <p>Help freelancers understand the type of work you bring.</p>
         <div class="form-group">
           <label for="s-about">About / Description</label>
-          <textarea id="s-about" placeholder="We build SaaS products and need freelancers for design, frontend, and backend work...">${currentData().about || ''}</textarea>
+          <textarea id="s-about" placeholder="We build SaaS products and need freelancers for design, frontend, and backend work..."></textarea>
         </div>
       `,
       save: () => ({ about: document.getElementById('s-about').value.trim() })
+    },
+    {
+      id: 'photo',
+      title: 'Profile Photo',
+      desc: 'Upload a profile photo.',
+      required: true,
+      render: () => `
+        <h2>Upload Your Profile Photo</h2>
+        <p>Help freelancers put a face to your name. This is required.</p>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:20px;padding:12px 0;">
+          <div id="photo-preview-wrap" style="width:110px;height:110px;border-radius:50%;background:#f0f0f0;overflow:hidden;display:flex;align-items:center;justify-content:center;border:3px dashed #d0d0d0;position:relative;">
+            <svg id="photo-placeholder-icon" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <img id="photo-preview-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:50%;">
+          </div>
+          <label for="s-photo-input" style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:10px;background:rgba(29,191,115,0.08);color:#16a060;border:1.5px solid rgba(29,191,115,0.25);font-weight:700;font-size:0.88rem;cursor:pointer;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Choose Photo
+          </label>
+          <input type="file" id="s-photo-input" accept="image/*" style="display:none;">
+          <p id="photo-hint" style="font-size:0.78rem;color:#aaa;text-align:center;margin:0;">JPG, PNG or WEBP · Max 4MB</p>
+          <p id="photo-name" style="font-size:0.82rem;color:#1dbf73;font-weight:600;display:none;"></p>
+        </div>
+      `,
+      afterRender: () => {
+        const input = document.getElementById('s-photo-input');
+        input.addEventListener('change', () => {
+          const file = input.files[0];
+          if (!file) return;
+          if (file.size > 4 * 1024 * 1024) {
+            document.getElementById('photo-hint').textContent = 'File too large. Please choose an image under 4MB.';
+            document.getElementById('photo-hint').style.color = '#e53e3e';
+            return;
+          }
+          const reader = new FileReader();
+          reader.onload = e => {
+            const src = e.target.result;
+            document.getElementById('photo-preview-img').src = src;
+            document.getElementById('photo-preview-img').style.display = 'block';
+            document.getElementById('photo-placeholder-icon').style.display = 'none';
+            document.getElementById('photo-preview-wrap').style.borderColor = '#1dbf73';
+            document.getElementById('photo-name').textContent = file.name;
+            document.getElementById('photo-name').style.display = 'block';
+          };
+          reader.readAsDataURL(file);
+        });
+      },
+      save: () => {
+        const img = document.getElementById('photo-preview-img');
+        if (img && img.src && img.src.startsWith('data:')) {
+          return { avatar: img.src };
+        }
+        return {};
+      }
     }
   ];
 
@@ -397,6 +504,10 @@
     document.getElementById('step-content').innerHTML = step.render();
     if (step.afterRender) step.afterRender();
 
+    // Hide Skip on required steps (photo)
+    const skipBtn = document.getElementById('btn-skip');
+    if (skipBtn) skipBtn.style.display = step.required ? 'none' : '';
+
     // dots
     const dots = document.getElementById('step-dots');
     dots.innerHTML = steps.map((_, i) => {
@@ -426,6 +537,17 @@
   }
 
   function nextStep() {
+    const steps = getSteps();
+    const step = steps[currentStep];
+    // Enforce photo upload on the photo step
+    if (step && step.id === 'photo') {
+      const img = document.getElementById('photo-preview-img');
+      if (!img || !img.src || !img.src.startsWith('data:')) {
+        const hint = document.getElementById('photo-hint');
+        if (hint) { hint.textContent = 'Please upload a profile photo to continue.'; hint.style.color = '#e53e3e'; }
+        return;
+      }
+    }
     saveCurrentStep();
     completedSteps = Math.max(completedSteps, currentStep + 1);
     currentStep++;
@@ -439,8 +561,6 @@
   }
 
   function showComplete() {
-    const steps = getSteps();
-    completedSteps = steps.length;
     updateProgress();
 
     const dashUrl = session.role === 'recruiter' ? 'recruiter/dashboard.html' : 'candidate/dashboard.html';

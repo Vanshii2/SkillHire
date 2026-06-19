@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Secure Payment — SkillBridge</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/footer.css">
+  <style>
+    .payment-page {
+      min-height: calc(100vh - 140px);
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 60px 24px 80px;
+      background: var(--bg-color);
+    }
+    .payment-wrap {
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      gap: 40px;
+      max-width: 900px;
+      width: 100%;
+      align-items: start;
+    }
+    @media (max-width: 780px) {
+      .payment-wrap { grid-template-columns: 1fr; }
+      .payment-order { order: -1; }
+    }
+
+    /* Order summary */
+    .payment-order {
+      background: var(--surface-color);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 32px;
+      box-shadow: var(--shadow-sm);
+      position: sticky;
+      top: 100px;
+    }
+    .order-header {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--secondary-text);
+      margin-bottom: 20px;
+    }
+    .order-plan-name {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--primary-text);
+      margin-bottom: 6px;
+    }
+    .order-plan-desc {
+      font-size: 0.82rem;
+      color: var(--secondary-text);
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+    .order-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+    .order-features li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.86rem;
+      color: var(--primary-text);
+    }
+    .order-features li svg { flex-shrink: 0; }
+    .order-divider {
+      border: none;
+      border-top: 1px solid var(--border-color);
+      margin: 20px 0;
+    }
+    .order-total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+    .order-total-label { font-size: 0.82rem; color: var(--secondary-text); }
+    .order-total-amount { font-size: 1.6rem; font-weight: 800; color: var(--primary-text); }
+    .order-gst { font-size: 0.75rem; color: var(--secondary-text); margin-top: 4px; text-align: right; }
+    .order-secure {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.78rem;
+      color: var(--secondary-text);
+      margin-top: 16px;
+    }
+
+    /* Payment form card */
+    .payment-form-card {
+      background: var(--surface-color);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 36px;
+      box-shadow: var(--shadow-sm);
+    }
+    .payment-form-card h1 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+    .payment-form-card .subtitle {
+      font-size: 0.88rem;
+      color: var(--secondary-text);
+      margin-bottom: 32px;
+    }
+    .pay-section-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--secondary-text);
+      margin-bottom: 16px;
+      margin-top: 28px;
+    }
+    .pay-section-label:first-of-type { margin-top: 0; }
+    .pay-field {
+      margin-bottom: 16px;
+    }
+    .pay-field label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--secondary-text);
+      margin-bottom: 6px;
+    }
+    .pay-field input {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid var(--border-color);
+      border-radius: 10px;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      color: var(--primary-text);
+      background: var(--bg-color);
+      box-sizing: border-box;
+      transition: border-color 0.15s;
+    }
+    .pay-field input:focus {
+      outline: none;
+      border-color: var(--accent-color);
+      background: #fff;
+    }
+    .pay-field input.error {
+      border-color: #e53e3e;
+    }
+    .pay-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .pay-field .field-error {
+      font-size: 0.75rem;
+      color: #e53e3e;
+      margin-top: 4px;
+      display: none;
+    }
+    .pay-field.has-error input { border-color: #e53e3e; }
+    .pay-field.has-error .field-error { display: block; }
+    .card-icons {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+    .card-icon {
+      width: 38px;
+      height: 24px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      background: #f8f8f8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.55rem;
+      font-weight: 700;
+      color: #555;
+    }
+    .card-icon.visa { color: #1a1f71; }
+    .card-icon.mc { background: linear-gradient(90deg, #eb001b 40%, #f79e1b 60%); color: transparent; border: none; }
+    .card-icon.rupay { color: #2c7bbc; }
+    #pay-submit {
+      width: 100%;
+      padding: 14px;
+      background: #1dbf73;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-family: var(--font-body);
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 28px;
+      transition: background 0.15s, transform 0.1s;
+    }
+    #pay-submit:hover { background: #18a864; }
+    #pay-submit:active { transform: scale(0.98); }
+    #pay-submit:disabled { background: #a8e6c8; cursor: not-allowed; }
+    #pay-error {
+      background: #fff5f5;
+      border: 1px solid #fed7d7;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 0.82rem;
+      color: #c53030;
+      margin-top: 16px;
+      display: none;
+    }
+    /* Success screen */
+    #pay-success {
+      display: none;
+      text-align: center;
+      padding: 20px 0;
+    }
+    .success-icon-wrap {
+      width: 72px;
+      height: 72px;
+      background: #f0fdf7;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+    }
+    #pay-success h2 { font-size: 1.4rem; font-weight: 800; margin-bottom: 10px; }
+    #pay-success p { font-size: 0.9rem; color: var(--secondary-text); line-height: 1.6; margin-bottom: 28px; }
+    .btn-back-post {
+      display: inline-block;
+      padding: 12px 32px;
+      background: #1dbf73;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-family: var(--font-body);
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 0.95rem;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+  <header id="site-header">
+    <div class="nav-container">
+      <a href="index.html" class="logo">SkillBridge</a>
+      <ul class="nav-menu" id="nav-menu-list"></ul>
+      <div class="nav-cta" id="nav-cta-area">
+        <button class="btn btn-secondary" id="nav-btn-login" style="margin-right:8px;">Log In</button>
+        <button class="btn btn-primary" id="nav-btn-register">Register</button>
+      </div>
+      <button class="mobile-toggle" id="mobile-hamburger" aria-label="Toggle Menu">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+    </div>
+  </header>
+  <div class="mobile-drawer-overlay" id="mobile-overlay"></div>
+  <div class="mobile-drawer" id="mobile-drawer-menu">
+    <ul class="mobile-nav-list" id="mob-nav-list"></ul>
+    <div class="mobile-nav-cta" id="mob-cta-area">
+      <button class="btn btn-secondary btn-block" id="mob-btn-login">Log In</button>
+      <button class="btn btn-primary btn-block" id="mob-btn-register" style="margin-top:10px;">Register</button>
+    </div>
+  </div>
+
+  <div class="payment-page">
+    <div class="payment-wrap">
+
+      <!-- LEFT: Payment form -->
+      <div class="payment-form-card">
+        <div id="pay-form-wrap">
+          <h1>Complete your payment</h1>
+          <p class="subtitle">You're one step away from posting unlimited projects on SkillBridge.</p>
+
+          <div class="pay-section-label">Billing details</div>
+          <div class="pay-field" id="field-billing-name">
+            <label for="billing-name">Full Name on card</label>
+            <input type="text" id="billing-name" placeholder="e.g. Vanshita Tripathi" autocomplete="cc-name">
+            <div class="field-error">Please enter the name as it appears on your card.</div>
+          </div>
+          <div class="pay-field" id="field-billing-email">
+            <label for="billing-email">Email address</label>
+            <input type="email" id="billing-email" placeholder="you@example.com" autocomplete="email">
+            <div class="field-error">Please enter a valid email address.</div>
+          </div>
+
+          <div class="pay-section-label">Card details</div>
+          <div class="card-icons">
+            <div class="card-icon visa">VISA</div>
+            <div class="card-icon mc"></div>
+            <div class="card-icon rupay">RuPay</div>
+          </div>
+
+          <div class="pay-field" id="field-card-number">
+            <label for="card-number">Card number</label>
+            <input type="text" id="card-number" placeholder="1234 5678 9012 3456" maxlength="19" autocomplete="cc-number" inputmode="numeric">
+            <div class="field-error">Please enter a valid 16-digit card number.</div>
+          </div>
+          <div class="pay-row">
+            <div class="pay-field" id="field-card-expiry">
+              <label for="card-expiry">Expiry date</label>
+              <input type="text" id="card-expiry" placeholder="MM / YY" maxlength="7" autocomplete="cc-exp" inputmode="numeric">
+              <div class="field-error">Enter a valid future date (MM / YY).</div>
+            </div>
+            <div class="pay-field" id="field-card-cvv">
+              <label for="card-cvv">CVV / CVC</label>
+              <input type="password" id="card-cvv" placeholder="•••" maxlength="4" autocomplete="cc-csc" inputmode="numeric">
+              <div class="field-error">Enter the 3 or 4 digit CVV.</div>
+            </div>
+          </div>
+
+          <div class="pay-field" id="field-card-name">
+            <label for="card-name">Name on card</label>
+            <input type="text" id="card-name" placeholder="e.g. VANSHITA TRIPATHI" autocomplete="cc-name">
+            <div class="field-error">Please enter the cardholder name.</div>
+          </div>
+
+          <button type="button" id="pay-submit">Pay now — <span id="pay-amount-btn"></span></button>
+          <div id="pay-error"></div>
+        </div>
+
+        <div id="pay-success">
+          <div class="success-icon-wrap">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <h2>Payment successful!</h2>
+          <p>Your <strong id="success-plan-name"></strong> plan is now active. You can post projects freely. A receipt has been sent to your email.</p>
+          <a id="btn-back-post" href="post-project.html" class="btn-back-post">Post your project now</a>
+        </div>
+      </div>
+
+      <!-- RIGHT: Order summary -->
+      <div class="payment-order">
+        <div class="order-header">Order summary</div>
+        <div class="order-plan-name" id="order-plan-name">Pro Plan</div>
+        <div class="order-plan-desc" id="order-plan-desc">Perfect for growing teams and frequent hirers.</div>
+        <ul class="order-features" id="order-features">
+          <li>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Unlimited project posts
+          </li>
+          <li>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Featured listing boost
+          </li>
+          <li>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Priority freelancer matching
+          </li>
+          <li>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Dedicated account support
+          </li>
+        </ul>
+        <hr class="order-divider">
+        <div class="order-total-row">
+          <span class="order-total-label">Total due today</span>
+          <span class="order-total-amount" id="order-total">₹999</span>
+        </div>
+        <div class="order-gst" id="order-gst">Incl. 18% GST</div>
+        <div class="order-secure">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          256-bit SSL encrypted · Powered by SkillBridge Pay
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer id="site-footer">
+    <div class="footer-bottom-strip">
+      <div class="container footer-bottom-inner">
+        <div class="footer-copy">&copy; 2026 SkillBridge. All rights reserved.</div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/db.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    const PLANS = {
+      starter: {
+        name: 'Starter Plan',
+        desc: 'Great for individuals posting their first few projects.',
+        amount: 499,
+        features: ['5 project posts/month', 'Standard listing', 'Email support'],
+      },
+      pro: {
+        name: 'Pro Plan',
+        desc: 'Perfect for growing teams and frequent hirers.',
+        amount: 999,
+        features: ['Unlimited project posts', 'Featured listing boost', 'Priority freelancer matching', 'Dedicated account support'],
+      },
+      business: {
+        name: 'Business Plan',
+        desc: 'For agencies and enterprises needing full control.',
+        amount: 2499,
+        features: ['Everything in Pro', 'Team seats (up to 10)', 'Custom contracts', 'Dedicated account manager'],
+      },
+    };
+
+    const params = new URLSearchParams(window.location.search);
+    const planKey = params.get('plan') || 'pro';
+    const returnUrl = params.get('return') || 'post-project.html';
+    const plan = PLANS[planKey] || PLANS.pro;
+
+    document.getElementById('order-plan-name').textContent = plan.name;
+    document.getElementById('order-plan-desc').textContent = plan.desc;
+    document.getElementById('order-total').textContent = '₹' + plan.amount.toLocaleString('en-IN');
+    document.getElementById('pay-amount-btn').textContent = '₹' + plan.amount.toLocaleString('en-IN');
+    document.getElementById('order-gst').textContent = 'Incl. 18% GST';
+    const featEl = document.getElementById('order-features');
+    featEl.innerHTML = plan.features.map(f => `
+      <li>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        ${f}
+      </li>`).join('');
+
+    // Pre-fill email if logged in
+    window.addEventListener('DOMContentLoaded', () => {
+      const session = window.SessionManager && window.SessionManager.getActiveUser();
+      if (session) {
+        document.getElementById('billing-email').value = session.user.email || '';
+        document.getElementById('billing-name').value = session.user.name || '';
+      }
+    });
+
+    // Format card number with spaces
+    document.getElementById('card-number').addEventListener('input', function () {
+      let v = this.value.replace(/\D/g, '').slice(0, 16);
+      this.value = v.match(/.{1,4}/g)?.join(' ') || v;
+    });
+
+    // Format expiry MM / YY
+    document.getElementById('card-expiry').addEventListener('input', function () {
+      let v = this.value.replace(/\D/g, '').slice(0, 4);
+      if (v.length > 2) v = v.slice(0, 2) + ' / ' + v.slice(2);
+      this.value = v;
+    });
+
+    // CVV — digits only
+    document.getElementById('card-cvv').addEventListener('input', function () {
+      this.value = this.value.replace(/\D/g, '').slice(0, 4);
+    });
+
+    function setError(fieldId, show) {
+      const el = document.getElementById(fieldId);
+      if (show) el.classList.add('has-error');
+      else el.classList.remove('has-error');
+    }
+
+    function validateExpiry(val) {
+      const clean = val.replace(/\s/g, '').replace('/', '');
+      if (clean.length < 4) return false;
+      const month = parseInt(clean.slice(0, 2), 10);
+      const year = parseInt('20' + clean.slice(2, 4), 10);
+      if (month < 1 || month > 12) return false;
+      const now = new Date();
+      const exp = new Date(year, month - 1, 1);
+      return exp >= new Date(now.getFullYear(), now.getMonth(), 1);
+    }
+
+    document.getElementById('pay-submit').addEventListener('click', () => {
+      const billingName = document.getElementById('billing-name').value.trim();
+      const billingEmail = document.getElementById('billing-email').value.trim();
+      const cardNumber = document.getElementById('card-number').value.replace(/\s/g, '');
+      const cardExpiry = document.getElementById('card-expiry').value.trim();
+      const cardCvv = document.getElementById('card-cvv').value.trim();
+      const cardName = document.getElementById('card-name').value.trim();
+      const errEl = document.getElementById('pay-error');
+
+      let valid = true;
+
+      setError('field-billing-name', false);
+      setError('field-billing-email', false);
+      setError('field-card-number', false);
+      setError('field-card-expiry', false);
+      setError('field-card-cvv', false);
+      setError('field-card-name', false);
+      errEl.style.display = 'none';
+
+      if (!billingName) { setError('field-billing-name', true); valid = false; }
+      if (!billingEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(billingEmail)) { setError('field-billing-email', true); valid = false; }
+      if (cardNumber.length !== 16 || !/^\d+$/.test(cardNumber)) { setError('field-card-number', true); valid = false; }
+      if (!validateExpiry(cardExpiry)) { setError('field-card-expiry', true); valid = false; }
+      if (cardCvv.length < 3 || cardCvv.length > 4) { setError('field-card-cvv', true); valid = false; }
+      if (!cardName) { setError('field-card-name', true); valid = false; }
+
+      if (!valid) return;
+
+      const btn = document.getElementById('pay-submit');
+      btn.textContent = 'Processing…';
+      btn.disabled = true;
+
+      // Simulate payment processing delay
+      setTimeout(() => {
+        const session = window.SessionManager && window.SessionManager.getActiveUser();
+        if (session) {
+          localStorage.setItem('skillbridge_plan_' + session.user.id, planKey);
+          localStorage.removeItem('skillbridge_pending_plan_' + session.user.id);
+        }
+
+        document.getElementById('pay-form-wrap').style.display = 'none';
+        document.getElementById('pay-success').style.display = 'block';
+        document.getElementById('success-plan-name').textContent = plan.name;
+        document.getElementById('btn-back-post').href = returnUrl;
+      }, 1800);
+    });
+  </script>
+</body>
+</html>

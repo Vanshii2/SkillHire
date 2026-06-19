@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Contracts — SkillBridge</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/footer.css">
+  <style>
+    main { padding-top: 64px; background: #f7f8fa; min-height: calc(100vh - 64px); }
+
+    .contracts-hero {
+      background: linear-gradient(135deg, #0d1b2a 0%, #0a2617 100%);
+      padding: 40px 0 32px;
+      color: white;
+    }
+    .contracts-hero-inner {
+      max-width: 960px; margin: 0 auto; padding: 0 32px;
+    }
+    .contracts-hero h1 {
+      font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+      font-weight: 800; letter-spacing: -0.03em; margin-bottom: 6px;
+    }
+    .contracts-hero p { color: rgba(255,255,255,0.6); font-size: 0.9rem; }
+
+    .contracts-body {
+      max-width: 960px; margin: 0 auto; padding: 32px 32px 80px;
+    }
+
+    .tab-row {
+      display: flex; gap: 6px; margin-bottom: 24px;
+    }
+    .ctab {
+      padding: 8px 20px; border-radius: 100px; font-size: 0.85rem; font-weight: 700;
+      border: 1.5px solid #e0e0e0; background: #fff; color: #888; cursor: pointer;
+      transition: all 0.15s;
+    }
+    .ctab.active { background: #1dbf73; color: #fff; border-color: #1dbf73; }
+
+    .contract-card {
+      background: #fff; border: 1px solid #e8e8e8; border-radius: 18px;
+      padding: 24px 28px; margin-bottom: 20px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+      transition: box-shadow 0.15s;
+    }
+    .contract-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+
+    .contract-header {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      gap: 16px; flex-wrap: wrap; margin-bottom: 16px;
+    }
+    .contract-title { font-size: 1.05rem; font-weight: 800; color: #111; margin-bottom: 4px; }
+    .contract-parties { font-size: 0.82rem; color: #777; }
+    .contract-parties strong { color: #333; font-weight: 600; }
+
+    .status-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 14px; border-radius: 100px; font-size: 0.75rem; font-weight: 700;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .status-awaiting { background: #fff8e6; color: #b45309; border: 1px solid #fde68a; }
+    .status-funded { background: #e6f4ff; color: #1d6fb8; border: 1px solid #bfdbfe; }
+    .status-submitted { background: rgba(29,191,115,0.08); color: #16a060; border: 1px solid rgba(29,191,115,0.25); }
+    .status-released { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+    .status-disputed { background: #fff5f5; color: #c53030; border: 1px solid #fed7d7; }
+
+    .contract-meta {
+      display: flex; gap: 20px; flex-wrap: wrap;
+      font-size: 0.82rem; color: #666; margin-bottom: 16px;
+    }
+    .contract-meta span { display: flex; align-items: center; gap: 5px; }
+    .contract-meta strong { color: #111; font-weight: 700; }
+
+    .timeline-bar-wrap {
+      background: #f5f5f5; border-radius: 100px; height: 8px; overflow: hidden; margin-bottom: 6px;
+    }
+    .timeline-bar { height: 100%; border-radius: 100px; background: #1dbf73; transition: width 0.5s; }
+    .timeline-label { font-size: 0.75rem; color: #888; margin-bottom: 14px; }
+
+    .contract-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn-fund {
+      padding: 9px 20px; background: #1dbf73; color: #fff; border: none;
+      border-radius: 9px; font-weight: 700; cursor: pointer; font-family: inherit; font-size: 0.85rem;
+    }
+    .btn-fund:hover { background: #18a864; }
+    .btn-release {
+      padding: 9px 20px; background: #1d6fb8; color: #fff; border: none;
+      border-radius: 9px; font-weight: 700; cursor: pointer; font-family: inherit; font-size: 0.85rem;
+    }
+    .btn-done {
+      padding: 9px 20px; background: #7c3aed; color: #fff; border: none;
+      border-radius: 9px; font-weight: 700; cursor: pointer; font-family: inherit; font-size: 0.85rem;
+    }
+    .btn-dispute {
+      padding: 9px 16px; background: #fff; color: #c53030;
+      border: 1.5px solid #fed7d7; border-radius: 9px;
+      font-weight: 700; cursor: pointer; font-family: inherit; font-size: 0.85rem;
+    }
+    .btn-complaint {
+      padding: 9px 16px; background: #fff; color: #555;
+      border: 1.5px solid #e0e0e0; border-radius: 9px;
+      font-weight: 600; cursor: pointer; font-family: inherit; font-size: 0.82rem;
+    }
+    .btn-complaint:hover { border-color: #c53030; color: #c53030; }
+
+    /* Complaint form */
+    .complaint-form {
+      display: none; margin-top: 16px; padding: 18px;
+      background: #fff9f9; border: 1.5px solid #fed7d7; border-radius: 12px;
+    }
+    .complaint-form.open { display: block; }
+    .complaint-form h4 { font-size: 0.9rem; font-weight: 800; color: #c53030; margin-bottom: 12px; }
+    .cf-field { margin-bottom: 10px; }
+    .cf-field label { display: block; font-size: 0.75rem; font-weight: 600; color: #888; margin-bottom: 4px; }
+    .cf-field input, .cf-field select, .cf-field textarea {
+      width: 100%; padding: 8px 12px; border: 1.5px solid #e0e0e0; border-radius: 8px;
+      font-family: inherit; font-size: 0.85rem; box-sizing: border-box;
+    }
+    .cf-field textarea { resize: vertical; }
+    .cf-actions { display: flex; gap: 8px; margin-top: 4px; }
+    .btn-submit-complaint {
+      padding: 9px 20px; background: #c53030; color: #fff; border: none;
+      border-radius: 8px; font-weight: 700; cursor: pointer; font-family: inherit; font-size: 0.85rem;
+    }
+    .btn-cancel-complaint {
+      padding: 9px 16px; background: #fff; color: #888; border: 1.5px solid #e0e0e0;
+      border-radius: 8px; font-weight: 600; cursor: pointer; font-family: inherit; font-size: 0.82rem;
+    }
+
+    .empty-state {
+      text-align: center; padding: 64px 20px; color: #aaa;
+    }
+    .empty-state svg { stroke: #ddd; margin: 0 auto 16px; display: block; }
+    .empty-state h3 { font-size: 1.1rem; font-weight: 700; color: #555; margin-bottom: 8px; }
+    .empty-state p { font-size: 0.88rem; }
+
+    .toast-ctr { position: fixed; bottom: 24px; right: 24px; z-index: 3000; }
+
+    @media (max-width: 600px) {
+      .contracts-body { padding: 20px 16px 60px; }
+      .contract-card { padding: 18px 16px; }
+    }
+  </style>
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+  <header id="site-header">
+    <div class="nav-container">
+      <a href="index.html" class="logo" id="nav-logo">SkillBridge</a>
+      <ul class="nav-menu" id="nav-menu-list"></ul>
+      <div class="nav-cta" id="nav-cta-area"></div>
+    </div>
+  </header>
+
+  <main>
+    <div class="contracts-hero">
+      <div class="contracts-hero-inner">
+        <h1>My Contracts</h1>
+        <p>Track your active projects, escrow payments, and timelines in one place.</p>
+      </div>
+    </div>
+
+    <div class="contracts-body">
+      <div class="tab-row">
+        <button class="ctab active" id="ctab-active" onclick="showCTab('active')">Active</button>
+        <button class="ctab" id="ctab-completed" onclick="showCTab('completed')">Completed</button>
+        <button class="ctab" id="ctab-disputed" onclick="showCTab('disputed')">Disputes</button>
+        <button class="ctab" id="ctab-complaints" onclick="showCTab('complaints')">My Complaints</button>
+      </div>
+
+      <div id="cpanel-active"></div>
+      <div id="cpanel-completed" style="display:none;"></div>
+      <div id="cpanel-disputed" style="display:none;"></div>
+      <div id="cpanel-complaints" style="display:none;"></div>
+    </div>
+  </main>
+
+  <div id="toast-area" class="toast-ctr"></div>
+
+  <script src="js/db.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+  function escH(str) {
+    if (!str) return '';
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function showCTab(name) {
+    ['active','completed','disputed','complaints'].forEach(t => {
+      document.getElementById('ctab-' + t).classList.toggle('active', t === name);
+      document.getElementById('cpanel-' + t).style.display = t === name ? 'block' : 'none';
+    });
+  }
+
+  function toast(msg, bg) {
+    const t = document.createElement('div');
+    t.style.cssText = `background:${bg || '#1dbf73'};color:#fff;padding:10px 20px;border-radius:10px;font-weight:700;font-size:0.88rem;margin-top:8px;box-shadow:0 4px 16px rgba(0,0,0,0.14);`;
+    t.textContent = msg;
+    document.getElementById('toast-area').appendChild(t);
+    setTimeout(() => t.remove(), 2800);
+  }
+
+  function daysLeft(fundedAt, deadline) {
+    // deadline is like "2 weeks", "30 days", "1 month"
+    if (!fundedAt) return null;
+    let daysTotal = 14;
+    if (deadline) {
+      const m = deadline.match(/(\d+)\s*(day|week|month)/i);
+      if (m) {
+        const n = parseInt(m[1]);
+        if (/week/i.test(m[2])) daysTotal = n * 7;
+        else if (/month/i.test(m[2])) daysTotal = n * 30;
+        else daysTotal = n;
+      }
+    }
+    const elapsed = (Date.now() - new Date(fundedAt).getTime()) / 86400000;
+    const remaining = Math.max(0, daysTotal - elapsed);
+    const pct = Math.min(100, (elapsed / daysTotal) * 100);
+    return { remaining: Math.ceil(remaining), total: daysTotal, pct };
+  }
+
+  function statusLabel(status) {
+    return {
+      awaiting_payment: 'Awaiting Payment',
+      funded: 'In Progress',
+      work_submitted: 'Work Submitted',
+      released: 'Completed',
+      disputed: 'Disputed'
+    }[status] || status;
+  }
+
+  function statusClass(status) {
+    return {
+      awaiting_payment: 'status-awaiting',
+      funded: 'status-funded',
+      work_submitted: 'status-submitted',
+      released: 'status-released',
+      disputed: 'status-disputed'
+    }[status] || '';
+  }
+
+  function renderContractCard(e, session, job) {
+    const isClient = e.clientId === session.user.id;
+    const otherName = isClient ? e.freelancerName : e.clientName;
+    const otherRole = isClient ? 'Freelancer' : 'Client';
+    const tl = e.status === 'funded' || e.status === 'work_submitted'
+      ? daysLeft(e.fundedAt, job ? job.deadline : null) : null;
+
+    const timelineHtml = tl ? `
+      <div class="timeline-bar-wrap"><div class="timeline-bar" style="width:${tl.pct}%;background:${tl.pct > 80 ? '#f59e0b' : '#1dbf73'};"></div></div>
+      <div class="timeline-label">${tl.remaining} day${tl.remaining !== 1 ? 's' : ''} remaining of ${tl.total}</div>
+    ` : '';
+
+    let actionsHtml = '';
+    if (e.status === 'awaiting_payment' && isClient) {
+      actionsHtml = `<button class="btn-fund" onclick="fundContract('${e.id}')">Fund Escrow — ₹${escH(e.amount)}</button>`;
+    } else if (e.status === 'funded' && !isClient) {
+      actionsHtml = `<button class="btn-done" onclick="markDone('${e.id}')">Mark Work as Done</button>`;
+    } else if ((e.status === 'funded' || e.status === 'work_submitted') && isClient) {
+      actionsHtml = `
+        <button class="btn-release" onclick="releaseContract('${e.id}')">Release Payment</button>
+        <button class="btn-dispute" onclick="disputeContract('${e.id}')">Raise Dispute</button>`;
+    } else if (e.status === 'released') {
+      actionsHtml = `<span style="color:#15803d;font-weight:700;font-size:0.88rem;">✓ Payment released</span>`;
+    } else if (e.status === 'disputed') {
+      actionsHtml = `<span style="color:#c53030;font-weight:700;font-size:0.88rem;">⚠ Under review by support</span>`;
+    }
+
+    const existingComplaints = window.ComplaintsDB ? window.ComplaintsDB.getByContract(e.id) : [];
+    const complaintBtn = existingComplaints.length === 0
+      ? `<button class="btn-complaint" onclick="toggleComplaintForm('${e.id}')">📋 File a Complaint</button>`
+      : `<span style="font-size:0.8rem;color:#888;">Complaint filed (${existingComplaints[0].status})</span>`;
+
+    return `
+    <div class="contract-card" id="contract-${e.id}">
+      <div class="contract-header">
+        <div>
+          <div class="contract-title">${escH(e.jobTitle)}</div>
+          <div class="contract-parties">
+            ${isClient ? 'Freelancer' : 'Client'}: <strong>${escH(otherName)}</strong>
+          </div>
+        </div>
+        <div class="status-pill ${statusClass(e.status)}">${statusLabel(e.status)}</div>
+      </div>
+
+      <div class="contract-meta">
+        <span>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          Escrow: <strong>₹${escH(e.amount)}</strong>
+        </span>
+        <span>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          ${job ? escH(job.deadline) : '—'}
+        </span>
+        <span>Started ${new Date(e.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+      </div>
+
+      ${timelineHtml}
+
+      <div class="contract-actions" style="margin-bottom:${(e.status !== 'released' && e.status !== 'disputed') ? '10px' : '0'};">
+        ${actionsHtml}
+        ${complaintBtn}
+      </div>
+
+      <!-- Complaint Form -->
+      <div class="complaint-form" id="cf-${e.id}">
+        <h4>📋 File a Complaint</h4>
+        <div class="cf-field">
+          <label>Subject *</label>
+          <input id="cf-subject-${e.id}" type="text" placeholder="Brief summary of the issue">
+        </div>
+        <div class="cf-field">
+          <label>Category</label>
+          <select id="cf-category-${e.id}">
+            <option value="payment">Payment Issue</option>
+            <option value="quality">Work Quality</option>
+            <option value="communication">Communication</option>
+            <option value="deadline">Missed Deadline</option>
+            <option value="fraud">Fraud / Scam</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="cf-field">
+          <label>Detailed Description *</label>
+          <textarea id="cf-desc-${e.id}" rows="4" placeholder="Describe what happened in detail. Include dates, amounts, and any relevant context."></textarea>
+        </div>
+        <div class="cf-actions">
+          <button class="btn-submit-complaint" onclick="submitComplaint('${e.id}')">Submit Complaint</button>
+          <button class="btn-cancel-complaint" onclick="toggleComplaintForm('${e.id}')">Cancel</button>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  function toggleComplaintForm(escrowId) {
+    const f = document.getElementById('cf-' + escrowId);
+    if (f) f.classList.toggle('open');
+  }
+
+  function fundContract(escrowId) {
+    if (!confirm('Fund the escrow? The money will be held securely until you release it.')) return;
+    window.EscrowDB.updateStatus(escrowId, 'funded', { fundedAt: new Date().toISOString() });
+    toast('Escrow funded! The freelancer has been notified and work can begin.', '#1dbf73');
+    loadContracts();
+  }
+
+  function markDone(escrowId) {
+    if (!confirm('Mark your work as done? The client will review and release payment.')) return;
+    window.EscrowDB.updateStatus(escrowId, 'work_submitted', { workSubmittedAt: new Date().toISOString() });
+    toast('Work marked as done. Waiting for client to release payment.', '#7c3aed');
+    loadContracts();
+  }
+
+  function releaseContract(escrowId) {
+    if (!confirm('Release payment to the freelancer? This cannot be undone.')) return;
+    window.EscrowDB.updateStatus(escrowId, 'released', { releasedAt: new Date().toISOString() });
+    toast('Payment released! Thank you for using SkillBridge.', '#1dbf73');
+    loadContracts();
+  }
+
+  function disputeContract(escrowId) {
+    if (!confirm('Raise a dispute? Our support team will review the case.')) return;
+    window.EscrowDB.updateStatus(escrowId, 'disputed');
+    toast('Dispute raised. Support team will contact both parties within 24 hours.', '#e53e3e');
+    loadContracts();
+  }
+
+  function submitComplaint(escrowId) {
+    const subject = document.getElementById('cf-subject-' + escrowId).value.trim();
+    const description = document.getElementById('cf-desc-' + escrowId).value.trim();
+    const category = document.getElementById('cf-category-' + escrowId).value;
+    if (!subject || !description) { alert('Please fill in subject and description.'); return; }
+
+    const session = window.SessionManager.getActiveUser();
+    const e = window.EscrowDB.getById(escrowId);
+    if (!e) return;
+
+    const isClient = e.clientId === session.user.id;
+    window.ComplaintsDB.file({
+      escrowId,
+      filedBy: session.user.id,
+      filedByName: session.user.name,
+      againstUserId: isClient ? e.freelancerId : e.clientId,
+      againstName: isClient ? e.freelancerName : e.clientName,
+      subject, description, category,
+      contractTitle: e.jobTitle
+    });
+
+    toast('Complaint filed. Our team will review within 24-48 hours.', '#c53030');
+    toggleComplaintForm(escrowId);
+    loadContracts();
+  }
+
+  function loadContracts() {
+    const session = window.SessionManager && window.SessionManager.getActiveUser();
+    if (!session) { window.location.href = 'index.html'; return; }
+
+    const allEscrow = window.EscrowDB.getAll().filter(e =>
+      e.clientId === session.user.id || e.freelancerId === session.user.id
+    );
+
+    const active = allEscrow.filter(e => ['awaiting_payment','funded','work_submitted'].includes(e.status));
+    const completed = allEscrow.filter(e => e.status === 'released');
+    const disputed = allEscrow.filter(e => e.status === 'disputed');
+    const myComplaints = window.ComplaintsDB ? window.ComplaintsDB.getByUser(session.user.id) : [];
+
+    function renderList(items, panelId) {
+      const el = document.getElementById(panelId);
+      if (!items.length) {
+        el.innerHTML = `<div class="empty-state">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <h3>No contracts here</h3>
+          <p>Contracts appear here when a proposal is accepted and escrow is created.</p>
+        </div>`;
+        return;
+      }
+      el.innerHTML = items.map(e => {
+        // jobId is stored directly on the escrow record (added when escrow created)
+        // Fall back to proposal lookup for older records
+        let jobId = e.jobId;
+        if (!jobId && window.ProposalsDB) {
+          const prop = window.ProposalsDB.getAll().find(p => p.id === e.proposalId);
+          jobId = prop ? prop.jobId : null;
+        }
+        const job = jobId && window.JobsDB ? window.JobsDB.getById(jobId) : null;
+        return renderContractCard(e, session, job);
+      }).join('');
+    }
+
+    renderList(active, 'cpanel-active');
+    renderList(completed, 'cpanel-completed');
+    renderList(disputed, 'cpanel-disputed');
+
+    // Complaints panel
+    const cpEl = document.getElementById('cpanel-complaints');
+    if (!myComplaints.length) {
+      cpEl.innerHTML = `<div class="empty-state">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#ddd" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <h3>No complaints filed</h3>
+        <p>If something goes wrong on a contract, you can file a complaint from the Active tab.</p>
+      </div>`;
+    } else {
+      cpEl.innerHTML = myComplaints.map(c => `
+        <div class="contract-card">
+          <div class="contract-header">
+            <div>
+              <div class="contract-title" style="font-size:0.95rem;">${escH(c.subject)}</div>
+              <div class="contract-parties">Contract: <strong>${escH(c.contractTitle)}</strong> · Against: <strong>${escH(c.againstName)}</strong></div>
+            </div>
+            <span class="status-pill ${c.status === 'open' ? 'status-awaiting' : 'status-released'}">${c.status === 'open' ? 'Under Review' : 'Resolved'}</span>
+          </div>
+          <div style="font-size:0.82rem;color:#666;line-height:1.6;background:#fafafa;border-radius:8px;padding:10px 12px;">
+            ${escH(c.description.slice(0, 200))}${c.description.length > 200 ? '…' : ''}
+          </div>
+          <div style="font-size:0.75rem;color:#aaa;margin-top:8px;">Filed ${new Date(c.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+        </div>`).join('');
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', loadContracts);
+  </script>
+</body>
+</html>

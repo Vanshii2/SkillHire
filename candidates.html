@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="css/navbar.css">
   <link rel="stylesheet" href="css/footer.css">
   <link rel="stylesheet" href="css/candidates.css">
+  <link rel="stylesheet" href="css/responsive.css">
 </head>
 <body>
 
@@ -51,7 +52,7 @@
 
 
   <main>
-    <div style="background:linear-gradient(135deg,#0f0f0f 0%,#1a1a2e 100%);padding:52px 0 40px;color:white;">
+    <div style="background:linear-gradient(135deg,#0d1b2a 0%,#0a2617 100%);padding:52px 0 40px;color:white;">
       <div class="container">
         <h1 style="font-size:clamp(1.8rem,4vw,2.6rem);font-weight:800;letter-spacing:-0.03em;color:white;margin-bottom:8px;">Browse Freelancers</h1>
         <p style="color:rgba(255,255,255,0.7);font-size:1rem;">Find talented professionals for your next project. Filter by skill, availability, and more.</p>
@@ -77,9 +78,9 @@
           <div class="filter-group">
             <span class="filter-group-label">Sort By</span>
             <select class="sort-select" id="sort-select">
-              <option value="">Best Match</option>
+              <option value="projects" selected>Most Projects</option>
+              <option value="rating">Highest Rated</option>
               <option value="price">Lowest Price / Hr</option>
-              <option value="projects">Most Projects</option>
               <option value="skills">Most Skills</option>
             </select>
           </div>
@@ -96,6 +97,7 @@
               <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="Vue.js"> <span>Vue.js</span></label>
               <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="Next.js"> <span>Next.js</span></label>
               <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="UI/UX"> <span>UI/UX</span></label>
+              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="AI"> <span>AI</span></label>
               <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="Flutter"> <span>Flutter</span></label>
               <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="Docker"> <span>Docker</span></label>
               <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="MongoDB"> <span>MongoDB</span></label>
@@ -103,7 +105,6 @@
               <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="React Native"> <span>React Native</span></label>
               <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="AWS"> <span>AWS</span></label>
               <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="PostgreSQL"> <span>PostgreSQL</span></label>
-              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="Figma"> <span>Figma</span></label>
               <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="Redis"> <span>Redis</span></label>
               <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="Firebase"> <span>Firebase</span></label>
               <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="GraphQL"> <span>GraphQL</span></label>
@@ -147,7 +148,7 @@
           <div class="footer-column">
             <div class="footer-title">Resources</div>
             <ul class="footer-list">
-              <li><a href="about.html" class="footer-link">About Us</a></li>
+              <li><a href="index.html#faq" class="footer-link">About Us</a></li>
               <li><a href="about.html#how-it-works" class="footer-link">How It Works</a></li>
               <li><a href="about.html" class="footer-link">Help Center</a></li>
             </ul>
@@ -155,8 +156,8 @@
           <div class="footer-column">
             <div class="footer-title">Legal</div>
             <ul class="footer-list">
-              <li><a href="about.html" class="footer-link">Privacy Policy</a></li>
-              <li><a href="about.html" class="footer-link">Terms of Service</a></li>
+              <li><a href="policies.html" class="footer-link">Privacy Policy</a></li>
+              <li><a href="policies.html" class="footer-link">Terms of Service</a></li>
             </ul>
           </div>
         </div>

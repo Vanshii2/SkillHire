@@ -12,7 +12,7 @@
     .req-star { color: #e53e3e; font-size: 0.85em; margin-left: 2px; }
 
     .pp-hero {
-      background: linear-gradient(135deg, #0f0f0f 0%, #1a1a2e 100%);
+      background: linear-gradient(135deg, #0d1b2a 0%, #0a2617 100%);
       padding: 56px 0 44px;
       color: white;
     }
@@ -177,7 +177,7 @@
 
     /* Auth Gate */
     .auth-gate {
-      background: linear-gradient(135deg, #1dbf73 0%, #16a060 100%);
+      background: linear-gradient(135deg, #0d1b2a 0%, #0a2617 100%);
       border-radius: 20px;
       padding: 48px 40px;
       text-align: center;
@@ -264,13 +264,14 @@
       line-height: 1.4;
       padding-top: 3px;
     }
-    .step-item.active-step .step-label { color: var(--accent-color); }
+    .step-item.active-step .step-label { color: var(--primary-text); font-weight: 700; }
     .step-item.active-step .step-num {
       background: rgba(29,191,115,0.1);
       border-color: var(--accent-color);
       color: var(--accent-color);
     }
   </style>
+  <link rel="stylesheet" href="css/responsive.css">
 </head>
 <body>
 
@@ -373,7 +374,7 @@
 
             <div class="form-group">
               <label for="proj-category">Category <span class="req-star">*</span></label>
-              <select id="proj-category" required>
+              <select id="proj-category" required onchange="toggleCustomCategory(this.value)">
                 <option value="">Select a category...</option>
                 <option value="Web Development">Web Development</option>
                 <option value="Mobile Development">Mobile Development</option>
@@ -385,6 +386,10 @@
                 <option value="Digital Marketing">Digital Marketing</option>
                 <option value="General">Other / General</option>
               </select>
+            </div>
+            <div class="form-group" id="custom-category-group" style="display:none;">
+              <label for="proj-category-custom">Specify Your Category <span class="req-star">*</span></label>
+              <input type="text" id="proj-category-custom" placeholder="e.g. Blockchain, Game Development, AR/VR..." maxlength="60">
             </div>
 
             <div class="form-group">
@@ -405,14 +410,14 @@
             <div class="form-row">
               <div class="form-group">
                 <label for="proj-budget-type">Budget Type <span class="req-star">*</span></label>
-                <select id="proj-budget-type" required>
+                <select id="proj-budget-type" required onchange="updateBudgetLabel(this.value)">
                   <option value="fixed">Fixed Price</option>
                   <option value="hourly">Hourly Rate</option>
                 </select>
               </div>
               <div class="form-group">
-                <label for="proj-budget" id="budget-label">Budget Range <span class="req-star">*</span></label>
-                <input type="text" id="proj-budget" placeholder="e.g. ₹15,000 – ₹30,000" required>
+                <label id="budget-label">Budget (₹) <span class="req-star">*</span></label>
+                <input type="number" id="proj-budget-amount" min="100" step="100" placeholder="e.g. 15000" required oninput="this.value=this.value.replace(/[^0-9]/g,'')">
               </div>
             </div>
 
@@ -653,19 +658,29 @@
     document.getElementById('proj-skills-hidden').value = skills.join(',');
   }
 
-  function initBudgetTypeToggle() {
-    const select = document.getElementById('proj-budget-type');
+  function updateBudgetLabel(val) {
     const label = document.getElementById('budget-label');
-    const input = document.getElementById('proj-budget');
-    select.addEventListener('change', () => {
-      if (select.value === 'hourly') {
-        label.textContent = 'Hourly Rate';
-        input.placeholder = 'e.g. ₹800 – ₹1,200/hr';
-      } else {
-        label.textContent = 'Budget Range';
-        input.placeholder = 'e.g. ₹15,000 – ₹30,000';
-      }
-    });
+    const input = document.getElementById('proj-budget-amount');
+    if (val === 'hourly') {
+      label.innerHTML = 'Hourly Rate (₹/hr) <span class="req-star">*</span>';
+      input.placeholder = 'e.g. 800';
+    } else {
+      label.innerHTML = 'Budget (₹) <span class="req-star">*</span>';
+      input.placeholder = 'e.g. 15000';
+    }
+  }
+
+  function toggleCustomCategory(val) {
+    const grp = document.getElementById('custom-category-group');
+    const inp = document.getElementById('proj-category-custom');
+    const show = val === 'General';
+    grp.style.display = show ? 'block' : 'none';
+    inp.required = show;
+    if (!show) inp.value = '';
+  }
+
+  function initBudgetTypeToggle() {
+    // Legacy stub — handled by inline onchange now
   }
 
   function handleSubmit(e) {
@@ -677,10 +692,13 @@
     if (!session) { errEl.textContent = 'Please log in to post a project.'; return; }
 
     const title = document.getElementById('proj-title').value.trim();
-    const category = document.getElementById('proj-category').value;
+    const rawCategory = document.getElementById('proj-category').value;
+    const customCategory = document.getElementById('proj-category-custom').value.trim();
+    const category = rawCategory === 'General' && customCategory ? customCategory : rawCategory;
     const description = document.getElementById('proj-desc').value.trim();
-    const budget = document.getElementById('proj-budget').value.trim();
+    const budgetAmount = document.getElementById('proj-budget-amount').value.trim();
     const budgetType = document.getElementById('proj-budget-type').value;
+    const budget = budgetAmount ? `₹${Number(budgetAmount).toLocaleString('en-IN')}${budgetType === 'hourly' ? '/hr' : ''}` : '';
     const deadline = document.getElementById('proj-deadline').value;
     const companyName = document.getElementById('proj-company').value.trim();
 
@@ -702,10 +720,11 @@
   }
 
   function selectPlan(plan) {
-    // Simulate plan purchase — unlock posting for this session
-    localStorage.setItem('skillbridge_plan_' + window.SessionManager.getActiveUser().user.id, plan);
-    document.getElementById('pricing-gate').style.display = 'none';
-    document.getElementById('post-project-form').style.display = 'block';
+    // Store chosen plan and redirect to payment page
+    const session = window.SessionManager.getActiveUser();
+    if (!session) return;
+    localStorage.setItem('skillbridge_pending_plan_' + session.user.id, plan);
+    window.location.href = 'payment.html?plan=' + encodeURIComponent(plan) + '&return=post-project.html';
   }
 
   function resetForm() {

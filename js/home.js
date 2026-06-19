@@ -341,7 +341,7 @@ function renderDesigners() {
   const container = document.getElementById('designers-grid');
   if (!container || container.dataset.rendered) return;
 
-  const candidates = window.CandidatesDB.getAll();
+  const candidates = window.CandidatesDB.getAll().slice(0, 3);
   if (!candidates || candidates.length === 0) {
     container.innerHTML = '<p style="text-align:center;color:var(--secondary-text);padding:40px 0;">No freelancers found.</p>';
     return;

@@ -7,6 +7,8 @@ const RECRUITERS_KEY = 'skillbridge_recruiters';
 const MESSAGES_KEY = 'skillbridge_messages';
 const JOBS_KEY = 'skillbridge_jobs';
 const PROPOSALS_KEY = 'skillbridge_proposals';
+const REVIEWS_KEY = 'skillbridge_reviews';
+const ESCROW_KEY = 'skillbridge_escrow';
 
 /* ==========================================================================
    Static Projects Showcase Data (Portfolio feed)
@@ -18,7 +20,7 @@ const PROJECTS_DATA = [
     description: 'A complete visual identity system for Aatma, a contemporary wellness brand. This project covers logo design, color system, typography scale, and packaging mockups — all built around a philosophy of mindful minimalism.',
     thumbnail: 'assets/images/aatma1.webp',
     images: ['assets/images/aatma1.webp', 'assets/images/aatmaa2.webp'],
-    tags: ['Branding', 'Identity', 'Figma'],
+    tags: ['Branding', 'Identity', 'AI'],
     authorName: 'Aditi Rao',
     authorAvatar: 'assets/images/avatar2.png',
     authorId: 'aditi-rao',
@@ -67,10 +69,10 @@ const PROJECTS_DATA = [
   {
     id: 'matcha-ecommerce',
     title: 'Matcha — E-Commerce UI Kit',
-    description: 'A sophisticated e-commerce UI kit designed for premium tea brands. Includes landing page templates, product detail views, cart flows, and a comprehensive component library built in Figma and HTML/CSS.',
+    description: 'A sophisticated e-commerce UI kit designed for premium tea brands. Includes landing page templates, product detail views, cart flows, and a comprehensive component library built in  and HTML/CSS.',
     thumbnail: 'assets/images/matcha2.webp',
     images: ['assets/images/matcha2.webp', 'assets/images/matcha3.webp', 'assets/images/matcha4.webp', 'assets/images/matcha5.webp'],
-    tags: ['E-Commerce', 'UI Kit', 'Figma'],
+    tags: ['E-Commerce', 'UI Kit', 'AI'],
     authorName: 'Aditi Rao',
     authorAvatar: 'assets/images/avatar2.png',
     authorId: 'aditi-rao',
@@ -274,10 +276,10 @@ const SEED_CANDIDATES = [
     rating: 5.0,
     reviewCount: 44,
     about: 'Visual designer and prototype developer bridging the gap between aesthetics and engineering. Crafting clean Design Systems and high-fidelity HTML/CSS layouts.',
-    skills: ['UI/UX', 'Figma', 'Prototyping', 'Design Systems', 'Webflow', 'Brand Identity', 'Motion Design'],
+    skills: ['UI/UX', 'AI', 'Prototyping', 'Design Systems', 'Webflow', 'Brand Identity', 'Motion Design'],
     contact: { email: 'aditi.rao@example.com', linkedin: 'https://linkedin.com/in/aditirao-demo', github: 'https://github.com/aditirao-demo' },
     projects: [
-      { name: 'Atlas Design System', description: 'A comprehensive, multi-platform design token library featuring responsive typography scales and color mapping generators.', techStack: ['Figma', 'CSS', 'HTML', 'JavaScript'], screenshot: 'assets/images/8.webp', github: 'https://github.com', live: 'https://example.com' }
+      { name: 'Atlas Design System', description: 'A comprehensive, multi-platform design token library featuring responsive typography scales and color mapping generators.', techStack: ['AI', 'CSS', 'HTML', 'JavaScript'], screenshot: 'assets/images/8.webp', github: 'https://github.com', live: 'https://example.com' }
     ]
   },
   {
@@ -307,7 +309,7 @@ const SEED_JOBS = [
     id: 'job-001',
     title: 'Build a React E-Commerce Frontend',
     description: 'Looking for an experienced React developer to build the frontend for our e-commerce platform. The project includes product listing, cart, checkout, and user profile pages. Must be responsive and follow our existing design system.',
-    budget: '₹25,000 – ₹40,000',
+    budget: '₹25,000',
     budgetType: 'fixed',
     skills: ['React', 'JavaScript', 'CSS', 'HTML'],
     deadline: '30 days',
@@ -322,10 +324,10 @@ const SEED_JOBS = [
   {
     id: 'job-002',
     title: 'UI/UX Designer for SaaS Dashboard',
-    description: 'We need a UI/UX designer to redesign our analytics dashboard. You will work with our product team to create wireframes, high-fidelity mockups, and a complete design system in Figma. Experience with data visualization is a plus.',
-    budget: '₹15,000 – ₹30,000',
+    description: 'We need a UI/UX designer to redesign our analytics dashboard. You will work with our product team to create wireframes, high-fidelity mockups, and a complete design system. Experience with data visualization and AI tools is a plus.',
+    budget: '₹15,000',
     budgetType: 'fixed',
-    skills: ['UI/UX', 'Figma', 'Prototyping', 'Design Systems'],
+    skills: ['UI/UX', 'AI', 'Prototyping', 'Design Systems'],
     deadline: '21 days',
     clientId: 'jane-doe',
     clientName: 'Jane Doe',
@@ -339,7 +341,7 @@ const SEED_JOBS = [
     id: 'job-003',
     title: 'Python Backend API Development',
     description: 'Need a skilled Python developer to build REST APIs using Django/FastAPI for our mobile application. The APIs should support user authentication, data processing, and third-party integrations. Strong knowledge of SQL databases required.',
-    budget: '₹800 – ₹1,200/hr',
+    budget: '₹800/hr',
     budgetType: 'hourly',
     skills: ['Python', 'Django', 'REST API', 'PostgreSQL', 'SQL'],
     deadline: '45 days',
@@ -354,10 +356,10 @@ const SEED_JOBS = [
   {
     id: 'job-004',
     title: 'Mobile App UI — React Native',
-    description: 'We are building a fitness tracking app and need a React Native developer to implement UI screens from our Figma designs. 12 screens total including onboarding, home, workout tracker, profile, and settings.',
-    budget: '₹20,000 – ₹35,000',
+    description: 'We are building a fitness tracking app and need a React Native developer to implement UI screens from our designs. 12 screens total including onboarding, home, workout tracker, profile, and settings.',
+    budget: '₹20,000',
     budgetType: 'fixed',
-    skills: ['React Native', 'JavaScript', 'Mobile', 'Figma'],
+    skills: ['React Native', 'JavaScript', 'Mobile', 'AI'],
     deadline: '20 days',
     clientId: 'jane-doe',
     clientName: 'Jane Doe',
@@ -376,6 +378,17 @@ class CandidatesDB {
   static init() {
     if (!localStorage.getItem(STORAGE_KEY)) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(SEED_CANDIDATES));
+    } else {
+      // Migrate: replace Figma with AI in existing candidates' skills
+      const candidates = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      let dirty = false;
+      candidates.forEach(c => {
+        if (c.skills && c.skills.includes('Figma')) {
+          c.skills = c.skills.map(s => s === 'Figma' ? 'AI' : s);
+          dirty = true;
+        }
+      });
+      if (dirty) localStorage.setItem(STORAGE_KEY, JSON.stringify(candidates));
     }
   }
 
@@ -407,6 +420,15 @@ class CandidatesDB {
     return candidate.id;
   }
 
+  static update(candidate) {
+    const all = this.getAll();
+    const i = all.findIndex(c => c.id === candidate.id);
+    if (i !== -1) {
+      all[i] = candidate;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+    }
+  }
+
   static signup(name, email, password, role = 'Frontend Developer') {
     const candidates = this.getAll();
     if (this.getByEmail(email)) throw new Error('Email is already registered.');
@@ -421,8 +443,8 @@ class CandidatesDB {
       password,
       rating: 0,
       reviewCount: 0,
-      about: 'Welcome! Complete your profile to start finding great projects.',
-      skills: ['HTML', 'CSS', 'JavaScript'],
+      about: '',
+      skills: [],
       contact: { email, linkedin: '', github: '' },
       projects: []
     };
@@ -431,8 +453,10 @@ class CandidatesDB {
     return newCandidate;
   }
 
-  static query({ search = '', skills = [], sortBy = '' } = {}) {
+  static query({ search = '', skills = [], sortBy = 'projects' } = {}) {
     let candidates = this.getAll();
+    // Only show candidates with at least 1 project
+    candidates = candidates.filter(c => c.projects && c.projects.length > 0);
     if (search.trim()) {
       const q = search.toLowerCase().trim();
       candidates = candidates.filter(c =>
@@ -447,10 +471,27 @@ class CandidatesDB {
       );
     }
     if (sortBy === 'price') candidates.sort((a, b) => (a.hourlyRate || 0) - (b.hourlyRate || 0));
-    else if (sortBy === 'projects') candidates.sort((a, b) => b.projects.length - a.projects.length);
     else if (sortBy === 'skills') candidates.sort((a, b) => b.skills.length - a.skills.length);
     else if (sortBy === 'rating') candidates.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+    else candidates.sort((a, b) => (b.projects || []).length - (a.projects || []).length);
     return candidates;
+  }
+
+  static addProject(candidateId, project) {
+    const candidate = this.getById(candidateId);
+    if (!candidate) return null;
+    if (!candidate.projects) candidate.projects = [];
+    const proj = { ...project, id: 'proj-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5) };
+    candidate.projects.push(proj);
+    this.update(candidate);
+    return proj;
+  }
+
+  static removeProject(candidateId, projectId) {
+    const candidate = this.getById(candidateId);
+    if (!candidate) return;
+    candidate.projects = (candidate.projects || []).filter(p => p.id !== projectId);
+    this.update(candidate);
   }
 }
 
@@ -480,6 +521,15 @@ class RecruitersDB {
     if (window.CandidatesDB && window.CandidatesDB.getByEmail(email)) throw new Error('Email is already registered.');
 
     const id = name.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Date.now().toString().slice(-4);
+    const newRecruiter = { id, name, email, password, company: company || name, savedCandidates: [] };
+    recruiters.push(newRecruiter);
+    localStorage.setItem(RECRUITERS_KEY, JSON.stringify(recruiters));
+    return newRecruiter;
+  }
+
+  static signupWithId(id, name, email, password, company) {
+    const recruiters = this.getAll();
+    if (recruiters.some(r => r.id === id)) return this.getById(id);
     const newRecruiter = { id, name, email, password, company: company || name, savedCandidates: [] };
     recruiters.push(newRecruiter);
     localStorage.setItem(RECRUITERS_KEY, JSON.stringify(recruiters));
@@ -540,6 +590,28 @@ class JobsDB {
   static init() {
     if (!localStorage.getItem(JOBS_KEY)) {
       localStorage.setItem(JOBS_KEY, JSON.stringify(SEED_JOBS));
+    } else {
+      // Migrate: fix range budgets and Figma→AI in existing seeded jobs
+      const jobs = JSON.parse(localStorage.getItem(JOBS_KEY));
+      let dirty = false;
+      jobs.forEach(j => {
+        // Fix range budgets (contains ' – ')
+        if (j.budget && j.budget.includes(' – ')) {
+          j.budget = j.budget.split(' – ')[0].replace(/\/hr.*$/, '') + (j.budgetType === 'hourly' ? '/hr' : '');
+          dirty = true;
+        }
+        // Fix Figma → AI in skills
+        if (j.skills && j.skills.includes('Figma')) {
+          j.skills = j.skills.map(s => s === 'Figma' ? 'AI' : s);
+          dirty = true;
+        }
+        // Fix description mentioning Figma
+        if (j.description && j.description.includes('Figma')) {
+          j.description = j.description.replace(/Figma /g, 'AI ').replace(/ Figma/g, ' AI').replace(/Figma\b/g, 'AI');
+          dirty = true;
+        }
+      });
+      if (dirty) localStorage.setItem(JOBS_KEY, JSON.stringify(jobs));
     }
   }
 
@@ -578,6 +650,17 @@ class JobsDB {
     jobs.unshift(newJob);
     localStorage.setItem(JOBS_KEY, JSON.stringify(jobs));
     return newJob;
+  }
+
+  static delete(jobId) {
+    const jobs = this.getAll().filter(j => j.id !== jobId);
+    localStorage.setItem(JOBS_KEY, JSON.stringify(jobs));
+  }
+
+  static updateStatus(jobId, status) {
+    const jobs = this.getAll();
+    const j = jobs.find(j => j.id === jobId);
+    if (j) { j.status = status; localStorage.setItem(JOBS_KEY, JSON.stringify(jobs)); }
   }
 
   static query({ search = '', category = '', skills = [] } = {}) {
@@ -625,13 +708,15 @@ class ProposalsDB {
     if (this.hasApplied(jobId, freelancerSession.user.id)) throw new Error('You have already submitted a proposal for this project.');
 
     const proposals = this.getAll();
+    // Pull fresh candidate record so avatar/role reflect latest edits
+    const freshCand = CandidatesDB.getById(freelancerSession.user.id) || freelancerSession.user;
     const proposal = {
       id: 'prop-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6),
       jobId,
       freelancerId: freelancerSession.user.id,
-      freelancerName: freelancerSession.user.name,
-      freelancerRole: freelancerSession.user.role || 'Freelancer',
-      freelancerAvatar: freelancerSession.user.avatar || null,
+      freelancerName: freshCand.name || freelancerSession.user.name,
+      freelancerRole: freshCand.role || 'Freelancer',
+      freelancerAvatar: freshCand.avatar || null,
       coverLetter: formData.coverLetter,
       proposedBudget: formData.proposedBudget,
       proposedTimeline: formData.proposedTimeline,
@@ -701,16 +786,166 @@ class SessionManager {
   }
 }
 
+/* ==========================================================================
+   ReviewsDB (Client ratings of freelancers)
+   ========================================================================== */
+class ReviewsDB {
+  static init() {
+    if (!localStorage.getItem(REVIEWS_KEY)) localStorage.setItem(REVIEWS_KEY, JSON.stringify([]));
+  }
+
+  static getAll() { this.init(); return JSON.parse(localStorage.getItem(REVIEWS_KEY)) || []; }
+
+  static getForCandidate(candidateId) { return this.getAll().filter(r => r.candidateId === candidateId); }
+
+  static hasReviewed(clientId, candidateId) {
+    return this.getAll().some(r => r.clientId === clientId && r.candidateId === candidateId);
+  }
+
+  static add(clientId, clientName, candidateId, rating, comment) {
+    const reviews = this.getAll();
+    const review = {
+      id: 'rev-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5),
+      clientId, clientName, candidateId,
+      rating: Math.min(5, Math.max(1, rating)),
+      comment: comment || '',
+      createdAt: new Date().toISOString()
+    };
+    reviews.push(review);
+    localStorage.setItem(REVIEWS_KEY, JSON.stringify(reviews));
+    // Update candidate's computed rating
+    const allForCandidate = reviews.filter(r => r.candidateId === candidateId);
+    const avg = allForCandidate.reduce((s, r) => s + r.rating, 0) / allForCandidate.length;
+    const candidate = CandidatesDB.getById(candidateId);
+    if (candidate) {
+      candidate.rating = Math.round(avg * 10) / 10;
+      candidate.reviewCount = allForCandidate.length;
+      CandidatesDB.update(candidate);
+    }
+    return review;
+  }
+
+  static getAverageRating(candidateId) {
+    const reviews = this.getForCandidate(candidateId);
+    if (!reviews.length) return { average: 0, count: 0 };
+    const avg = reviews.reduce((s, r) => s + r.rating, 0) / reviews.length;
+    return { average: Math.round(avg * 10) / 10, count: reviews.length };
+  }
+
+  static renderStarsHTML(rating) {
+    const full = Math.floor(rating);
+    const half = rating % 1 >= 0.5;
+    let html = '';
+    for (let i = 1; i <= 5; i++) {
+      if (i <= full) html += '<span style="color:#f59e0b">★</span>';
+      else if (i === full + 1 && half) html += '<span style="color:#f59e0b">½</span>';
+      else html += '<span style="color:#ccc">★</span>';
+    }
+    return html;
+  }
+}
+
+/* ==========================================================================
+   EscrowDB (Payment escrow between clients and freelancers)
+   ========================================================================== */
+class EscrowDB {
+  static init() {
+    if (!localStorage.getItem(ESCROW_KEY)) localStorage.setItem(ESCROW_KEY, JSON.stringify([]));
+  }
+
+  static getAll() { this.init(); return JSON.parse(localStorage.getItem(ESCROW_KEY)) || []; }
+  static getById(id) { return this.getAll().find(e => e.id === id) || null; }
+  static getByClient(clientId) { return this.getAll().filter(e => e.clientId === clientId); }
+  static getByFreelancer(freelancerId) { return this.getAll().filter(e => e.freelancerId === freelancerId); }
+  static getByProposal(proposalId) { return this.getAll().find(e => e.proposalId === proposalId) || null; }
+
+  static create(proposalId, clientId, clientName, freelancerId, freelancerName, jobTitle, amount, jobId) {
+    if (this.getByProposal(proposalId)) return this.getByProposal(proposalId);
+    const escrows = this.getAll();
+    const escrow = {
+      id: 'escrow-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5),
+      proposalId, jobId: jobId || null,
+      clientId, clientName, freelancerId, freelancerName,
+      jobTitle, amount,
+      status: 'awaiting_payment', // awaiting_payment → funded → work_submitted → released | disputed
+      createdAt: new Date().toISOString(),
+      fundedAt: null,
+      releasedAt: null,
+      workNote: ''
+    };
+    escrows.push(escrow);
+    localStorage.setItem(ESCROW_KEY, JSON.stringify(escrows));
+    return escrow;
+  }
+
+  static updateStatus(escrowId, status, extra = {}) {
+    const escrows = this.getAll();
+    const e = escrows.find(e => e.id === escrowId);
+    if (!e) return;
+    e.status = status;
+    Object.assign(e, extra);
+    localStorage.setItem(ESCROW_KEY, JSON.stringify(escrows));
+    return e;
+  }
+}
+
+const COMPLAINTS_KEY = 'skillbridge_complaints';
+
+class ComplaintsDB {
+  static init() {
+    if (!localStorage.getItem(COMPLAINTS_KEY)) localStorage.setItem(COMPLAINTS_KEY, JSON.stringify([]));
+  }
+
+  static getAll() { this.init(); return JSON.parse(localStorage.getItem(COMPLAINTS_KEY)) || []; }
+  static getByUser(userId) { return this.getAll().filter(c => c.filedBy === userId || c.againstUserId === userId); }
+  static getByContract(escrowId) { return this.getAll().filter(c => c.escrowId === escrowId); }
+
+  static file({ escrowId, filedBy, filedByName, againstUserId, againstName, subject, description, contractTitle }) {
+    this.init();
+    const complaints = this.getAll();
+    const c = {
+      id: 'cmp-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5),
+      escrowId, filedBy, filedByName, againstUserId, againstName,
+      subject, description, contractTitle,
+      status: 'open',
+      createdAt: new Date().toISOString()
+    };
+    complaints.unshift(c);
+    localStorage.setItem(COMPLAINTS_KEY, JSON.stringify(complaints));
+    return c;
+  }
+}
+
 // Auto-init
 CandidatesDB.init();
 RecruitersDB.init();
 MessagesDB.init();
 JobsDB.init();
 ProposalsDB.init();
+ReviewsDB.init();
+EscrowDB.init();
+ComplaintsDB.init();
 
-window.CandidatesDB = CandidatesDB;
-window.RecruitersDB = RecruitersDB;
-window.MessagesDB = MessagesDB;
-window.JobsDB = JobsDB;
-window.ProposalsDB = ProposalsDB;
+// ── Window globals (script-tag usage) ──────────────────────────────────────
+window.CandidatesDB  = CandidatesDB;
+window.RecruitersDB  = RecruitersDB;
+window.MessagesDB    = MessagesDB;
+window.JobsDB        = JobsDB;
+window.ProposalsDB   = ProposalsDB;
+window.ReviewsDB     = ReviewsDB;
+window.EscrowDB      = EscrowDB;
+window.ComplaintsDB  = ComplaintsDB;
 window.SessionManager = SessionManager;
+
+// ── ESM export shim (ES-module / bundler usage) ────────────────────────────
+// When this file is loaded as type="module" or bundled, named exports are
+// available. The window assignments above remain as the fallback for classic
+// <script src="js/db.js"> usage — no functionality changes.
+if (typeof module !== 'undefined' && module.exports) {
+  // CommonJS (Node / Jest)
+  module.exports = { CandidatesDB, RecruitersDB, MessagesDB, JobsDB,
+    ProposalsDB, ReviewsDB, EscrowDB, ComplaintsDB, SessionManager };
+}
+// For native ESM: add  type="module"  to the script tag and import like:
+//   import { JobsDB, ProposalsDB } from './js/db.js'
+// The classes are top-level declarations — they are automatically tree-shakeable.

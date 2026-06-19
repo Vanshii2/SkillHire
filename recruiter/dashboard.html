@@ -11,7 +11,7 @@
     main { padding-top: 64px; }
 
     .dash-hero {
-      background: linear-gradient(135deg, #0f0f0f 0%, #1a1a2e 100%);
+      background: linear-gradient(135deg, #0d1b2a 0%, #0a2617 100%);
       padding: 40px 0 32px;
       color: white;
     }
@@ -25,7 +25,7 @@
       background: var(--accent-color); color: #fff;
       font-size: 1.4rem; font-weight: 800;
       display: flex; align-items: center; justify-content: center;
-      font-family: var(--font-heading); flex-shrink: 0;
+      font-family: var(--font-heading); flex-shrink: 0; overflow: hidden;
     }
     .dash-welcome-text h1 { font-size: 1.4rem; font-weight: 800; color: white; margin-bottom: 4px; letter-spacing: -0.02em; }
     .dash-welcome-text p { color: rgba(255,255,255,0.6); font-size: 0.88rem; }
@@ -126,6 +126,7 @@
     .shortlist-role { font-size: 0.8rem; color: var(--secondary-text); }
     .shortlist-actions { margin-left: auto; display: flex; gap: 8px; }
   </style>
+  <link rel="stylesheet" href="../css/responsive.css">
 </head>
 <body>
 
@@ -188,6 +189,11 @@
       <div class="dash-tabs">
         <button class="dash-tab active" onclick="showTab('posted')" id="tab-posted">My Posted Projects</button>
         <button class="dash-tab" onclick="showTab('shortlisted')" id="tab-shortlisted">Shortlisted Freelancers</button>
+        <button class="dash-tab" onclick="showTab('escrow')" id="tab-escrow">Payments &amp; Escrow</button>
+        <a href="../contracts.html" class="dash-tab" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          My Contracts
+        </a>
       </div>
 
       <!-- Tab: Posted Projects -->
@@ -198,6 +204,11 @@
       <!-- Tab: Shortlisted -->
       <div id="panel-shortlisted" style="display:none;">
         <div id="shortlisted-list"></div>
+      </div>
+
+      <!-- Tab: Escrow / Payments -->
+      <div id="panel-escrow" style="display:none;">
+        <div id="escrow-list"></div>
       </div>
     </div>
   </main>
@@ -213,15 +224,23 @@
   <script src="../js/db.js"></script>
   <script src="../js/main.js"></script>
   <script>
+  // Module-level session — accessible by all global functions (handleProposal, sendCounter, etc.)
+  let session = null;
+
   document.addEventListener('DOMContentLoaded', () => {
-    const session = window.SessionManager.getActiveUser();
+    session = window.SessionManager.getActiveUser();
     if (!session) { window.location.href = '../index.html'; return; }
 
     const mode = localStorage.getItem('skillbridge_mode') || (session.role === 'recruiter' ? 'client' : 'freelancer');
     const name = session.user.name || 'User';
     const initial = name.charAt(0).toUpperCase();
 
-    document.getElementById('dash-avatar').textContent = initial;
+    const avEl = document.getElementById('dash-avatar');
+    if (session.user.avatar && session.user.avatar.startsWith('data:')) {
+      avEl.innerHTML = `<img src="${session.user.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="">`;
+    } else {
+      avEl.textContent = initial;
+    }
     document.getElementById('dash-name').textContent = 'Welcome back, ' + name.split(' ')[0] + '!';
     document.getElementById('mode-label').textContent = mode === 'client' ? 'Client Mode' : 'Freelancer Mode';
 
@@ -232,9 +251,9 @@
     document.getElementById('stat-posted').textContent = jobs.length;
     document.getElementById('stat-proposals').textContent = totalProposals;
 
-    // Shortlisted
-    const shortlistKey = 'skillbridge_shortlist_' + session.user.id;
-    const shortlisted = JSON.parse(localStorage.getItem(shortlistKey) || '[]');
+    // Shortlisted — read from RecruitersDB.savedCandidates (same source as profile/browse save buttons)
+    const recruiterRecord = window.RecruitersDB.getById(session.user.id);
+    const shortlisted = (recruiterRecord && recruiterRecord.savedCandidates) ? recruiterRecord.savedCandidates : [];
     document.getElementById('stat-shortlisted').textContent = shortlisted.length;
 
     renderPostedJobs(jobs);
@@ -254,22 +273,24 @@
       return;
     }
     el.innerHTML = jobs.map(j => {
-      const proposalCount = j.proposals || 0;
+      const proposals = window.ProposalsDB ? window.ProposalsDB.getByJob(j.id) : [];
+      const proposalCount = proposals.length;
       const statusClass = j.status === 'open' ? 'status-open' : 'status-closed';
       const statusLabel = j.status === 'open' ? 'Open' : 'Closed';
       const postedDate = new Date(j.postedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
       const skills = (j.skills || []).slice(0, 4).map(s => `<span class="skill-pill">${s}</span>`).join('');
       return `
-        <div class="job-card">
+        <div class="job-card" style="cursor:pointer;position:relative;">
+          <div onclick="openProjectModal('${escH(j.id)}')" style="display:contents;">
           <div class="job-card-main">
             <div class="job-card-title">${escH(j.title)}</div>
             <div class="job-card-meta">
               <span>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
                 ${escH(j.budget)}
               </span>
               <span>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                 ${escH(j.deadline)}
               </span>
               <span>Posted ${postedDate}</span>
@@ -278,11 +299,18 @@
           </div>
           <div class="job-card-side">
             <div class="proposal-count">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
               ${proposalCount} proposal${proposalCount !== 1 ? 's' : ''}
             </div>
             <span class="status-badge ${statusClass}">${statusLabel}</span>
           </div>
+          </div>
+          <button onclick="deleteJob(event,'${escH(j.id)}')" title="Delete project"
+            style="position:absolute;top:10px;right:10px;background:none;border:none;cursor:pointer;color:#ccc;padding:4px;border-radius:6px;transition:color 0.15s,background 0.15s;"
+            onmouseover="this.style.color='#e53e3e';this.style.background='#fff5f5'"
+            onmouseout="this.style.color='#ccc';this.style.background='none'">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          </button>
         </div>`;
     }).join('');
   }
@@ -322,11 +350,311 @@
     document.getElementById('tab-' + tab).classList.add('active');
     document.getElementById('panel-posted').style.display = tab === 'posted' ? 'block' : 'none';
     document.getElementById('panel-shortlisted').style.display = tab === 'shortlisted' ? 'block' : 'none';
+    document.getElementById('panel-escrow').style.display = tab === 'escrow' ? 'block' : 'none';
+    if (tab === 'escrow') renderEscrow();
+  }
+
+  function renderEscrow() {
+    const container = document.getElementById('escrow-list');
+    const escrows = window.EscrowDB ? window.EscrowDB.getByClient(session.user.id) : [];
+    if (!escrows.length) {
+      container.innerHTML = `<div style="text-align:center;padding:48px 16px;color:#aaa;">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ddd" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto 12px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <p>No escrow payments yet. Accept a proposal to get started.</p>
+      </div>`;
+      return;
+    }
+    const statusLabels = { awaiting_payment: 'Awaiting Payment', funded: 'Funded', work_submitted: 'Work Submitted', released: 'Released', disputed: 'Disputed' };
+    const statusColors = { awaiting_payment: '#b45309', funded: '#1dbf73', work_submitted: '#3b82f6', released: '#16a060', disputed: '#e53e3e' };
+    container.innerHTML = escrows.map(e => `
+      <div id="escrow-card-${e.id}" style="border:1px solid #e8e8e8;border-radius:14px;padding:20px;margin-bottom:16px;background:#fff;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px;">
+          <div>
+            <div style="font-weight:800;font-size:0.95rem;color:#1a1a2e;margin-bottom:3px;">${escH(e.jobTitle)}</div>
+            <div style="font-size:0.82rem;color:#888;">Freelancer: <strong>${escH(e.freelancerName)}</strong></div>
+          </div>
+          <span id="esc-badge-${e.id}" style="padding:4px 12px;border-radius:100px;font-size:0.72rem;font-weight:700;background:rgba(29,191,115,0.08);color:${statusColors[e.status]||'#888'};">${statusLabels[e.status]||e.status}</span>
+        </div>
+        <div style="font-size:0.85rem;color:#555;margin-bottom:14px;">
+          Amount: <strong style="color:#1dbf73;font-size:1rem;">₹${escH(e.amount)}</strong>
+          ${e.fundedAt ? ` · Funded: ${new Date(e.fundedAt).toLocaleDateString('en-IN',{day:'numeric',month:'short'})}` : ''}
+          ${e.releasedAt ? ` · Released: ${new Date(e.releasedAt).toLocaleDateString('en-IN',{day:'numeric',month:'short'})}` : ''}
+        </div>
+        <div id="escrow-actions-${e.id}">
+          ${e.status === 'awaiting_payment' ? `
+            <button onclick="fundEscrowFromPanel('${e.id}')" style="padding:8px 18px;background:#1dbf73;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:0.85rem;">Fund Escrow</button>
+          ` : e.status === 'funded' || e.status === 'work_submitted' ? `
+            <button onclick="releasePayment('${e.id}')" style="padding:8px 18px;background:#1dbf73;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:0.85rem;margin-right:8px;">Release Payment</button>
+            <button onclick="disputeEscrow('${e.id}')" style="padding:8px 18px;background:#fff;color:#e53e3e;border:1.5px solid #fed7d7;border-radius:8px;font-weight:700;cursor:pointer;font-size:0.85rem;">Raise Dispute</button>
+          ` : e.status === 'released' ? `<span style="color:#16a060;font-weight:700;">✓ Payment Released</span>` :
+             e.status === 'disputed' ? `<span style="color:#e53e3e;font-weight:700;">⚠ Dispute in Progress</span>` : ''}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function fundEscrowFromPanel(escrowId) {
+    window.EscrowDB.updateStatus(escrowId, 'funded', { fundedAt: new Date().toISOString() });
+    showDashToast('Escrow funded! Freelancer will be notified.', '#1dbf73');
+    renderEscrow();
+  }
+
+  function releasePayment(escrowId) {
+    if (!confirm('Release the payment to the freelancer? This cannot be undone.')) return;
+    window.EscrowDB.updateStatus(escrowId, 'released', { releasedAt: new Date().toISOString() });
+    showDashToast('Payment released to freelancer!', '#1dbf73');
+    renderEscrow();
+  }
+
+  function disputeEscrow(escrowId) {
+    window.EscrowDB.updateStatus(escrowId, 'disputed');
+    showDashToast('Dispute raised. Our team will review.', '#e53e3e');
+    renderEscrow();
   }
 
   function escH(str) {
     if (!str) return '';
     return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function openProjectModal(jobId) {
+    const job = window.JobsDB && window.JobsDB.getById(jobId);
+    if (!job) return;
+    const proposals = window.ProposalsDB ? window.ProposalsDB.getByJob(jobId) : [];
+
+    const existing = document.getElementById('project-modal-overlay');
+    if (existing) existing.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'project-modal-overlay';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2000;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px);';
+
+    const propCards = proposals.length ? proposals.map(p => {
+      const date = new Date(p.submittedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+      const statusColor = p.status === 'accepted' ? '#16a060' : p.status === 'declined' ? '#c53030' : '#b45309';
+      const statusBg = p.status === 'accepted' ? 'rgba(29,191,115,0.08)' : p.status === 'declined' ? '#fff5f5' : '#fff8e6';
+      const statusLabel = p.status === 'accepted' ? 'Accepted' : p.status === 'declined' ? 'Declined' : 'Pending';
+      const initial = (p.freelancerName || '?').charAt(0).toUpperCase();
+      const hasPhoto = p.freelancerAvatar && p.freelancerAvatar.startsWith('data:');
+      const avatarHtml = hasPhoto
+        ? `<img src="${p.freelancerAvatar}" style="width:38px;height:38px;border-radius:50%;object-fit:cover;" alt="">`
+        : `<div style="width:38px;height:38px;border-radius:50%;background:#1dbf73;color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;">${initial}</div>`;
+      return `
+        <div id="prop-${p.id}" style="border:1px solid #eee;border-radius:12px;padding:16px;margin-bottom:12px;">
+          <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;">
+            ${avatarHtml}
+            <div style="flex:1;">
+              <div style="font-weight:700;font-size:0.9rem;color:#111;">${escH(p.freelancerName)}</div>
+              <div style="font-size:0.78rem;color:#888;">${escH(p.freelancerRole || '')}</div>
+            </div>
+            <span style="padding:3px 10px;border-radius:100px;font-size:0.72rem;font-weight:700;background:${statusBg};color:${statusColor};">${statusLabel}</span>
+          </div>
+          <div style="display:flex;gap:16px;font-size:0.8rem;color:#555;margin-bottom:8px;flex-wrap:wrap;">
+            <span><strong style="color:#1dbf73;">₹${escH(p.proposedBudget || '—')}</strong> budget</span>
+            <span>Timeline: ${escH(p.proposedTimeline || '—')}</span>
+            <span>${date}</span>
+          </div>
+          ${p.coverLetter ? `<div style="font-size:0.82rem;color:#555;line-height:1.55;background:#fafafa;border-radius:8px;padding:10px 12px;margin-bottom:10px;">${escH(p.coverLetter)}</div>` : ''}
+          ${p.status === 'pending' ? `
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button onclick="handleProposal('${p.id}','accepted')" style="flex:1;min-width:90px;padding:8px;border-radius:8px;background:#1dbf73;color:#fff;border:none;font-weight:700;cursor:pointer;font-family:inherit;font-size:0.85rem;">
+              Accept
+            </button>
+            <button onclick="toggleCounter('${p.id}')" style="flex:1;min-width:90px;padding:8px;border-radius:8px;background:#f0faf5;color:#16a060;border:1.5px solid #b2dfc9;font-weight:700;cursor:pointer;font-family:inherit;font-size:0.85rem;">
+              Counter Offer
+            </button>
+            <button onclick="handleProposal('${p.id}','declined')" style="flex:1;min-width:90px;padding:8px;border-radius:8px;background:#fff;color:#c53030;border:1.5px solid #fed7d7;font-weight:700;cursor:pointer;font-family:inherit;font-size:0.85rem;">
+              Decline
+            </button>
+          </div>
+          <div id="counter-form-${p.id}" style="display:none;margin-top:10px;padding:12px;background:#fafafa;border:1.5px solid #e0e0e0;border-radius:10px;">
+            <div style="font-size:0.8rem;font-weight:700;color:#333;margin-bottom:8px;">Send Counter Offer</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+              <div>
+                <label style="font-size:0.72rem;color:#888;display:block;margin-bottom:3px;">Your Budget (₹)</label>
+                <input id="counter-budget-${p.id}" type="number" min="0" placeholder="e.g. 12000"
+                  style="width:100%;padding:7px 10px;border:1.5px solid #e0e0e0;border-radius:7px;font-family:inherit;font-size:0.82rem;box-sizing:border-box;">
+              </div>
+              <div>
+                <label style="font-size:0.72rem;color:#888;display:block;margin-bottom:3px;">Timeline</label>
+                <input id="counter-timeline-${p.id}" type="text" placeholder="e.g. 3 weeks"
+                  style="width:100%;padding:7px 10px;border:1.5px solid #e0e0e0;border-radius:7px;font-family:inherit;font-size:0.82rem;box-sizing:border-box;">
+              </div>
+            </div>
+            <textarea id="counter-msg-${p.id}" rows="2" placeholder="Explain your counter offer…"
+              style="width:100%;padding:7px 10px;border:1.5px solid #e0e0e0;border-radius:7px;font-family:inherit;font-size:0.82rem;box-sizing:border-box;resize:vertical;margin-bottom:8px;"></textarea>
+            <div style="display:flex;gap:8px;">
+              <button onclick="sendCounter('${p.id}','${p.freelancerId}')" style="flex:1;padding:7px;background:#1dbf73;color:#fff;border:none;border-radius:7px;font-weight:700;cursor:pointer;font-family:inherit;font-size:0.82rem;">Send Counter</button>
+              <button onclick="toggleCounter('${p.id}')" style="padding:7px 14px;background:#fff;color:#888;border:1.5px solid #e0e0e0;border-radius:7px;font-weight:600;cursor:pointer;font-family:inherit;font-size:0.82rem;">Cancel</button>
+            </div>
+          </div>` : ''}
+        </div>`;
+    }).join('') : `<div style="text-align:center;padding:32px 16px;color:#aaa;">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 12px;display:block;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        <p style="font-size:0.88rem;">No proposals yet. Share your project link to attract freelancers.</p>
+      </div>`;
+
+    overlay.innerHTML = `
+      <div style="background:#fff;border-radius:20px;max-width:560px;width:100%;max-height:88vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,0.18);">
+        <div style="padding:24px 28px 16px;border-bottom:1px solid #eee;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;position:sticky;top:0;background:#fff;border-radius:20px 20px 0 0;">
+          <div>
+            <div style="font-size:1.1rem;font-weight:800;color:#111;margin-bottom:4px;">${escH(job.title)}</div>
+            <div style="font-size:0.8rem;color:#888;">${escH(job.category || '')} · ${escH(job.budget || '')} · ${escH(job.deadline || '')}</div>
+          </div>
+          <button onclick="document.getElementById('project-modal-overlay').remove()" style="background:none;border:none;cursor:pointer;color:#aaa;padding:4px;flex-shrink:0;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        ${job.description ? `<div style="padding:14px 28px;font-size:0.85rem;color:#555;line-height:1.6;border-bottom:1px solid #f0f0f0;">${escH(job.description)}</div>` : ''}
+        <div style="padding:20px 28px;">
+          <div style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#aaa;margin-bottom:14px;">
+            Proposals (${proposals.length})
+          </div>
+          ${propCards}
+        </div>
+      </div>`;
+
+    document.body.appendChild(overlay);
+    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+  }
+
+  function handleProposal(proposalId, status) {
+    const proposal = window.ProposalsDB.getAll().find(p => p.id === proposalId);
+    if (!proposal) { showDashToast('Proposal not found.', '#e53e3e'); return; }
+
+    // Guard: prevent accepting a second proposal for the same job
+    if (status === 'accepted') {
+      const alreadyAccepted = window.ProposalsDB.getAll().some(
+        p => p.jobId === proposal.jobId && p.id !== proposalId && p.status === 'accepted'
+      );
+      if (alreadyAccepted) {
+        showDashToast('A proposal for this job is already accepted.', '#e53e3e');
+        return;
+      }
+    }
+
+    window.ProposalsDB.updateStatus(proposalId, status);
+
+    const card = document.getElementById('prop-' + proposalId);
+    if (card) {
+      const statusColor = status === 'accepted' ? '#16a060' : '#c53030';
+      const statusBg = status === 'accepted' ? 'rgba(29,191,115,0.08)' : '#fff5f5';
+      const label = status === 'accepted' ? 'Accepted' : 'Declined';
+      const badge = card.querySelector('span[style*="font-weight:700"]');
+      if (badge) { badge.textContent = label; badge.style.color = statusColor; badge.style.background = statusBg; }
+      const btns = card.querySelector('div[style*="gap:8px;flex-wrap:wrap"]');
+      if (btns) btns.remove();
+    }
+
+    // On accept: create escrow, close the job, decline all other pending proposals
+    if (status === 'accepted') {
+      const job = window.JobsDB.getById(proposal.jobId);
+      if (proposal && job) {
+        // Close the job so no new applications come in
+        window.JobsDB.updateStatus(proposal.jobId, 'in_progress');
+
+        // Decline all other pending proposals for this job
+        window.ProposalsDB.getAll()
+          .filter(p => p.jobId === proposal.jobId && p.id !== proposalId && p.status === 'pending')
+          .forEach(p => window.ProposalsDB.updateStatus(p.id, 'declined'));
+
+        // Create escrow (with jobId stored)
+        const esc = window.EscrowDB.create(
+          proposalId, session.user.id, session.user.name,
+          proposal.freelancerId, proposal.freelancerName,
+          job.title, proposal.proposedBudget || '0', proposal.jobId
+        );
+
+        // Inject fund-escrow CTA into the card
+        if (card) {
+          const escDiv = document.createElement('div');
+          escDiv.style.cssText = 'margin-top:10px;padding:12px;background:rgba(29,191,115,0.05);border:1.5px solid rgba(29,191,115,0.2);border-radius:10px;';
+          escDiv.innerHTML = `
+            <div style="font-size:0.82rem;font-weight:700;color:#16a060;margin-bottom:6px;">✓ Escrow Created</div>
+            <div style="font-size:0.8rem;color:#555;margin-bottom:10px;">Amount: <strong>₹${escH(proposal.proposedBudget || '—')}</strong> — <a href="../contracts.html" style="color:#1dbf73;font-weight:600;">View in My Contracts →</a></div>
+            <button onclick="fundEscrow('${esc.id}')" id="fund-btn-${esc.id}" style="padding:7px 16px;background:#1dbf73;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:0.82rem;">
+              Fund Escrow Now
+            </button>
+          `;
+          card.appendChild(escDiv);
+        }
+      }
+    }
+
+    showDashToast(status === 'accepted' ? '✓ Proposal accepted! Escrow created.' : 'Proposal declined.', status === 'accepted' ? '#1dbf73' : '#e53e3e');
+  }
+
+  function fundEscrow(escrowId) {
+    window.EscrowDB.updateStatus(escrowId, 'funded', { fundedAt: new Date().toISOString() });
+    const btn = document.getElementById('fund-btn-' + escrowId);
+    if (btn) { btn.textContent = 'Funded ✓'; btn.disabled = true; btn.style.opacity = '0.6'; }
+    const statusEl = document.getElementById('esc-status-' + escrowId);
+    if (statusEl) { statusEl.textContent = 'Funded — Awaiting Work'; statusEl.style.color = '#1dbf73'; }
+    showDashToast('Escrow funded! Freelancer has been notified.', '#1dbf73');
+  }
+
+  function showDashToast(msg, bg) {
+    const toast = document.createElement('div');
+    toast.style.cssText = `position:fixed;bottom:24px;right:24px;background:${bg};color:#fff;padding:10px 20px;border-radius:10px;font-weight:700;font-size:0.88rem;z-index:3000;box-shadow:0 4px 16px rgba(0,0,0,0.15);`;
+    toast.textContent = msg;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 2800);
+  }
+
+  function toggleCounter(proposalId) {
+    const form = document.getElementById('counter-form-' + proposalId);
+    if (form) form.style.display = form.style.display === 'none' ? 'block' : 'none';
+  }
+
+  function sendCounter(proposalId, freelancerId) {
+    const budget = document.getElementById('counter-budget-' + proposalId).value.trim();
+    const timeline = document.getElementById('counter-timeline-' + proposalId).value.trim();
+    const msg = document.getElementById('counter-msg-' + proposalId).value.trim();
+    if (!budget) { alert('Please enter a counter budget.'); return; }
+    const proposal = window.ProposalsDB.getAll().find(p => p.id === proposalId);
+    const job = proposal ? window.JobsDB.getById(proposal.jobId) : null;
+    const company = session.user.company || session.user.name;
+    window.MessagesDB.send(
+      session.user.id, session.user.name, company, session.user.email,
+      freelancerId, `Counter Offer: ${job ? job.title : 'Project'}`,
+      `Hello ${proposal ? proposal.freelancerName : ''},\n\nI'd like to make a counter offer for this project.\n\nBudget: ₹${budget}\nTimeline: ${timeline || 'To be discussed'}\n\n${msg || 'Please let me know if you\'d like to proceed on these terms.'}`
+    );
+    // Mark proposal as countered (store info)
+    const allProps = window.ProposalsDB.getAll();
+    const idx = allProps.findIndex(p => p.id === proposalId);
+    if (idx > -1) {
+      allProps[idx].counterBudget = budget;
+      allProps[idx].counterTimeline = timeline;
+      allProps[idx].counterMsg = msg;
+      allProps[idx].status = 'countered';
+      localStorage.setItem('skillbridge_proposals', JSON.stringify(allProps)); // matches PROPOSALS_KEY in db.js
+    }
+    showDashToast('Counter offer sent to freelancer!', '#1dbf73');
+    // Update the card status badge
+    const card = document.getElementById('prop-' + proposalId);
+    if (card) {
+      const badge = card.querySelector('span[style*="font-weight:700"]');
+      if (badge) { badge.textContent = 'Counter Sent'; badge.style.color = '#7c3aed'; badge.style.background = 'rgba(124,58,237,0.08)'; }
+      const form = document.getElementById('counter-form-' + proposalId);
+      if (form) form.remove();
+      const btns = card.querySelector('div[style*="gap:8px;flex-wrap:wrap"]');
+      if (btns) btns.remove();
+    }
+  }
+
+  function deleteJob(e, jobId) {
+    e.stopPropagation();
+    const job = window.JobsDB.getById(jobId);
+    if (!job) return;
+    if (!confirm(`Delete "${job.title}"? This cannot be undone.`)) return;
+    window.JobsDB.delete(jobId);
+    showDashToast('Project deleted.', '#e53e3e');
+    // Close modal if open
+    const modal = document.getElementById('project-modal-overlay');
+    if (modal) modal.remove();
+    // Re-render
+    const jobs = window.JobsDB.getByClient(session.user.id);
+    renderPostedJobs(jobs);
   }
   </script>
 </body>

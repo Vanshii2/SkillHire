@@ -1,0 +1,262 @@
+/* ==========================================================================
+   SkillBridge — Global Responsive Stylesheet
+   Covers: navbar, dashboards, browse pages, profile, candidates, contracts
+   Breakpoints: 1024px (tablet), 768px (large mobile), 480px (small mobile)
+   ========================================================================== */
+
+/* ── Utility ── */
+*, *::before, *::after { box-sizing: border-box; }
+img { max-width: 100%; height: auto; }
+
+/* ── Navbar ── */
+@media (max-width: 768px) {
+  .nav-container { padding: 0 16px; }
+  .logo { font-size: 1.1rem; }
+  .nav-menu { display: none; }
+  .nav-cta { display: none; }
+  .mobile-toggle { display: flex !important; }
+}
+
+/* ── Hero sections (all pages) ── */
+@media (max-width: 768px) {
+  .dash-hero-inner,
+  .bp-hero-inner,
+  .pp-hero-inner,
+  .contracts-hero-inner {
+    padding: 0 16px;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .dash-hero { padding: 24px 0 20px; }
+  .bp-hero  { padding: 28px 16px 22px; }
+  .pp-hero  { padding: 28px 0 22px; }
+  .contracts-hero { padding: 28px 0 22px; }
+  .dash-welcome-text h1 { font-size: 1.15rem; }
+  .mode-badge { font-size: 0.72rem; padding: 5px 12px; }
+}
+
+/* ── Dashboard body wrapper ── */
+@media (max-width: 1024px) {
+  .dash-body { padding: 24px 20px 60px; }
+}
+@media (max-width: 768px) {
+  .dash-body { padding: 16px 12px 60px; }
+  .stats-row { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .stat-card { padding: 14px 16px; gap: 10px; }
+  .stat-num  { font-size: 1.4rem; }
+}
+@media (max-width: 480px) {
+  .stats-row { grid-template-columns: 1fr; }
+}
+
+/* ── Dashboard grid (main + sidebar) ── */
+@media (max-width: 900px) {
+  .dash-grid { grid-template-columns: 1fr !important; }
+}
+
+/* ── Panel tabs ── */
+@media (max-width: 640px) {
+  .panel-tabs {
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 10px 12px 0;
+  }
+  .ptab { font-size: 0.72rem; padding: 5px 10px; }
+  .dash-tabs { flex-wrap: wrap; gap: 4px; }
+  .dash-tab { font-size: 0.78rem; padding: 7px 12px; }
+}
+
+/* ── Recruiter dashboard stats row ── */
+@media (max-width: 768px) {
+  .stats-row.recruiter { grid-template-columns: 1fr 1fr; }
+  .stat-card-num { font-size: 1.5rem; }
+  .stat-card-label { font-size: 0.72rem; }
+}
+
+/* ── Job cards (browse + dashboard) ── */
+@media (max-width: 640px) {
+  .job-card { padding: 14px 14px; }
+  .job-header { flex-direction: column; gap: 8px; }
+  .job-footer { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .job-footer-meta { flex-wrap: wrap; gap: 6px; }
+  .btn-apply { width: 100%; justify-content: center; }
+  .job-card-main .job-card-title { font-size: 0.92rem; }
+  .job-card-meta { flex-wrap: wrap; gap: 4px; font-size: 0.75rem; }
+}
+
+/* ── Browse projects layout ── */
+@media (max-width: 1024px) {
+  .bp-body { gap: 20px; }
+  .sidebar-filters { min-width: 200px; }
+}
+@media (max-width: 768px) {
+  .bp-body {
+    flex-direction: column !important;
+    padding: 16px 12px;
+    gap: 16px;
+  }
+  .sidebar-filters {
+    width: 100% !important;
+    min-width: unset;
+    position: static !important;
+  }
+  .filter-options { display: flex; flex-wrap: wrap; gap: 6px; }
+  .checkbox-label { white-space: nowrap; }
+  .bp-main { width: 100%; }
+  .job-count { font-size: 0.82rem; }
+}
+
+/* ── Candidates grid ── */
+@media (max-width: 1024px) {
+  .candidates-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+  .candidates-grid { grid-template-columns: 1fr; }
+  .ht-page-wrap { flex-direction: column; }
+  .sidebar-filters { width: 100%; }
+}
+
+/* ── Candidate card ── */
+@media (max-width: 480px) {
+  .candidate-card { padding: 16px; }
+  .upw-card-top { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .upw-avatar-wrap { width: 48px; height: 48px; }
+}
+
+/* ── Profile page ── */
+@media (max-width: 900px) {
+  .profile-grid { grid-template-columns: 1fr !important; }
+  .profile-sidebar { order: -1; }
+}
+@media (max-width: 640px) {
+  .profile-hero { padding: 24px 16px; }
+  .profile-header { flex-direction: column; align-items: flex-start; gap: 16px; }
+  .profile-actions { flex-direction: column; width: 100%; }
+  .profile-actions a,
+  .profile-actions button { width: 100%; text-align: center; justify-content: center; }
+  .skills-grid { gap: 6px; }
+}
+
+/* ── Post project form ── */
+@media (max-width: 768px) {
+  .pp-form-wrap { padding: 20px 16px; }
+  .pp-form-grid { grid-template-columns: 1fr !important; }
+  .pp-step { padding: 20px 16px; }
+}
+
+/* ── Contracts page ── */
+@media (max-width: 768px) {
+  .contracts-body { padding: 20px 12px 60px; }
+  .contract-card { padding: 16px 14px; }
+  .contract-header { flex-direction: column; gap: 8px; }
+  .contract-actions { flex-direction: column; }
+  .contract-actions button,
+  .contract-actions .btn-complaint { width: 100%; }
+  .tab-row { flex-wrap: wrap; gap: 6px; }
+  .ctab { font-size: 0.78rem; padding: 6px 14px; }
+  .complaint-form { padding: 14px 12px; }
+  .cf-field input,
+  .cf-field select,
+  .cf-field textarea { font-size: 0.82rem; }
+}
+@media (max-width: 480px) {
+  .contract-meta { gap: 10px; font-size: 0.78rem; }
+}
+
+/* ── Edit profile page ── */
+@media (max-width: 768px) {
+  .ep-form-wrap { padding: 20px 14px; }
+  .ep-grid { grid-template-columns: 1fr !important; }
+  .project-item { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .project-item-thumb { width: 100%; height: 120px; object-fit: cover; border-radius: 8px; }
+}
+
+/* ── Proposal modal (client) ── */
+@media (max-width: 600px) {
+  #project-modal-overlay > div {
+    max-width: 100% !important;
+    border-radius: 16px 16px 0 0 !important;
+    max-height: 92vh !important;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+}
+
+/* ── Hire candidate modal ── */
+@media (max-width: 600px) {
+  #hire-modal-overlay > div {
+    max-width: 100% !important;
+    border-radius: 16px 16px 0 0 !important;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+}
+
+/* ── Auth modal ── */
+@media (max-width: 500px) {
+  .auth-modal { max-width: 100% !important; margin: 0 8px; border-radius: 16px; }
+}
+
+/* ── Invite cards in freelancer dashboard ── */
+@media (max-width: 640px) {
+  .match-card { padding: 12px; }
+  #invite-actions-placeholder { flex-direction: column; }
+  .match-card button { width: 100%; }
+  .bid-form-grid { grid-template-columns: 1fr !important; }
+}
+
+/* ── Footer ── */
+@media (max-width: 768px) {
+  .footer-top-inner { flex-direction: column; gap: 28px; }
+  .footer-nav-groups { flex-direction: column; gap: 24px; margin-left: 0 !important; }
+  .footer-socials { margin-left: 0 !important; }
+  .footer-bottom-inner { flex-direction: column; gap: 8px; text-align: center; }
+}
+@media (max-width: 480px) {
+  .footer-top { padding: 32px 16px; }
+}
+
+/* ── Profile setup / onboarding steps ── */
+@media (max-width: 640px) {
+  .setup-card { padding: 24px 16px; margin: 0 12px; }
+  .step-fields-grid { grid-template-columns: 1fr !important; }
+  .skills-bubble-wrap { gap: 6px; }
+}
+
+/* ── Shortlisted cards in recruiter dashboard ── */
+@media (max-width: 600px) {
+  .shortlist-card { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .shortlist-actions { width: 100%; display: flex; gap: 8px; }
+  .shortlist-actions a,
+  .shortlist-actions button { flex: 1; text-align: center; }
+}
+
+/* ── Job card in recruiter dashboard ── */
+@media (max-width: 640px) {
+  .job-card { flex-direction: column; gap: 8px; }
+  .job-card-side { flex-direction: row; justify-content: space-between; align-items: center; }
+}
+
+/* ── Generic container padding on small screens ── */
+@media (max-width: 480px) {
+  .container { padding: 0 12px; }
+  h1 { font-size: clamp(1.3rem, 6vw, 1.8rem); }
+  h2 { font-size: clamp(1.1rem, 5vw, 1.5rem); }
+}
+
+/* ── Scrollable tables / overflow ── */
+@media (max-width: 640px) {
+  .overflow-x-auto { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+}
+
+/* ── Bid form inside invite card ── */
+@media (max-width: 480px) {
+  #bid-form-placeholder .bid-grid,
+  [id^="bid-form-"] > div:nth-child(2) {
+    grid-template-columns: 1fr !important;
+  }
+}

@@ -3,255 +3,317 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Candidate Dashboard — SkillBridge</title>
-  <meta name="description" content="Manage your developer profile, showcase projects, and read inbound recruiter inquiries.">
-  
-  <!-- CSS Stylesheets -->
+  <title>Freelancer Dashboard — SkillBridge</title>
   <link rel="stylesheet" href="../css/base.css">
   <link rel="stylesheet" href="../css/navbar.css">
   <link rel="stylesheet" href="../css/footer.css">
-  <link rel="stylesheet" href="../css/dashboard.css">
+  <style>
+    main { padding-top: 64px; background: #f7f8fa; min-height: calc(100vh - 64px); }
+
+    /* ── Hero ── */
+    .dash-hero {
+      background: linear-gradient(135deg, #0d1b2a 0%, #0a2617 100%);
+      padding: 36px 0 30px;
+    }
+    .dash-hero-inner {
+      max-width: 1100px; margin: 0 auto; padding: 0 32px;
+      display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;
+    }
+    .dash-welcome { display: flex; align-items: center; gap: 16px; }
+    .dash-avatar-wrap { position: relative; flex-shrink: 0; }
+    .dash-avatar {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: #1dbf73; color: #fff;
+      font-size: 1.5rem; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-heading); overflow: hidden;
+    }
+    .dash-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+    .dash-welcome-text h1 { font-size: 1.35rem; font-weight: 800; color: white; margin-bottom: 3px; letter-spacing: -0.02em; }
+    .dash-welcome-text p { color: rgba(255,255,255,0.55); font-size: 0.83rem; }
+    .mode-badge {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: rgba(29,191,115,0.15); border: 1px solid rgba(29,191,115,0.35);
+      border-radius: 100px; padding: 7px 16px;
+      font-size: 0.8rem; font-weight: 700; color: #6effc0; letter-spacing: 0.02em;
+    }
+    .mode-dot { width: 7px; height: 7px; border-radius: 50%; background: #1dbf73; }
+
+    /* ── Body ── */
+    .dash-body { max-width: 1100px; margin: 0 auto; padding: 32px 32px 80px; }
+
+    /* ── Stats ── */
+    .stats-row {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 28px;
+    }
+    @media (max-width: 640px) { .stats-row { grid-template-columns: 1fr 1fr; } }
+    .stat-card {
+      background: #fff; border: 1px solid var(--border-color); border-radius: 16px;
+      padding: 20px 22px; display: flex; align-items: center; gap: 14px;
+    }
+    .stat-icon {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: rgba(29,191,115,0.1); display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .stat-icon svg { stroke: #1dbf73; }
+    .stat-num { font-size: 1.7rem; font-weight: 800; color: #111; letter-spacing: -0.04em; line-height: 1; margin-bottom: 3px; }
+    .stat-label { font-size: 0.78rem; color: var(--secondary-text); font-weight: 500; }
+
+    /* ── Quick Actions ── */
+    .quick-actions {
+      display: flex; gap: 10px; margin-bottom: 28px; flex-wrap: wrap;
+    }
+    .qa-btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 9px 16px; border-radius: 10px; font-size: 0.85rem; font-weight: 600;
+      border: 1.5px solid var(--border-color); background: #fff; color: #333;
+      cursor: pointer; text-decoration: none; transition: all 0.15s;
+    }
+    .qa-btn svg { stroke: #1dbf73; flex-shrink: 0; }
+    .qa-btn:hover { border-color: #1dbf73; color: #1dbf73; background: rgba(29,191,115,0.04); }
+    .qa-btn.primary { background: #1dbf73; color: #fff; border-color: #1dbf73; }
+    .qa-btn.primary svg { stroke: #fff; }
+    .qa-btn.primary:hover { background: #18a864; }
+
+    /* ── Main grid ── */
+    .dash-grid { display: grid; grid-template-columns: 1fr 340px; gap: 24px; }
+    @media (max-width: 900px) { .dash-grid { grid-template-columns: 1fr; } }
+
+    /* ── Panel cards ── */
+    .panel-card {
+      background: #fff; border: 1px solid var(--border-color); border-radius: 18px; overflow: hidden;
+    }
+    .panel-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 22px 16px; border-bottom: 1px solid var(--border-color);
+    }
+    .panel-header h3 { font-size: 0.95rem; font-weight: 800; color: #111; display: flex; align-items: center; gap: 8px; }
+    .panel-header h3 svg { stroke: #1dbf73; }
+    .panel-header a { font-size: 0.8rem; color: #1dbf73; font-weight: 600; text-decoration: none; }
+    .panel-body { padding: 16px 22px; }
+
+    /* ── Tab pills inside panel ── */
+    .panel-tabs { display: flex; gap: 6px; padding: 14px 22px 0; }
+    .ptab {
+      padding: 6px 14px; border-radius: 100px; font-size: 0.8rem; font-weight: 600;
+      background: #f5f5f5; color: #888; border: none; cursor: pointer; transition: all 0.15s;
+    }
+    .ptab.active { background: rgba(29,191,115,0.12); color: #16a060; }
+
+    /* ── Proposal cards ── */
+    .prop-card {
+      border: 1px solid var(--border-color); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px;
+      transition: border-color 0.15s;
+    }
+    .prop-card:hover { border-color: rgba(29,191,115,0.4); }
+    .prop-title { font-size: 0.92rem; font-weight: 700; color: #111; margin-bottom: 4px; }
+    .prop-meta { font-size: 0.78rem; color: var(--secondary-text); margin-bottom: 6px; display: flex; gap: 10px; flex-wrap: wrap; }
+    .prop-status {
+      display: inline-block; padding: 2px 10px; border-radius: 100px; font-size: 0.72rem; font-weight: 700;
+    }
+    .status-pending { background: #fff8e6; color: #b45309; border: 1px solid #fde68a; }
+    .status-accepted { background: rgba(29,191,115,0.1); color: #16a060; border: 1px solid rgba(29,191,115,0.25); }
+    .status-declined { background: #fff5f5; color: #c53030; border: 1px solid #fed7d7; }
+
+    /* ── Matching job cards ── */
+    .match-card {
+      border: 1px solid var(--border-color); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px;
+      transition: border-color 0.15s;
+    }
+    .match-card:hover { border-color: rgba(29,191,115,0.4); }
+    .match-title { font-size: 0.92rem; font-weight: 700; color: #111; margin-bottom: 3px; }
+    .match-meta { font-size: 0.78rem; color: var(--secondary-text); margin-bottom: 8px; }
+    .match-budget { font-size: 0.9rem; font-weight: 700; color: #1dbf73; }
+    .skills-row { display: flex; flex-wrap: wrap; gap: 5px; margin: 8px 0; }
+    .skill-pill {
+      padding: 2px 9px; border-radius: 100px; font-size: 0.73rem; font-weight: 600;
+      background: #f5f5f5; color: #555; border: 1px solid #eee;
+    }
+    .skill-pill.match { background: rgba(29,191,115,0.08); color: #16a060; border-color: rgba(29,191,115,0.25); }
+    .btn-apply {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 6px 14px; border-radius: 8px; font-size: 0.8rem; font-weight: 700;
+      background: #1dbf73; color: #fff; border: none; cursor: pointer; text-decoration: none;
+      transition: background 0.15s;
+    }
+    .btn-apply:hover { background: #18a864; }
+
+    /* ── Message cards ── */
+    .msg-card {
+      border: 1px solid var(--border-color); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px;
+    }
+    .msg-from { font-size: 0.85rem; font-weight: 700; color: #111; margin-bottom: 3px; }
+    .msg-subject { font-size: 0.8rem; color: #1dbf73; font-weight: 600; margin-bottom: 6px; }
+    .msg-body { font-size: 0.82rem; color: var(--secondary-text); line-height: 1.5; }
+    .msg-date { font-size: 0.72rem; color: #bbb; margin-top: 6px; }
+
+    /* ── Profile sidebar card ── */
+    .profile-sidebar-card {
+      background: #fff; border: 1px solid var(--border-color); border-radius: 18px;
+      padding: 24px; text-align: center; margin-bottom: 16px;
+    }
+    .psc-avatar {
+      width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 14px;
+      background: #1dbf73; color: #fff; font-size: 2rem; font-weight: 800;
+      display: flex; align-items: center; justify-content: center; overflow: hidden;
+    }
+    .psc-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+    .psc-name { font-size: 1rem; font-weight: 800; color: #111; margin-bottom: 3px; }
+    .psc-role { font-size: 0.82rem; color: var(--secondary-text); margin-bottom: 14px; }
+    .psc-skills { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-bottom: 16px; }
+    .psc-edit-btn {
+      display: flex; align-items: center; justify-content: center; gap: 7px;
+      width: 100%; padding: 10px; border-radius: 10px; font-size: 0.85rem; font-weight: 700;
+      background: rgba(29,191,115,0.08); color: #16a060; border: 1.5px solid rgba(29,191,115,0.25);
+      cursor: pointer; text-decoration: none; transition: all 0.15s;
+    }
+    .psc-edit-btn svg { stroke: #1dbf73; }
+    .psc-edit-btn:hover { background: rgba(29,191,115,0.15); }
+
+    .empty-state {
+      text-align: center; padding: 32px 16px;
+    }
+    .empty-state svg { stroke: #1dbf73; margin: 0 auto 12px; display: block; opacity: 0.5; }
+    .empty-state p { font-size: 0.85rem; color: var(--secondary-text); }
+    .empty-state a { color: #1dbf73; font-weight: 600; font-size: 0.82rem; display: inline-block; margin-top: 10px; }
+  </style>
+  <link rel="stylesheet" href="../css/responsive.css">
 </head>
 <body>
 
-  
   <header id="site-header">
     <div class="nav-container">
-      <a href="../index.html" class="logo" id="nav-logo">
-        SkillBridge
-      </a>
-      <ul class="nav-menu" id="nav-menu-list">
-        <li><a href="../index.html" class="nav-link active" id="nav-link-home">Home</a></li>
-        <li><a href="../candidates.html" class="nav-link" id="nav-link-candidates">Candidates</a></li>
-        <li><a href="../posts.html" class="nav-link" id="nav-link-posts">Posts</a></li>
-      </ul>
-      <div class="nav-cta">
-        <button class="btn btn-secondary" id="nav-btn-signup" style="margin-right: 8px;">Sign Up</button>
-        <button class="btn btn-primary" id="nav-btn-portal-trigger">Log in</button>
+      <a href="../index.html" class="logo">SkillBridge</a>
+      <ul class="nav-menu" id="nav-menu-list"></ul>
+      <div class="nav-cta" id="nav-cta-area">
+        <button class="btn btn-secondary" id="nav-btn-login" style="margin-right:8px;">Log In</button>
+        <button class="btn btn-primary" id="nav-btn-register">Register</button>
       </div>
       <button class="mobile-toggle" id="mobile-hamburger" aria-label="Toggle Menu">
-        <span class="hamburger-line"></span>
-        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span><span class="hamburger-line"></span>
       </button>
     </div>
   </header>
-
   <div class="mobile-drawer-overlay" id="mobile-overlay"></div>
   <div class="mobile-drawer" id="mobile-drawer-menu">
-    <ul class="mobile-nav-list">
-      <li><a href="../index.html" class="mobile-nav-link active" id="mob-link-home">Home</a></li>
-      <li><a href="../candidates.html" class="mobile-nav-link" id="mob-link-candidates">Candidates</a></li>
-      <li><a href="../posts.html" class="mobile-nav-link" id="mob-link-posts">Posts</a></li>
-    </ul>
-    <div class="mobile-nav-cta">
-      <button class="btn btn-secondary btn-block" id="mob-btn-signup">Sign Up</button>
-      <button class="btn btn-primary btn-block" id="mob-btn-portal-trigger" style="margin-top: 10px;">Log in</button>
-    </div>
+    <ul class="mobile-nav-list" id="mob-nav-list"></ul>
+    <div class="mobile-nav-cta" id="mob-cta-area"></div>
   </div>
 
-
   <main>
-    <section class="dashboard-section container">
-      <div class="dashboard-layout">
-        
-        <!-- Sidebar Navigation -->
-        <aside class="dashboard-sidebar">
-          <div class="candidate-summary-card">
-            <img id="dashboard-avatar" src="../assets/images/avatar1.png" alt="Candidate Avatar" class="dashboard-avatar">
-            <h3 id="dashboard-name">Loading...</h3>
-            <p id="dashboard-role">Software Developer</p>
+    <!-- Hero -->
+    <div class="dash-hero">
+      <div class="dash-hero-inner">
+        <div class="dash-welcome">
+          <div class="dash-avatar-wrap">
+            <div class="dash-avatar" id="dash-avatar-el">?</div>
           </div>
-          <nav class="dashboard-menu">
-            <a href="dashboard.html" class="menu-item active">
-              <span class="menu-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span> Profile & Projects
-            </a>
-            <a href="requests.html" class="menu-item">
-              <span class="menu-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span> Project Requests
-            </a>
-            <a href="contracts.html" class="menu-item">
-              <span class="menu-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span> My Contracts
-            </a>
-          </nav>
-        </aside>
-
-        <!-- Main Dashboard View Panel -->
-        <div class="dashboard-content">
-          
-          <!-- Inner Tabs for Candidate (Edit profile & Manage projects) -->
-          <div style="display: flex; gap: 12px; margin-bottom: 30px; border-bottom: 1px solid rgba(0,0,0,0.04); padding-bottom: 12px;">
-            <button class="search-tab active" id="tab-btn-edit" onclick="switchInnerTab('edit')" style="border-radius: var(--radius-sm);">Edit Profile</button>
-            <button class="search-tab" id="tab-btn-projects" onclick="switchInnerTab('projects')" style="border-radius: var(--radius-sm);">Manage Projects</button>
-            <button class="search-tab" id="tab-btn-inquiries" onclick="switchInnerTab('inquiries')" style="border-radius: var(--radius-sm);">Inbound Inquiries</button>
-          </div>
-
-          <!-- TAB 1: Edit Profile -->
-          <div class="inner-tab-content" id="tab-edit-profile">
-            <div class="tab-header">
-              <h2>Edit Profile Information</h2>
-              <p>Update your details, tags, and availability status.</p>
-            </div>
-            
-            <form id="profile-edit-form">
-              <div class="form-block">
-                <div class="form-row">
-                  <div class="form-group">
-                    <label for="edit-name">Full Name *</label>
-                    <input type="text" id="edit-name" placeholder="John Doe" required>
-                  </div>
-                  <div class="form-group">
-                    <label for="edit-role">Professional Title *</label>
-                    <input type="text" id="edit-role" placeholder="e.g. Frontend Developer" required>
-                  </div>
-                </div>
-
-                <div class="form-row">
-                  <div class="form-group">
-                    <label for="edit-availability">Availability Status *</label>
-                    <select id="edit-availability">
-                      <option value="Available for Internship">Available for Internship</option>
-                      <option value="Available for Full-Time">Available for Full-Time</option>
-                    </select>
-                  </div>
-                  <div class="form-group">
-                    <label>Profile Avatar *</label>
-                    <input type="hidden" id="edit-avatar-path" value="assets/images/avatar1.png">
-                    <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
-                      <div class="avatar-preset-grid">
-                        <div class="avatar-preset-option selected" data-path="assets/images/avatar1.png">
-                          <img src="../assets/images/avatar1.png" alt="Male preset">
-                        </div>
-                        <div class="avatar-preset-option" data-path="assets/images/avatar2.png">
-                          <img src="../assets/images/avatar2.png" alt="Female preset">
-                        </div>
-                      </div>
-                      <div style="display: flex; flex-direction: column; gap: 6px;">
-                        <span style="font-size:0.8rem; font-weight:600; color:var(--secondary-text);">Or Upload Custom Photo:</span>
-                        <input type="file" id="edit-avatar-file" accept="image/*" style="font-size: 0.8rem; border: none; background: transparent; padding: 0;">
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="form-group">
-                  <label for="edit-about">Professional Bio / About Me *</label>
-                  <textarea id="edit-about" rows="5" placeholder="Write something about your goals, favorite stacks, and drive..." required style="resize: vertical;"></textarea>
-                </div>
-              </div>
-
-              <div class="form-block">
-                <div class="form-block-title">Technical Skill Tags</div>
-                <div class="form-group">
-                  <label for="edit-skill-input">Add Skills</label>
-                  <div class="skills-input-row">
-                    <input type="text" id="edit-skill-input" placeholder="e.g. React (Press Add or Enter)">
-                    <button type="button" class="btn btn-secondary" id="btn-dashboard-add-skill">Add Tag</button>
-                  </div>
-                  <div class="skills-list" id="dashboard-skills-wrapper">
-                    <!-- Dynamic tag chips -->
-                  </div>
-                </div>
-              </div>
-
-              <div class="form-block">
-                <div class="form-block-title">Contact & Social Links</div>
-                <div class="form-row">
-                  <div class="form-group">
-                    <label for="edit-linkedin">LinkedIn URL</label>
-                    <input type="url" id="edit-linkedin" placeholder="https://linkedin.com/in/username">
-                  </div>
-                  <div class="form-group">
-                    <label for="edit-github">GitHub Profile URL</label>
-                    <input type="url" id="edit-github" placeholder="https://github.com/username">
-                  </div>
-                </div>
-              </div>
-
-              <div class="form-actions">
-                <button type="submit" class="btn btn-primary">Save Changes</button>
-                <div class="toast-success" id="profile-save-toast" style="display: none;">✓ Profile changes saved!</div>
-              </div>
-            </form>
-          </div>
-
-          <!-- TAB 2: Manage Projects -->
-          <div class="inner-tab-content" id="tab-manage-projects" style="display: none;">
-            <div class="tab-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
-              <div>
-                <h2>Manage Showcase Projects</h2>
-                <p>Highlight the top projects you have designed or built.</p>
-              </div>
-              <button class="btn btn-primary" id="btn-open-project-modal">+ Add Showcase Project</button>
-            </div>
-            
-            <div class="projects-dashboard-grid" id="dashboard-projects-grid">
-              <!-- Rendered Dynamically -->
-            </div>
-          </div>
-
-          <!-- TAB 3: Recruiter Messages -->
-          <div class="inner-tab-content" id="tab-recruiter-messages" style="display: none;">
-            <div class="tab-header">
-              <h2>Recruiter Inquiries History</h2>
-              <p>Log of messages received from recruiters on the platform.</p>
-            </div>
-            
-            <div class="messages-inbox-container" id="dashboard-messages-inbox">
-              <!-- Rendered Dynamically -->
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-    </section>
-  </main>
-
-  
-    <footer id="site-footer">
-    <div class="footer-top">
-      <div class="container footer-top-inner">
-        <a href="../index.html" class="footer-logo" id="footer-logo">
-          SkillBridge
-        </a>
-        <div class="footer-nav-groups" style="display: flex; gap: 64px; margin-left: 64px; flex-wrap: wrap;">
-          <div class="footer-column">
-            <div class="footer-title">Platform</div>
-            <ul class="footer-list">
-              <li><a href="../candidates.html" class="footer-link">Browse Talent</a></li>
-              <li><a href="../posts.html" class="footer-link">Job Posts</a></li>
-              <li><a href="../index.html" class="footer-link">Post a Project</a></li>
-            </ul>
-          </div>
-          <div class="footer-column">
-            <div class="footer-title">Resources</div>
-            <ul class="footer-list">
-              <li><a href="../about.html" class="footer-link">About Us</a></li>
-              <li><a href="../about.html#how-it-works" class="footer-link">How It Works</a></li>
-              <li><a href="../about.html" class="footer-link">Help Center</a></li>
-            </ul>
-          </div>
-          <div class="footer-column">
-            <div class="footer-title">Legal</div>
-            <ul class="footer-list">
-              <li><a href="../about.html" class="footer-link">Privacy Policy</a></li>
-              <li><a href="../about.html" class="footer-link">Terms of Service</a></li>
-            </ul>
+          <div class="dash-welcome-text">
+            <h1 id="dash-name">Loading...</h1>
+            <p id="dash-sub">Freelancer Dashboard</p>
           </div>
         </div>
-        
-        <div class="footer-socials" style="margin-left: auto;">
-          <a href="https://twitter.com" target="_blank" rel="noopener" class="footer-social-icon" aria-label="Twitter/X">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.736l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-          </a>
-          <a href="https://linkedin.com" target="_blank" rel="noopener" class="footer-social-icon" aria-label="LinkedIn">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-          </a>
-          <a href="https://instagram.com" target="_blank" rel="noopener" class="footer-social-icon" aria-label="Instagram">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
-          </a>
+        <div class="mode-badge">
+          <span class="mode-dot"></span>
+          <span>Freelancer Mode</span>
         </div>
       </div>
     </div>
+
+    <div class="dash-body">
+      <!-- Stats -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <div>
+            <div class="stat-num" id="stat-proposals">0</div>
+            <div class="stat-label">Proposals Sent</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </div>
+          <div>
+            <div class="stat-num" id="stat-matching">0</div>
+            <div class="stat-label">Invites Received</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div>
+            <div class="stat-num" id="stat-messages">0</div>
+            <div class="stat-label">Messages</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="quick-actions">
+        <a href="../browse-projects.html" class="qa-btn primary">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          Browse Projects
+        </a>
+      </div>
+
+      <!-- Main Grid -->
+      <div class="dash-grid">
+
+        <!-- LEFT: Tabbed main panel -->
+        <div>
+          <!-- Tab pills -->
+          <div class="panel-tabs" style="background:#fff;border:1px solid var(--border-color);border-radius:14px 14px 0 0;border-bottom:none;padding-bottom:14px;">
+            <button class="ptab active" id="ptab-matching" onclick="showPTab('matching')">Invites</button>
+            <button class="ptab" id="ptab-proposals" onclick="showPTab('proposals')">My Proposals</button>
+            <button class="ptab" id="ptab-messages" onclick="showPTab('messages')">Messages</button>
+            <button class="ptab" id="ptab-escrow" onclick="showPTab('escrow')">Payments</button>
+          </div>
+
+          <div class="panel-card" style="border-radius:0 0 14px 14px;border-top:none;">
+            <!-- Matching Projects -->
+            <div id="panel-matching" class="panel-body"></div>
+            <!-- My Proposals -->
+            <div id="panel-proposals" class="panel-body" style="display:none;"></div>
+            <!-- Messages -->
+            <div id="panel-messages" class="panel-body" style="display:none;"></div>
+            <!-- Payments / Escrow -->
+            <div id="panel-escrow" class="panel-body" style="display:none;"></div>
+          </div>
+        </div>
+
+        <!-- RIGHT: Profile sidebar -->
+        <div>
+          <div class="profile-sidebar-card">
+            <div class="psc-avatar" id="psc-avatar-el">?</div>
+            <div class="psc-name" id="psc-name">—</div>
+            <div class="psc-role" id="psc-role">—</div>
+            <div class="psc-skills" id="psc-skills"></div>
+            <a id="psc-edit-link" href="../edit-profile.html" class="psc-edit-btn">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              Edit Profile
+            </a>
+          </div>
+
+          <!-- Recent activity stub -->
+          <div class="panel-card">
+            <div class="panel-header">
+              <h3>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                Activity
+              </h3>
+            </div>
+            <div class="panel-body" id="activity-panel"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer id="site-footer">
     <div class="footer-bottom-strip">
       <div class="container footer-bottom-inner">
         <div class="footer-copy">&copy; 2026 SkillBridge. All rights reserved.</div>
@@ -260,28 +322,396 @@
   </footer>
 
   <script src="../js/db.js"></script>
-  <script src="../js/storage.js"></script>
-  <script src="../js/auth.js"></script>
   <script src="../js/main.js"></script>
-  <script src="../js/candidate-dashboard.js"></script>
-
   <script>
-    // Handle tab switching in dashboard panel
-    function switchInnerTab(tab) {
-      document.querySelectorAll('.search-tab').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.inner-tab-content').forEach(t => t.style.display = 'none');
+  function escH(str) {
+    if (!str) return '';
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
 
-      if (tab === 'edit') {
-        document.getElementById('tab-btn-edit').classList.add('active');
-        document.getElementById('tab-edit-profile').style.display = 'block';
-      } else if (tab === 'projects') {
-        document.getElementById('tab-btn-projects').classList.add('active');
-        document.getElementById('tab-manage-projects').style.display = 'block';
-      } else if (tab === 'inquiries') {
-        document.getElementById('tab-btn-inquiries').classList.add('active');
-        document.getElementById('tab-recruiter-messages').style.display = 'block';
+  function showPTab(name) {
+    ['matching','proposals','messages','escrow'].forEach(t => {
+      document.getElementById('ptab-' + t).classList.toggle('active', t === name);
+      document.getElementById('panel-' + t).style.display = t === name ? 'block' : 'none';
+    });
+    if (name === 'escrow') renderFreelancerEscrow();
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const session = window.SessionManager && window.SessionManager.getActiveUser();
+    if (!session) { window.location.href = '../index.html'; return; }
+
+    const candidate = window.CandidatesDB.getById(session.user.id) || session.user;
+    const name = candidate.name || 'User';
+    const initial = name.charAt(0).toUpperCase();
+
+    // Hero avatar
+    const heroAv = document.getElementById('dash-avatar-el');
+    if (candidate.avatar && candidate.avatar.startsWith('data:')) {
+      heroAv.innerHTML = `<img src="${candidate.avatar}" alt="">`;
+    } else {
+      heroAv.textContent = initial;
+    }
+
+    document.getElementById('dash-name').textContent = 'Welcome back, ' + name.split(' ')[0] + '!';
+    document.getElementById('dash-sub').textContent = candidate.role || 'Freelancer';
+    document.getElementById('view-profile-btn').href = '../profile.html?id=' + encodeURIComponent(session.user.id);
+
+    // Sidebar profile card
+    const pscAv = document.getElementById('psc-avatar-el');
+    if (candidate.avatar && candidate.avatar.startsWith('data:')) {
+      pscAv.innerHTML = `<img src="${candidate.avatar}" alt="">`;
+    } else {
+      pscAv.textContent = initial;
+    }
+    document.getElementById('psc-name').textContent = name;
+    document.getElementById('psc-role').textContent = candidate.role || 'Freelancer';
+    document.getElementById('psc-edit-link').href = '../profile.html?id=' + encodeURIComponent(session.user.id);
+
+    const skills = candidate.skills || [];
+    document.getElementById('psc-skills').innerHTML = skills.slice(0, 5).map(s =>
+      `<span class="skill-pill match">${escH(s)}</span>`
+    ).join('') + (skills.length > 5 ? `<span class="skill-pill">+${skills.length - 5}</span>` : '');
+
+    // My Proposals
+    const myProposals = window.ProposalsDB ? window.ProposalsDB.getByFreelancer(session.user.id) : [];
+    document.getElementById('stat-proposals').textContent = myProposals.length;
+
+    // Messages
+    const messages = window.MessagesDB ? window.MessagesDB.getForCandidate(session.user.id) : [];
+    document.getElementById('stat-messages').textContent = messages.length;
+
+    // Direct invite jobs only (for "Invites" tab)
+    const allJobs = window.JobsDB ? window.JobsDB.getAll().filter(j => j.status === 'open') : [];
+    const inviteJobs = allJobs.filter(j => j.invitedFreelancerId === session.user.id);
+    // Exclude invites that have already been declined (stored in localStorage)
+    const declinedInvites = JSON.parse(localStorage.getItem('declined_invites_' + session.user.id) || '[]');
+    const pendingInvites = inviteJobs.filter(j => !declinedInvites.includes(j.id));
+    document.getElementById('stat-matching').textContent = pendingInvites.length;
+
+    renderInvites(pendingInvites, session);
+    renderProposals(myProposals);
+    renderMessages(messages);
+    renderActivity(myProposals, messages);
+  });
+
+  function renderInvites(jobs, session) {
+    const el = document.getElementById('panel-matching');
+    if (!jobs.length) {
+      el.innerHTML = `<div class="empty-state">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.39 2 2 0 0 1 3.6 1.21L6.59 1.2a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.61 9.1a16 16 0 0 0 6.29 6.29l1.06-1.23a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.91 16.92z"/></svg>
+        <p style="margin-top:12px;color:#888;">No invites yet.<br>
+          <a href="../browse-projects.html" style="color:#1dbf73;font-weight:600;">Browse open projects →</a>
+        </p>
+      </div>`;
+      return;
+    }
+    el.innerHTML = jobs.map(j => {
+      const alreadyBid = window.ProposalsDB && window.ProposalsDB.hasApplied(j.id, session.user.id);
+      const skillPills = (j.skills || []).slice(0, 5).map(s =>
+        `<span class="skill-pill match">${escH(s)}</span>`
+      ).join('');
+      return `
+      <div class="match-card" id="invite-card-${j.id}" style="border-color:#1dbf73;border-width:1.5px;padding:16px;">
+        <div style="font-size:0.7rem;font-weight:800;color:#1dbf73;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;">★ Project Invite from ${escH(j.clientName || 'Client')}</div>
+        <div class="match-title" style="font-size:1rem;margin-bottom:4px;">${escH(j.title)}</div>
+        <div class="match-meta" style="margin-bottom:6px;">${escH(j.category || 'General')} · ${escH(j.budget || 'Negotiable')} · ${escH(j.deadline || '—')}</div>
+        <div id="invite-desc-${j.id}" style="display:none;font-size:0.82rem;color:#555;line-height:1.6;background:#fafafa;border-radius:8px;padding:10px 12px;margin-bottom:10px;">${escH(j.description || 'No description provided.')}</div>
+        <div class="skills-row" style="margin-bottom:12px;">${skillPills}</div>
+
+        ${alreadyBid ? `
+          <div style="padding:8px 14px;background:rgba(29,191,115,0.08);border:1px solid rgba(29,191,115,0.2);border-radius:8px;font-size:0.82rem;font-weight:700;color:#16a060;">
+            ✓ You have already submitted a bid for this project.
+          </div>
+        ` : `
+        <!-- Action buttons -->
+        <div id="invite-actions-${j.id}" style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button onclick="toggleInviteDesc('${j.id}')" style="padding:8px 14px;border-radius:8px;background:#f5f5f5;color:#555;border:1.5px solid #e0e0e0;font-weight:600;cursor:pointer;font-family:inherit;font-size:0.82rem;">
+            View Details
+          </button>
+          <button onclick="openBidForm('${j.id}')" style="padding:8px 18px;border-radius:8px;background:#1dbf73;color:#fff;border:none;font-weight:700;cursor:pointer;font-family:inherit;font-size:0.82rem;">
+            Bid
+          </button>
+          <button onclick="declineInvite('${j.id}')" style="padding:8px 14px;border-radius:8px;background:#fff;color:#c53030;border:1.5px solid #fed7d7;font-weight:600;cursor:pointer;font-family:inherit;font-size:0.82rem;">
+            Decline
+          </button>
+        </div>
+
+        <!-- Bid form (hidden by default) -->
+        <div id="bid-form-${j.id}" style="display:none;margin-top:12px;padding:14px;background:#fafafa;border:1.5px solid #e0e0e0;border-radius:10px;">
+          <div style="font-size:0.82rem;font-weight:700;color:#111;margin-bottom:10px;">Submit Your Bid</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+            <div>
+              <label style="font-size:0.72rem;color:#888;font-weight:600;display:block;margin-bottom:3px;">Your Bid Amount (₹) *</label>
+              <input id="bid-budget-${j.id}" type="number" min="0" placeholder="e.g. 12000"
+                style="width:100%;padding:8px 10px;border:1.5px solid #e0e0e0;border-radius:7px;font-family:inherit;font-size:0.85rem;box-sizing:border-box;">
+            </div>
+            <div>
+              <label style="font-size:0.72rem;color:#888;font-weight:600;display:block;margin-bottom:3px;">Timeline *</label>
+              <input id="bid-timeline-${j.id}" type="text" placeholder="e.g. 2 weeks"
+                style="width:100%;padding:8px 10px;border:1.5px solid #e0e0e0;border-radius:7px;font-family:inherit;font-size:0.85rem;box-sizing:border-box;">
+            </div>
+          </div>
+          <div style="margin-bottom:10px;">
+            <label style="font-size:0.72rem;color:#888;font-weight:600;display:block;margin-bottom:3px;">Cover Message *</label>
+            <textarea id="bid-msg-${j.id}" rows="3" placeholder="Why are you the right fit? What's your approach?"
+              style="width:100%;padding:8px 10px;border:1.5px solid #e0e0e0;border-radius:7px;font-family:inherit;font-size:0.85rem;box-sizing:border-box;resize:vertical;"></textarea>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button onclick="submitBid('${j.id}')" style="flex:1;padding:9px;background:#1dbf73;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-family:inherit;font-size:0.85rem;">
+              Send Bid to Client
+            </button>
+            <button onclick="closeBidForm('${j.id}')" style="padding:9px 14px;background:#fff;color:#888;border:1.5px solid #e0e0e0;border-radius:8px;font-weight:600;cursor:pointer;font-family:inherit;font-size:0.85rem;">
+              Cancel
+            </button>
+          </div>
+        </div>
+        `}
+      </div>`;
+    }).join('');
+  }
+
+  function toggleInviteDesc(jobId) {
+    const d = document.getElementById('invite-desc-' + jobId);
+    if (d) d.style.display = d.style.display === 'none' ? 'block' : 'none';
+  }
+
+  function openBidForm(jobId) {
+    document.getElementById('bid-form-' + jobId).style.display = 'block';
+    document.getElementById('invite-actions-' + jobId).style.display = 'none';
+  }
+
+  function closeBidForm(jobId) {
+    document.getElementById('bid-form-' + jobId).style.display = 'none';
+    document.getElementById('invite-actions-' + jobId).style.display = 'flex';
+  }
+
+  function declineInvite(jobId) {
+    if (!confirm('Decline this invitation? The client will not be notified.')) return;
+    const session = window.SessionManager.getActiveUser();
+    const key = 'declined_invites_' + session.user.id;
+    const declined = JSON.parse(localStorage.getItem(key) || '[]');
+    declined.push(jobId);
+    localStorage.setItem(key, JSON.stringify(declined));
+    const card = document.getElementById('invite-card-' + jobId);
+    if (card) {
+      card.style.opacity = '0.4';
+      card.style.pointerEvents = 'none';
+      setTimeout(() => card.remove(), 400);
+    }
+    const stat = document.getElementById('stat-matching');
+    if (stat) stat.textContent = Math.max(0, parseInt(stat.textContent) - 1);
+    showFreeToast('Invitation declined.', '#888');
+  }
+
+  function submitBid(jobId) {
+    const budget = document.getElementById('bid-budget-' + jobId).value.trim();
+    const timeline = document.getElementById('bid-timeline-' + jobId).value.trim();
+    const msg = document.getElementById('bid-msg-' + jobId).value.trim();
+    if (!budget || !timeline || !msg) { alert('Please fill in all fields before submitting your bid.'); return; }
+
+    const session = window.SessionManager.getActiveUser();
+    const candidate = window.CandidatesDB.getById(session.user.id) || session.user;
+    const job = window.JobsDB.getById(jobId);
+    if (!job) { alert('Job not found.'); return; }
+
+    try {
+      window.ProposalsDB.submit(jobId, session, {
+        proposedBudget: budget,
+        proposedTimeline: timeline,
+        coverLetter: msg
+      });
+    } catch (err) {
+      showFreeToast(err.message || 'Could not submit bid.', '#e53e3e');
+      closeBidForm(jobId);
+      return;
+    }
+
+    // Notify client via message
+    const clientRecruiter = window.RecruitersDB && window.RecruitersDB.getById(job.clientId);
+    const clientEmail = clientRecruiter ? clientRecruiter.email : '';
+    window.MessagesDB.send(
+      session.user.id, candidate.name, candidate.role || 'Freelancer', candidate.contact?.email || '',
+      job.clientId, `New Bid: ${job.title}`,
+      `Hi,\n\n${candidate.name} has submitted a bid for your project "${job.title}".\n\nBid: ₹${budget}\nTimeline: ${timeline}\n\nMessage:\n${msg}\n\nLog in to your dashboard to review and respond.`
+    );
+
+    showFreeToast('Bid sent to client! ✓', '#1dbf73');
+
+    // Replace card actions with confirmation
+    const card = document.getElementById('invite-card-' + jobId);
+    if (card) {
+      const actionsOrForm = card.querySelector(`#bid-form-${jobId}, #invite-actions-${jobId}`);
+      if (actionsOrForm) {
+        actionsOrForm.outerHTML = `
+          <div style="padding:10px 14px;background:rgba(29,191,115,0.08);border:1px solid rgba(29,191,115,0.2);border-radius:8px;font-size:0.82rem;font-weight:700;color:#16a060;margin-top:8px;">
+            ✓ Bid sent — ₹${escH(budget)} · ${escH(timeline)}. Client will review soon.
+          </div>`;
       }
     }
+    const stat = document.getElementById('stat-proposals');
+    if (stat) stat.textContent = parseInt(stat.textContent || '0') + 1;
+  }
+
+  function showFreeToast(msg, bg) {
+    const t = document.createElement('div');
+    t.style.cssText = `position:fixed;bottom:24px;right:24px;background:${bg};color:#fff;padding:10px 20px;border-radius:10px;font-weight:700;font-size:0.88rem;z-index:3000;box-shadow:0 4px 16px rgba(0,0,0,0.15);`;
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 2500);
+  }
+
+  function renderProposals(props) {
+    const el = document.getElementById('panel-proposals');
+    if (!props.length) {
+      el.innerHTML = `<div class="empty-state">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <p>No proposals sent yet. <a href="../browse-projects.html">Find projects →</a></p>
+      </div>`;
+      return;
+    }
+    el.innerHTML = props.map(p => {
+      const job = window.JobsDB && window.JobsDB.getById(p.jobId);
+      const statusClass = p.status === 'accepted' ? 'status-accepted' : p.status === 'declined' ? 'status-declined' : 'status-pending';
+      const statusLabel = p.status === 'accepted' ? 'Accepted' : p.status === 'declined' ? 'Declined' : 'Pending Review';
+      const date = new Date(p.submittedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+      return `<div class="prop-card">
+        <div class="prop-title">${escH(job ? job.title : 'Project')}</div>
+        <div class="prop-meta">
+          <span>Budget: ${escH(p.proposedBudget || '—')}</span>
+          <span>Timeline: ${escH(p.proposedTimeline || '—')}</span>
+          <span>Submitted ${date}</span>
+        </div>
+        ${p.coverLetter ? `<div style="font-size:0.8rem;color:var(--secondary-text);line-height:1.5;margin-bottom:8px;">${escH(p.coverLetter.slice(0, 120))}${p.coverLetter.length > 120 ? '…' : ''}</div>` : ''}
+        <span class="prop-status ${statusClass}">${statusLabel}</span>
+      </div>`;
+    }).join('');
+  }
+
+  function renderMessages(msgs) {
+    const el = document.getElementById('panel-messages');
+    if (!msgs.length) {
+      el.innerHTML = `<div class="empty-state">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <p>No messages yet. Complete your profile to attract clients.</p>
+      </div>`;
+      return;
+    }
+    el.innerHTML = msgs.map(m => {
+      const date = new Date(m.sentAt || m.createdAt || m.timestamp).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+      const isInvite = m.subject && m.subject.startsWith('Project Invite:');
+      const isCounter = m.subject && m.subject.startsWith('Counter Offer:');
+      // Find the related job if this is a direct hire invite
+      let relatedJob = null;
+      if (isInvite && window.JobsDB) {
+        const titleMatch = m.subject.replace('Project Invite: ', '').trim();
+        relatedJob = window.JobsDB.getAll().find(j => j.title === titleMatch && j.clientId === m.recruiterId);
+      }
+      let counterJob = null;
+      if (isCounter && window.JobsDB) {
+        const titleMatch = m.subject.replace('Counter Offer: ', '').trim();
+        counterJob = window.JobsDB.getAll().find(j => j.title === titleMatch && j.clientId === m.recruiterId);
+      }
+      const borderColor = isInvite ? '#1dbf73' : isCounter ? '#7c3aed' : 'transparent';
+      return `<div class="msg-card" style="${(isInvite || isCounter) ? `border-left:3px solid ${borderColor};` : ''}">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+          <div style="flex:1;">
+            ${isInvite ? `<div style="font-size:0.7rem;font-weight:800;color:#1dbf73;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">★ Project Invite</div>` : ''}
+            ${isCounter ? `<div style="font-size:0.7rem;font-weight:800;color:#7c3aed;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">⟺ Counter Offer Received</div>` : ''}
+            <div class="msg-from">${escH(m.recruiterName || m.from || 'Client')}</div>
+            <div class="msg-subject">${escH(m.subject || 'New message')}</div>
+            <div class="msg-body">${escH((m.body || m.message || '').slice(0, 140))}${(m.body || '').length > 140 ? '…' : ''}</div>
+          </div>
+          <div class="msg-date" style="flex-shrink:0;">${date}</div>
+        </div>
+        ${relatedJob ? `
+          <a href="../browse-projects.html?job=${encodeURIComponent(relatedJob.id)}"
+             style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:7px 14px;background:#1dbf73;color:#fff;border-radius:8px;font-weight:700;font-size:0.82rem;text-decoration:none;">
+            View Project &amp; Submit Bid
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
+        ` : ''}
+        ${counterJob ? `
+          <a href="../browse-projects.html?job=${encodeURIComponent(counterJob.id)}"
+             style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:7px 14px;background:#7c3aed;color:#fff;border-radius:8px;font-weight:700;font-size:0.82rem;text-decoration:none;">
+            Review &amp; Update Bid
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
+        ` : ''}
+      </div>`;
+    }).join('');
+  }
+
+  function renderFreelancerEscrow() {
+    const el = document.getElementById('panel-escrow');
+    const session = window.SessionManager && window.SessionManager.getActiveUser();
+    if (!session) return;
+    const escrows = window.EscrowDB ? window.EscrowDB.getByFreelancer(session.user.id) : [];
+    if (!escrows.length) {
+      el.innerHTML = `<div class="empty-state">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <p>No escrow payments yet. Get hired to see your payments here.</p>
+      </div>`;
+      return;
+    }
+    const statusLabels = { awaiting_payment: 'Awaiting Client Payment', funded: 'Payment in Escrow', work_submitted: 'Work Submitted', released: 'Payment Released ✓', disputed: 'Dispute in Progress' };
+    const statusColors = { awaiting_payment: '#b45309', funded: '#1dbf73', work_submitted: '#3b82f6', released: '#16a060', disputed: '#e53e3e' };
+    el.innerHTML = escrows.map(e => `
+      <div style="border:1px solid #e8e8e8;border-radius:14px;padding:18px;margin-bottom:14px;background:#fff;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px;">
+          <div>
+            <div style="font-weight:800;font-size:0.92rem;color:#1a1a2e;">${escH(e.jobTitle)}</div>
+            <div style="font-size:0.8rem;color:#888;margin-top:2px;">Client: ${escH(e.clientName)}</div>
+          </div>
+          <span style="padding:3px 10px;border-radius:100px;font-size:0.72rem;font-weight:700;color:${statusColors[e.status]||'#888'};background:rgba(29,191,115,0.08);white-space:nowrap;">${statusLabels[e.status]||e.status}</span>
+        </div>
+        <div style="font-size:0.88rem;color:#555;margin-bottom:12px;">
+          Amount: <strong style="font-size:1.1rem;color:#1dbf73;">₹${escH(e.amount)}</strong>
+        </div>
+        ${e.status === 'funded' || e.status === 'work_submitted' ? `
+          <button onclick="submitWork('${e.id}')" id="work-btn-${e.id}" style="padding:8px 16px;background:#1dbf73;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:0.83rem;">
+            ${e.status === 'work_submitted' ? '✓ Work Submitted' : 'Mark Work as Done'}
+          </button>
+          ${e.status === 'work_submitted' ? '' : ''}
+        ` : e.status === 'released' ? `<div style="color:#16a060;font-weight:700;font-size:0.9rem;">✓ Payment Released to You</div>` : ''}
+      </div>
+    `).join('');
+  }
+
+  function submitWork(escrowId) {
+    window.EscrowDB.updateStatus(escrowId, 'work_submitted');
+    const btn = document.getElementById('work-btn-' + escrowId);
+    if (btn) { btn.textContent = '✓ Work Submitted'; btn.disabled = true; btn.style.opacity = '0.6'; }
+    const toast = document.createElement('div');
+    toast.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#1dbf73;color:#fff;padding:10px 20px;border-radius:10px;font-weight:700;font-size:0.88rem;z-index:3000;box-shadow:0 4px 16px rgba(0,0,0,0.15);';
+    toast.textContent = 'Work submitted! Waiting for client to release payment.';
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 2800);
+  }
+
+  function renderActivity(proposals, messages) {
+    const el = document.getElementById('activity-panel');
+    const items = [
+      ...proposals.map(p => ({ type: 'proposal', label: 'Sent proposal', time: p.submittedAt, status: p.status })),
+      ...messages.map(m => ({ type: 'message', label: 'Message from ' + (m.recruiterName || 'client'), time: m.sentAt || m.createdAt }))
+    ].sort((a, b) => new Date(b.time) - new Date(a.time)).slice(0, 5);
+
+    if (!items.length) {
+      el.innerHTML = `<p style="font-size:0.82rem;color:#bbb;text-align:center;padding:12px 0;">No recent activity</p>`;
+      return;
+    }
+    el.innerHTML = items.map(it => {
+      const date = new Date(it.time).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+      const dotColor = it.type === 'message' ? '#60a5fa' : '#1dbf73';
+      return `<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:12px;">
+        <span style="width:8px;height:8px;border-radius:50%;background:${dotColor};margin-top:5px;flex-shrink:0;"></span>
+        <div>
+          <div style="font-size:0.83rem;font-weight:600;color:#111;">${escH(it.label)}</div>
+          <div style="font-size:0.72rem;color:#bbb;">${date}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
   </script>
 </body>
 </html>

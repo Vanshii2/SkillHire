@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       if (searchInput) searchInput.value = '';
       skillCheckboxes.forEach(cb => cb.checked = false);
-      if (sortSelect) sortSelect.value = '';
+      if (sortSelect) sortSelect.value = 'projects';
       // Re-render
       filterAndRender();
     });
@@ -119,7 +119,8 @@ function filterAndRender() {
   }
 
   const session = window.SessionManager && window.SessionManager.getActiveUser();
-  const isRecruiter = session && session.role === 'recruiter';
+  const activeMode = localStorage.getItem('skillbridge_mode') || 'freelancer';
+  const isRecruiter = session && (session.role === 'recruiter' || (session.user && session.user.bothRoles && activeMode === 'client'));
 
   // Render cards
   const inSubdir = window.location.pathname.includes('/candidate/') ||
@@ -128,8 +129,8 @@ function filterAndRender() {
   const prefix = inSubdir ? '../' : '';
 
   gridContainer.innerHTML = matches.map((candidate, idx) => {
-    const rating = candidate.rating || 4.8;
-    const reviewCount = candidate.reviewCount || 12;
+    const rating = candidate.rating || 0;
+    const reviewCount = candidate.reviewCount || 0;
     const isSaved = isRecruiter && window.RecruitersDB && window.RecruitersDB.isSaved(session && session.user.id, candidate.id);
 
     let avatarSrc = candidate.avatar || '';
@@ -174,12 +175,13 @@ function filterAndRender() {
             <div class="upw-meta-row">
               <span class="upw-rate">${escapeHTML(rate)}</span>
               <span class="upw-sep">·</span>
+              ${reviewCount > 0 ? `
               <svg width="12" height="12" viewBox="0 0 24 24" fill="#f59e0b" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
               <span class="upw-rating">${rating.toFixed(1)}</span>
               <span class="upw-review-cnt">(${reviewCount})</span>
-              <span class="upw-sep">·</span>
+              <span class="upw-sep">·</span>` : ''}
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
-              <span class="upw-jobs">${(candidate.projects ? candidate.projects.length : 1) + 2} jobs</span>
+              <span class="upw-jobs">${candidate.projects ? candidate.projects.length : 0} project${(candidate.projects && candidate.projects.length === 1) ? '' : 's'}</span>
             </div>
           </div>
         </div>

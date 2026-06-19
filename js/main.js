@@ -287,7 +287,7 @@ function initAuthModal() {
       } else if (!wasSelected && otherSelected) {
         // Select both
         card.classList.add('selected');
-        roleInput.value = 'freelancer'; // register as freelancer, mode switch available
+        roleInput.value = 'both'; // both roles — mode switch will be available
         bothNotice.style.display = 'block';
         skillGroup.style.display = 'block';
         companyGroup.style.display = 'none';
@@ -377,9 +377,18 @@ function initAuthModal() {
 
     try {
       const prefix = getPrefix();
-      if (role === 'freelancer') {
+      // 'both' means user ticked both client + freelancer
+      const isBoth = role === 'both';
+      const effectiveRole = isBoth ? 'freelancer' : role;
+      if (effectiveRole === 'freelancer') {
         const skill = document.getElementById('reg-skill').value;
-        window.CandidatesDB.signup(name, email, password, skill);
+        const newUser = window.CandidatesDB.signup(name, email, password, skill);
+        if (isBoth) {
+          newUser.bothRoles = true;
+          window.CandidatesDB.update(newUser);
+          // Also create a recruiter record with same ID so shortlist/hire works
+          window.RecruitersDB.signupWithId(newUser.id, name, email, password, name);
+        }
         window.SessionManager.loginCandidate(email, password);
         modal.classList.remove('active');
         updateNavbarState();
@@ -644,12 +653,13 @@ function updateNavbarState() {
 
     const switchLabel = isClient ? 'Switch to Freelancer' : 'Switch to Client';
     const switchMode  = isClient ? 'freelancer' : 'client';
+    const canSwitchModes = session.user.bothRoles === true;
 
     desktopCta.innerHTML = `
-      <button class="btn-mode-switch" id="btn-mode-switch" title="${switchLabel}" data-mode="${switchMode}">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+      ${canSwitchModes ? `<button class="btn-mode-switch" id="btn-mode-switch" title="${switchLabel}" data-mode="${switchMode}">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
         <span>${isClient ? 'Freelancer mode' : 'Client mode'}</span>
-      </button>
+      </button>` : ''}
       <div class="nav-profile-wrap" id="nav-user-pill">
         <button type="button" class="user-pill-link" id="nav-user-badge" aria-expanded="false" aria-haspopup="true">
           <span class="user-pill-avatar">${session.user.name.charAt(0).toUpperCase()}</span>
@@ -685,8 +695,8 @@ function updateNavbarState() {
     }
     if (mobileCta) {
       mobileCta.innerHTML = `
-        <button class="btn btn-secondary btn-block" id="btn-mob-mode" style="font-size:0.82rem;">${switchLabel}</button>
-        <button class="btn btn-secondary btn-block" id="btn-mob-logout" style="margin-top:8px;">Log Out</button>
+        ${canSwitchModes ? `<button class="btn btn-secondary btn-block" id="btn-mob-mode" style="font-size:0.82rem;">${switchLabel}</button>` : ''}
+        <button class="btn btn-secondary btn-block" id="btn-mob-logout" style="margin-top:${canSwitchModes ? '8' : '0'}px;">Log Out</button>
       `;
     }
 
@@ -711,15 +721,19 @@ function updateNavbarState() {
       }, { capture: true });
     }
 
-    // Mode switch
+    // Mode switch — save new mode and redirect to that mode's home page
+    const modeDest = switchMode === 'client'
+      ? `${prefix}recruiter/dashboard.html`
+      : `${prefix}candidate/dashboard.html`;
+
     document.getElementById('btn-mode-switch')?.addEventListener('click', () => {
       localStorage.setItem('skillbridge_mode', switchMode);
-      updateNavbarState();
+      window.location.href = modeDest;
     });
     document.getElementById('btn-mob-mode')?.addEventListener('click', () => {
       localStorage.setItem('skillbridge_mode', switchMode);
       window.closeMobileMenu();
-      updateNavbarState();
+      window.location.href = modeDest;
     });
 
     // Logout

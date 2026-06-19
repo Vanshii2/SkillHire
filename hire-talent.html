@@ -47,7 +47,7 @@
 
     /* ── Post a Job CTA ── */
     .post-job-cta {
-      background: linear-gradient(135deg, #0f0f0f 0%, #1a1a2e 100%);
+      background: linear-gradient(135deg, #0d1b2a 0%, #0a2617 100%);
       padding: 100px 32px;
       text-align: center;
       position: relative;
@@ -153,6 +153,7 @@
       color: rgba(255, 255, 255, 0.4);
     }
   </style>
+  <link rel="stylesheet" href="css/responsive.css">
 </head>
 
 <body>
@@ -165,9 +166,9 @@
         <!-- <li><a href="candidates.html" class="nav-link" id="nav-link-get-hired">Get Hired</a></li> -->
         <li><a href="hire-talent.html" class="nav-link active" id="nav-link-hire-talent">Hire Talent</a></li>
       </ul>
-      <div class="nav-cta">
-        <button class="btn btn-secondary" id="nav-btn-signup" style="margin-right: 8px;">Sign Up</button>
-        <button class="btn btn-primary" id="nav-btn-portal-trigger">Log in</button>
+      <div class="nav-cta" id="nav-cta-area">
+        <button class="btn btn-secondary" id="nav-btn-login" style="margin-right: 8px;">Log In</button>
+        <button class="btn btn-primary" id="nav-btn-register">Register</button>
       </div>
       <button class="mobile-toggle" id="mobile-hamburger" aria-label="Toggle Menu">
         <span class="hamburger-line"></span>
@@ -178,13 +179,13 @@
 
   <div class="mobile-drawer-overlay" id="mobile-overlay"></div>
   <div class="mobile-drawer" id="mobile-drawer-menu">
-    <ul class="mobile-nav-list">
+    <ul class="mobile-nav-list" id="mob-nav-list">
       <li><a href="index.html" class="mobile-nav-link" id="mob-link-home">Home</a></li>
       <li><a href="hire-talent.html" class="mobile-nav-link active" id="mob-link-hire-talent">Hire Talent</a></li>
     </ul>
-    <div class="mobile-nav-cta">
-      <button class="btn btn-secondary btn-block" id="mob-btn-signup">Sign Up</button>
-      <button class="btn btn-primary btn-block" id="mob-btn-portal-trigger" style="margin-top: 10px;">Log in</button>
+    <div class="mobile-nav-cta" id="mob-cta-area">
+      <button class="btn btn-secondary btn-block" id="mob-btn-login">Log In</button>
+      <button class="btn btn-primary btn-block" id="mob-btn-register" style="margin-top: 10px;">Register</button>
     </div>
   </div>
 
@@ -222,7 +223,6 @@
           <div class="filter-group">
             <span class="filter-group-label">Sort By</span>
             <select class="sort-select" id="sort-select">
-              <option value="">Best Match</option>
               <option value="price">Lowest Price / Hr</option>
               <option value="projects">Most Projects</option>
               <option value="skills">Most Skills</option>
@@ -234,20 +234,27 @@
           <div class="filter-group" style="margin-bottom:0;">
             <span class="filter-group-label">Skills</span>
             <div class="filter-options">
-              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="React">
-                <span>React</span></label>
-              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="Java">
-                <span>Java</span></label>
-              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="Python">
-                <span>Python</span></label>
-              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="MERN">
-                <span>MERN</span></label>
-              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="Node.js">
-                <span>Node.js</span></label>
-              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="UI/UX">
-                <span>UI/UX</span></label>
-              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="Figma">
-                <span>Figma</span></label>
+              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="React"><span>React</span></label>
+              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="Node.js"><span>Node.js</span></label>
+              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="Python"><span>Python</span></label>
+              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="TypeScript"><span>TypeScript</span></label>
+              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="Vue.js"><span>Vue.js</span></label>
+              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="Next.js"><span>Next.js</span></label>
+              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="UI/UX"><span>UI/UX</span></label>
+              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="Flutter"><span>Flutter</span></label>
+              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="Docker"><span>Docker</span></label>
+              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="MongoDB"><span>MongoDB</span></label>
+              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="Django"><span>Django</span></label>
+              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="React Native"><span>React Native</span></label>
+              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="AWS"><span>AWS</span></label>
+              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="PostgreSQL"><span>PostgreSQL</span></label>
+              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="AI"><span>AI</span></label>
+              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="Redis"><span>Redis</span></label>
+              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="Firebase"><span>Firebase</span></label>
+              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="GraphQL"><span>GraphQL</span></label>
+              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="Swift"><span>Swift</span></label>
+              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="WordPress"><span>WordPress</span></label>
+              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="PHP"><span>PHP</span></label>
             </div>
           </div>
         </aside>
@@ -255,7 +262,7 @@
         <!-- Candidates Grid -->
         <div class="directory-content fade-in-section is-visible">
           <div class="directory-meta">
-            <div class="results-count" id="results-count-number">Showing 0 candidates</div>
+            <div class="results-count" id="results-count-number" style="display:none;"></div>
           </div>
           <div class="candidates-grid" id="candidates-list-grid">
             <!-- Rendered by candidates.js -->
@@ -328,15 +335,15 @@
           <div class="footer-column">
             <div class="footer-title">Resources</div>
             <ul class="footer-list">
-              <li><a href="about.html" class="footer-link">About Us</a></li>
+              <li><a href="index.html#faq" class="footer-link">About Us</a></li>
               <li><a href="about.html" class="footer-link">Help Center</a></li>
             </ul>
           </div>
           <div class="footer-column">
             <div class="footer-title">Legal</div>
             <ul class="footer-list">
-              <li><a href="about.html" class="footer-link">Privacy Policy</a></li>
-              <li><a href="about.html" class="footer-link">Terms of Service</a></li>
+              <li><a href="policies.html" class="footer-link">Privacy Policy</a></li>
+              <li><a href="policies.html" class="footer-link">Terms of Service</a></li>
             </ul>
           </div>
         </div>
