@@ -3,11 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Manage Contracts — Exhibitly</title>
+  <title>Manage Contracts — SkillBridge</title>
   <meta name="description" content="Manage contract milestones, fund SafePay escrow accounts, and review candidate deliveries.">
   
   <!-- CSS Stylesheets -->
-  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/navbar.css">
+  <link rel="stylesheet" href="../css/footer.css">
   <link rel="stylesheet" href="../css/dashboard.css">
   <link rel="stylesheet" href="../css/contracts.css">
 </head>
@@ -17,7 +19,7 @@
   <header id="site-header">
     <div class="nav-container">
       <a href="../index.html" class="logo" id="nav-logo">
-        Exhibitly
+        SkillBridge
       </a>
       <ul class="nav-menu" id="nav-menu-list">
         <li><a href="../index.html" class="nav-link active" id="nav-link-home">Home</a></li>
@@ -62,10 +64,10 @@
           </div>
           <nav class="dashboard-menu">
             <a href="dashboard.html" class="menu-item">
-              <span class="menu-icon">⭐</span> Dashboard Hub
+              <span class="menu-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span> Dashboard Hub
             </a>
             <a href="contracts.html" class="menu-item active">
-              <span class="menu-icon">📄</span> My Contracts
+              <span class="menu-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span> My Contracts
             </a>
           </nav>
         </aside>
@@ -93,7 +95,7 @@
     <div class="footer-top">
       <div class="container footer-top-inner">
         <a href="../index.html" class="footer-logo" id="footer-logo">
-          Exhibitly
+          SkillBridge
         </a>
         <div class="footer-nav-groups" style="display: flex; gap: 64px; margin-left: 64px; flex-wrap: wrap;">
           <div class="footer-column">
@@ -136,7 +138,7 @@
     </div>
     <div class="footer-bottom-strip">
       <div class="container footer-bottom-inner">
-        <div class="footer-copy">&copy; 2026 Exhibitly. All rights reserved.</div>
+        <div class="footer-copy">&copy; 2026 SkillBridge. All rights reserved.</div>
       </div>
     </div>
   </footer>
@@ -265,7 +267,7 @@
       if (myContracts.length === 0) {
         html += `
           <div style="text-align: center; padding: 60px 24px; color: var(--secondary-text); background: var(--bg-color); border-radius: var(--radius-lg); border: 1px dashed var(--border-color);">
-            <span style="font-size: 3rem; display: block; margin-bottom: 16px;">💼</span>
+            
             <h3 style="font-weight: 700; color: var(--primary-text); margin-bottom: 8px;">No Active Hires</h3>
             <p>Contracts appear here once a proposal is accepted and activated.</p>
           </div>
@@ -289,7 +291,7 @@
           if (escrowStatus === 'held') escrowClass = 'badge-internship';
           if (escrowStatus === 'released') escrowClass = 'badge-fulltime';
 
-          let manageBtnLabel = contract.status === 'pending-payment' ? '💳 Pay Escrow & Start' : '📋 Manage & Review';
+          let manageBtnLabel = contract.status === 'pending-payment' ? 'Pay Escrow & Start' : 'Manage & Review';
 
           html += `
             <div class="contract-card">

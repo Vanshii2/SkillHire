@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Exhibitly Contracts, Milestones & Deliverables Controller
+   SkillBridge Contracts, Milestones & Deliverables Controller
    ========================================================================== */
 
 class ContractsController {
@@ -170,7 +170,7 @@ class ContractsController {
         window.Storage.set('profiles', profiles);
       }
       
-      // Also update skillhire_candidates list to make sure directories are fully synced
+      // Also update skillbridge_candidates list to make sure directories are fully synced
       if (window.CandidatesDB) {
         const fullCand = window.CandidatesDB.getById(candidate.id);
         if (fullCand) {

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Exhibitly Candidate Profile Page Controller
+   SkillBridge Candidate Profile Page Controller
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -36,6 +36,23 @@ function renderProfile() {
     return;
   }
 
+  // ── Login gate ──
+  const session = window.SessionManager && window.SessionManager.getActiveUser();
+  if (!session) {
+    mainContainer.innerHTML = `
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center;padding:48px 24px;">
+        <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:20px;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <h2 style="font-size:1.6rem;font-weight:800;color:#111;letter-spacing:-0.02em;margin-bottom:10px;">Log in to view this profile</h2>
+        <p style="color:#666;font-size:0.95rem;max-width:360px;line-height:1.6;margin-bottom:28px;">Create a free account or log in to browse freelancer profiles, view portfolios, and connect with talent.</p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
+          <button class="btn btn-primary" style="padding:11px 28px;" onclick="window.openAuthModal && window.openAuthModal('login')">Log In</button>
+          <button class="btn btn-secondary" style="padding:11px 28px;" onclick="window.openAuthModal && window.openAuthModal('register')">Create Account</button>
+        </div>
+        <a href="candidates.html" style="margin-top:20px;font-size:0.85rem;color:#aaa;text-decoration:none;">&larr; Back to Browse Freelancers</a>
+      </div>`;
+    return;
+  }
+
   // Query candidate details
   const candidate = window.CandidatesDB.getById(candidateId);
   if (!candidate) {
@@ -43,20 +60,13 @@ function renderProfile() {
     return;
   }
 
-  const inSubdir = window.location.pathname.includes('/candidate/') || 
-                   window.location.pathname.includes('/recruiter/') || 
+  const inSubdir = window.location.pathname.includes('/candidate/') ||
+                   window.location.pathname.includes('/recruiter/') ||
                    window.location.pathname.includes('/shared/');
   const prefix = inSubdir ? '../' : '';
 
   // Set page HTML title dynamic
-  document.title = `${candidate.name} — ${candidate.role} | Exhibitly`;
-
-  // Require active session to view candidate full profile
-  const session = window.SessionManager.getActiveUser();
-  if (!session) {
-    renderLockedProfile(mainContainer);
-    return;
-  }
+  document.title = `${candidate.name} — ${candidate.role} | SkillBridge`;
 
   // Render Page Content
   const isInternship = candidate.availability.toLowerCase().includes('internship');
@@ -89,23 +99,44 @@ function renderProfile() {
     `<span class="skill-tag">${escapeHTML(skill)}</span>`
   ).join('');
 
-  // Construct project cards HTML
-  const projectsHtml = candidate.projects.map(proj => {
-    const techTags = proj.techStack.map(tech => 
+  // Merge candidate.projects with PROJECTS_DATA showcase items for this author
+  const showcaseItems = (window.ProjectsDB ? window.ProjectsDB.getByAuthor(candidateId) : []).map(p => ({
+    name: p.title,
+    description: p.description,
+    techStack: p.tags || [],
+    screenshot: p.thumbnail,
+    github: null,
+    live: null,
+    likes: p.likes,
+    views: p.views,
+    isShowcase: true
+  }));
+
+  const allProjects = [...showcaseItems, ...candidate.projects];
+
+  const projectsHtml = allProjects.length === 0
+    ? `<div style="color:var(--secondary-text);font-size:0.9rem;padding:24px 0;">No projects showcased yet.</div>`
+    : allProjects.map(proj => {
+    const techTags = proj.techStack.map(tech =>
       `<span class="skill-tag">${escapeHTML(tech)}</span>`
     ).join('');
+
+    const metaHtml = proj.isShowcase ? `
+      <div style="display:flex;gap:14px;margin-bottom:8px;font-size:0.78rem;color:#aaa;">
+        <span>❤ ${proj.likes} likes</span>
+        <span>👁 ${proj.views?.toLocaleString()} views</span>
+      </div>` : '';
 
     return `
       <div class="project-card fade-in-section is-visible">
         <div class="project-img-wrapper">
-          <img src="${resolveAssetPath(proj.screenshot)}" alt="${escapeHTML(proj.name)}" class="project-img" onerror="this.src='${prefix}assets/images/project1.png'">
+          <img src="${resolveAssetPath(proj.screenshot)}" alt="${escapeHTML(proj.name)}" class="project-img" onerror="this.style.display='none'">
         </div>
         <div class="project-info">
           <h3>${escapeHTML(proj.name)}</h3>
+          ${metaHtml}
           <p class="project-description">${escapeHTML(proj.description)}</p>
-          <div class="project-tech">
-            ${techTags}
-          </div>
+          <div class="project-tech">${techTags}</div>
           <div class="project-actions">
             ${proj.github ? `<a href="${escapeHTML(proj.github)}" target="_blank" class="btn btn-secondary">Source Code</a>` : ''}
             ${proj.live ? `<a href="${escapeHTML(proj.live)}" target="_blank" class="btn btn-primary">Live Demo</a>` : ''}
@@ -173,7 +204,7 @@ function renderProfile() {
           Contact Candidate
         </button>
         <button class="btn btn-primary" id="profile-btn-hire" style="padding: 10px 20px; font-size: 0.9rem; background-color: var(--accent-color); border-color: var(--accent-color);">
-          💼 Hire Candidate
+          Hire Candidate
         </button>
       `;
     } else if (session.role === 'candidate' && session.user.id === candidate.id) {
@@ -184,10 +215,10 @@ function renderProfile() {
       `;
     }
   } else {
-    // Guest view - show a prompt button that triggers the recruiter login
+    // Guest — show login prompt
     actionButtonsHtml = `
-      <button class="btn btn-secondary" onclick="window.openAuthModal('recruiter', 'login')" style="padding: 10px 20px; font-size: 0.9rem;">
-        Login as Recruiter to Contact
+      <button class="btn btn-primary" onclick="window.openAuthModal('login')" style="padding:10px 20px;font-size:0.9rem;">
+        Log In to Contact
       </button>
     `;
   }
@@ -288,7 +319,8 @@ function renderProfile() {
 
   if (btnHire) {
     btnHire.addEventListener('click', () => {
-      window.RequestsController.openHireModal(candidate.id, candidate.name);
+      // Open auth modal or a contact prompt if RequestsController not available
+      if (window.openAuthModal) window.openAuthModal('login');
     });
   }
 }
@@ -304,7 +336,7 @@ function renderError(container, title, message) {
 
   container.innerHTML = `
     <div class="profile-error-card">
-      <span style="font-size: 3rem;">⚠️</span>
+      
       <h1>${escapeHTML(title)}</h1>
       <p>${escapeHTML(message)}</p>
       <a href="${prefix}candidates.html" class="btn btn-primary">Browse Candidates Directory</a>
@@ -371,7 +403,7 @@ function renderLockedProfile(container) {
 
       <!-- Centered Premium Locked Card -->
       <div class="profile-lock-card" style="text-align: center; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.4); border-radius: var(--radius-xl); padding: 48px 32px; box-shadow: var(--shadow-lg); margin-top: -80px; position: relative; z-index: 10;">
-        <div style="font-size: 3.2rem; margin-bottom: 20px; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.08));">🔒</div>
+        <div style="width:64px;height:64px;border-radius:50%;background:#f5f5f5;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
         <h2 style="font-family: var(--font-heading); font-size: 1.8rem; font-weight: 800; letter-spacing: -0.02em; color: var(--primary-text); margin-bottom: 12px;">Full Portfolio Locked</h2>
         <p style="color: var(--secondary-text); font-size: 0.95rem; line-height: 1.6; max-width: 440px; margin: 0 auto 32px auto;">
           To view technical projects, source repositories, live demos, and direct candidate email or social channels, please log in.

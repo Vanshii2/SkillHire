@@ -1,803 +1,792 @@
 /* ==========================================================================
-   SkillHire Shared Script (Global Layout & Animations)
+   SkillBridge — Shared Script (Global Layout, Navbar, Auth)
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
   initNavbar();
-  initNavDropdown();
-  initActiveLinks();
   initScrollAnimations();
   initAuthModal();
   initContactModal();
   updateNavbarState();
 
-  // Check for auto-open modal actions on redirect
   const urlParams = new URLSearchParams(window.location.search);
   const action = urlParams.get('action');
-  if (action === 'candidate-signup') {
-    setTimeout(() => {
-      if (typeof window.openAuthModal === 'function') {
-        window.openAuthModal('candidate', 'signup');
-      }
-    }, 350);
+  if (action === 'login') {
+    setTimeout(() => { if (window.openAuthModal) window.openAuthModal('login'); }, 350);
+  } else if (action === 'register') {
+    setTimeout(() => { if (window.openAuthModal) window.openAuthModal('register'); }, 350);
+  } else if (action === 'candidate-signup') {
+    setTimeout(() => { if (window.openAuthModal) window.openAuthModal('register', 'freelancer'); }, 350);
   } else if (action === 'recruiter-login') {
-    setTimeout(() => {
-      if (typeof window.openAuthModal === 'function') {
-        window.openAuthModal('recruiter', 'login');
-      }
-    }, 350);
+    setTimeout(() => { if (window.openAuthModal) window.openAuthModal('login'); }, 350);
   }
 });
 
-/**
- * Floating glass navbar behavior (scrolling & mobile drawer)
- */
+/* --------------------------------------------------------------------------
+   Navbar — scroll shadow + mobile drawer
+   -------------------------------------------------------------------------- */
 function initNavbar() {
   const header = document.querySelector('header');
   const mobileToggle = document.querySelector('.mobile-toggle');
   const mobileDrawer = document.querySelector('.mobile-drawer');
   const mobileOverlay = document.querySelector('.mobile-drawer-overlay');
 
-  // Sticky Scroll Class Trigger
-  window.addEventListener('scroll', () => {
-    if (window.scrollY > 20) {
-      header.classList.add('scrolled');
-    } else {
-      header.classList.remove('scrolled');
-    }
-  });
-
-  // Toggle mobile drawer
-  if (mobileToggle) {
-    mobileToggle.addEventListener('click', () => {
-      const isOpen = mobileDrawer.classList.contains('open');
-      if (isOpen) {
-        closeMobileMenu();
-      } else {
-        openMobileMenu();
-      }
+  if (header) {
+    window.addEventListener('scroll', () => {
+      header.classList.toggle('scrolled', window.scrollY > 20);
     });
   }
 
-  // Close mobile drawer when clicking overlay
-  if (mobileOverlay) {
-    mobileOverlay.addEventListener('click', closeMobileMenu);
+  if (mobileToggle) {
+    mobileToggle.addEventListener('click', () => {
+      mobileDrawer.classList.contains('open') ? closeMobileMenu() : openMobileMenu();
+    });
   }
 
-  // Close drawer on escape key
-  window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      closeMobileMenu();
-    }
-  });
+  if (mobileOverlay) mobileOverlay.addEventListener('click', closeMobileMenu);
+  window.addEventListener('keydown', e => { if (e.key === 'Escape') closeMobileMenu(); });
 
   function openMobileMenu() {
-    mobileToggle.classList.add('active');
+    if (mobileToggle) mobileToggle.classList.add('active');
     if (mobileDrawer) mobileDrawer.classList.add('open');
     if (mobileOverlay) mobileOverlay.classList.add('visible');
-    document.body.style.overflow = 'hidden'; // Disable scroll under overlay
+    document.body.style.overflow = 'hidden';
   }
 
   function closeMobileMenu() {
     if (mobileToggle) mobileToggle.classList.remove('active');
     if (mobileDrawer) mobileDrawer.classList.remove('open');
     if (mobileOverlay) mobileOverlay.classList.remove('visible');
-    document.body.style.overflow = ''; // Re-enable scroll
+    document.body.style.overflow = '';
   }
 
   window.closeMobileMenu = closeMobileMenu;
 }
 
-/**
- * Hire Talent dropdown toggle + Post a Job auth gate
- */
-function initNavDropdown() {
-  const wrap = document.getElementById('nav-hire-talent-wrap');
-  const trigger = document.getElementById('nav-hire-talent-btn');
-  if (!wrap || !trigger) return;
-
-  // Toggle open/close
-  trigger.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const isOpen = wrap.classList.toggle('open');
-    trigger.setAttribute('aria-expanded', String(isOpen));
-  });
-
-  // Close when clicking outside
-  document.addEventListener('click', (e) => {
-    if (!wrap.contains(e.target)) {
-      wrap.classList.remove('open');
-      trigger.setAttribute('aria-expanded', 'false');
-    }
-  });
-
-  // Close on Escape
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      wrap.classList.remove('open');
-      trigger.setAttribute('aria-expanded', 'false');
-    }
-  });
-
-  // Post a Job: auth gate — if not logged in → open recruiter login modal
-  function handlePostJobClick(e) {
-    e.preventDefault();
-    wrap.classList.remove('open');
-    const session = window.SessionManager && window.SessionManager.getActiveUser();
-    if (session && session.role === 'recruiter') {
-      // Logged in recruiter → go to posts page
-      window.location.href = 'posts.html';
-    } else {
-      // Not logged in → open recruiter login/signup modal
-      if (typeof window.openAuthModal === 'function') {
-        window.openAuthModal('recruiter', 'login');
-      }
-    }
+/* --------------------------------------------------------------------------
+   Scroll-triggered fade-in animations
+   -------------------------------------------------------------------------- */
+function initScrollAnimations() {
+  const els = document.querySelectorAll('.fade-in-section');
+  if (!('IntersectionObserver' in window)) {
+    els.forEach(el => el.classList.add('is-visible'));
+    return;
   }
-
-  const ddPostJob = document.getElementById('nav-dd-post-job');
-  if (ddPostJob) ddPostJob.addEventListener('click', handlePostJobClick);
-
-  // Mobile Post a Job link
-  const mobPostJob = document.getElementById('mob-link-post-job');
-  if (mobPostJob) {
-    mobPostJob.addEventListener('click', (e) => {
-      e.preventDefault();
-      if (typeof window.closeMobileMenu === 'function') window.closeMobileMenu();
-      const session = window.SessionManager && window.SessionManager.getActiveUser();
-      if (session && session.role === 'recruiter') {
-        window.location.href = 'posts.html';
-      } else {
-        if (typeof window.openAuthModal === 'function') {
-          window.openAuthModal('recruiter', 'login');
-        }
+  const obs = new IntersectionObserver((entries, obs) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-visible');
+        obs.unobserve(entry.target);
       }
     });
-  }
+  }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+  els.forEach(el => obs.observe(el));
 }
 
-/**
- * Highlights active page navigation link based on URL
- */
-function initActiveLinks() {
-  const currentPath = window.location.pathname;
-  const navLinks = document.querySelectorAll('.nav-link, .mobile-nav-link');
-
-  navLinks.forEach(link => {
-    const href = link.getAttribute('href');
-    if (!href) return;
-
-    // Exact match or matches directory root index.html
-    const isHome = (currentPath === '/' || currentPath.endsWith('index.html')) && (href === 'index.html' || href === '/');
-    const matchesHref = currentPath.endsWith(href) && href !== 'index.html' && href !== '/';
-
-    if (isHome || matchesHref) {
-      link.classList.add('active');
-    } else {
-      link.classList.remove('active');
-    }
-  });
-}
-
-/**
- * Sets up fade-in animations on scroll for tags with '.fade-in-section'
- */
-function initScrollAnimations() {
-  const animatedElements = document.querySelectorAll('.fade-in-section');
-
-  if ('IntersectionObserver' in window) {
-    const observerOptions = {
-      root: null, // viewport
-      threshold: 0.1, // trigger when 10% is visible
-      rootMargin: '0px 0px -50px 0px' // offset slightly for better entrance feel
-    };
-
-    const observer = new IntersectionObserver((entries, observer) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('is-visible');
-          // Once visible, we don't need to observe it anymore
-          observer.unobserve(entry.target);
-        }
-      });
-    }, observerOptions);
-
-    animatedElements.forEach(el => observer.observe(el));
-  } else {
-    // Fallback if browser doesn't support IntersectionObserver
-    animatedElements.forEach(el => el.classList.add('is-visible'));
-  }
-}
-
-/**
- * Dynamic Auth Modal Injection and Controller
- */
+/* --------------------------------------------------------------------------
+   Auth Modal (unified — login / register with role selection)
+   -------------------------------------------------------------------------- */
 function initAuthModal() {
-  // If modal already exists, do not inject
   if (document.getElementById('auth-modal')) return;
 
-  const modalHtml = `
-    <div id="auth-modal" class="modal-overlay">
-      <div class="modal-card auth-card">
-        <button class="modal-close-btn" id="auth-modal-close">&times;</button>
-        
-        <div class="auth-tabs">
-          <button class="auth-tab-btn active" id="tab-candidate">Candidate Portal</button>
-          <button class="auth-tab-btn" id="tab-recruiter">Recruiter Portal</button>
+  const html = `
+  <div id="auth-modal" class="modal-overlay">
+    <div class="modal-card auth-card">
+      <button class="modal-close-btn" id="auth-modal-close" aria-label="Close">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+
+      <div class="auth-brand">
+        <span class="auth-logo-text">SkillBridge</span>
+      </div>
+
+      <div class="auth-tabs">
+        <button class="auth-tab-btn active" id="tab-login">Log In</button>
+        <button class="auth-tab-btn" id="tab-register">Register</button>
+      </div>
+
+      <!-- LOGIN PANEL -->
+      <div id="auth-panel-login">
+        <form id="login-form" novalidate>
+          <div class="form-group">
+            <label for="login-email">Email <span class="req-star">*</span></label>
+            <input type="email" id="login-email" placeholder="you@example.com" autocomplete="email" required>
+          </div>
+          <div class="form-group">
+            <label for="login-password">Password <span class="req-star">*</span></label>
+            <div class="pw-wrap">
+              <input type="password" id="login-password" placeholder="Your password" autocomplete="current-password" required>
+              <button type="button" class="pw-toggle" data-target="login-password" aria-label="Show/hide password">
+                <svg class="pw-eye-show" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="auth-error" id="login-error"></div>
+          <button type="submit" class="btn btn-primary btn-block" style="margin-top:4px;border-radius:10px;">Continue</button>
+        </form>
+        <p class="auth-toggle-text">
+          Don't have an account? <button class="auth-toggle-link" id="goto-register">Sign up free</button>
+        </p>
+      </div>
+
+      <!-- REGISTER PANEL -->
+      <div id="auth-panel-register" style="display:none;">
+
+        <div class="auth-role-selector" id="role-selector">
+          <div class="auth-role-card selected" data-role="freelancer" id="role-card-freelancer">
+            <div class="auth-role-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+            </div>
+            <div style="flex:1;">
+              <div class="auth-role-title">I'm a Freelancer</div>
+              <div class="auth-role-desc">Find projects &amp; get hired</div>
+            </div>
+            <div class="auth-role-check">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+          </div>
+          <div class="auth-role-card" data-role="client" id="role-card-client">
+            <div class="auth-role-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+            </div>
+            <div style="flex:1;">
+              <div class="auth-role-title">I'm a Client</div>
+              <div class="auth-role-desc">Post projects &amp; hire talent</div>
+            </div>
+            <div class="auth-role-check">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+          </div>
         </div>
 
-        <!-- Candidate Form -->
-        <div class="auth-form-container" id="candidate-form-wrapper">
-          <h2 class="auth-title" id="candidate-auth-title">Candidate Login</h2>
-          <p class="auth-subtitle">Showcase your projects and get noticed by tech recruiters.</p>
-          
-          <form id="candidate-auth-form">
-            <input type="hidden" id="candidate-mode" value="login">
-            
-            <div class="form-group" id="candidate-name-group" style="display: none;">
-              <label for="candidate-name">Full Name</label>
-              <input type="text" id="candidate-name" placeholder="John Doe">
-            </div>
-            
-            <div class="form-group">
-              <label for="candidate-email">Email Address</label>
-              <input type="email" id="candidate-email" placeholder="john@example.com" required>
-            </div>
-            
-            <div class="form-group">
-              <label for="candidate-password">Password</label>
-              <input type="password" id="candidate-password" placeholder="••••••••" required>
-            </div>
+        <!-- Both mode notice (hidden by default) -->
+        <div id="both-mode-notice" style="display:none;background:rgba(29,191,115,0.08);border:1px solid rgba(29,191,115,0.25);border-radius:10px;padding:10px 14px;margin-bottom:4px;font-size:0.82rem;color:#15803d;">
+          You'll be able to switch between Client and Freelancer mode any time after signing up.
+        </div>
 
-            <div class="form-group" id="candidate-role-group" style="display: none;">
-              <label for="candidate-role">Specialization Role</label>
-              <select id="candidate-role">
+        <input type="hidden" id="register-role" value="freelancer">
+
+        <form id="register-form" novalidate>
+          <div class="auth-form-row">
+            <div class="form-group">
+              <label for="reg-name">Full Name <span class="req-star">*</span></label>
+              <input type="text" id="reg-name" placeholder="Jane Doe" autocomplete="name" required>
+            </div>
+            <div class="form-group">
+              <label for="reg-email">Email <span class="req-star">*</span></label>
+              <input type="email" id="reg-email" placeholder="you@example.com" autocomplete="email" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="reg-password">Password <span class="req-star">*</span></label>
+            <div class="pw-wrap">
+              <input type="password" id="reg-password" placeholder="Min. 8 characters" autocomplete="new-password" required minlength="8">
+              <button type="button" class="pw-toggle" data-target="reg-password" aria-label="Show/hide password">
+                <svg class="pw-eye-show" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            <div class="pw-rules" id="pw-rules">
+              <span class="pw-rule" data-rule="length">8+ characters</span>
+              <span class="pw-rule" data-rule="upper">Uppercase letter</span>
+              <span class="pw-rule" data-rule="number">Number</span>
+              <span class="pw-rule" data-rule="special">Special character</span>
+            </div>
+          </div>
+
+          <div class="auth-form-row">
+            <div class="form-group" id="reg-skill-group">
+              <label for="reg-skill">Primary Skill</label>
+              <select id="reg-skill">
                 <option value="Frontend Developer">Frontend Developer</option>
+                <option value="Full-Stack Developer">Full-Stack Developer</option>
                 <option value="MERN Developer">MERN Developer</option>
-                <option value="Java Developer">Java Developer</option>
-                <option value="Python Developer">Python Developer</option>
                 <option value="UI/UX Designer">UI/UX Designer</option>
+                <option value="Python Developer">Python Developer</option>
                 <option value="Mobile Developer">Mobile Developer</option>
+                <option value="Java Developer">Java Developer</option>
+                <option value="Graphic Designer">Graphic Designer</option>
               </select>
             </div>
-
-            <div class="auth-error" id="candidate-auth-error"></div>
-            
-            <button type="submit" class="btn btn-primary btn-block" id="candidate-submit-btn">Login as Candidate</button>
-          </form>
-          
-          <div class="auth-toggle-text">
-            <span id="candidate-toggle-prompt">Don't have a profile?</span>
-            <button class="auth-toggle-link" id="candidate-toggle-btn">Create Profile / Sign Up</button>
+            <div class="form-group" id="reg-company-group" style="display:none;">
+              <label for="reg-company">Company <span style="color:#aaa;font-weight:400;font-size:0.8rem;">(optional)</span></label>
+              <input type="text" id="reg-company" placeholder="Your company name">
+            </div>
           </div>
-        </div>
 
-        <!-- Recruiter Form -->
-        <div class="auth-form-container" id="recruiter-form-wrapper" style="display: none;">
-          <h2 class="auth-title" id="recruiter-auth-title">Recruiter Login</h2>
-          <p class="auth-subtitle">Discover and contact fresh engineering and design talent.</p>
-          
-          <form id="recruiter-auth-form">
-            <input type="hidden" id="recruiter-mode" value="login">
-            
-            <div class="form-group" id="recruiter-name-group" style="display: none;">
-              <label for="recruiter-name">Full Name</label>
-              <input type="text" id="recruiter-name" placeholder="Jane Doe">
-            </div>
-
-            <div class="form-group" id="recruiter-company-group" style="display: none;">
-              <label for="recruiter-company">Company / Organization</label>
-              <input type="text" id="recruiter-company" placeholder="Acme Inc">
-            </div>
-            
-            <div class="form-group">
-              <label for="recruiter-email">Work Email</label>
-              <input type="email" id="recruiter-email" placeholder="jane@company.com" required>
-            </div>
-            
-            <div class="form-group">
-              <label for="recruiter-password">Password</label>
-              <input type="password" id="recruiter-password" placeholder="••••••••" required>
-            </div>
-
-            <div class="auth-error" id="recruiter-auth-error"></div>
-            
-            <button type="submit" class="btn btn-primary btn-block" id="recruiter-submit-btn">Login as Recruiter</button>
-          </form>
-          
-          <div class="auth-toggle-text">
-            <span id="recruiter-toggle-prompt">New to SkillHire?</span>
-            <button class="auth-toggle-link" id="recruiter-toggle-btn">Create Recruiter Account</button>
+          <div class="auth-tc-row">
+            <label class="auth-tc-label">
+              <input type="checkbox" id="reg-tc" required>
+              <span>I agree to the <a href="policies.html" target="_blank" style="color:var(--accent-color);font-weight:600;">Terms of Service</a> and <a href="policies.html#privacy" target="_blank" style="color:var(--accent-color);font-weight:600;">Privacy Policy</a></span>
+            </label>
           </div>
-        </div>
-        
+          <div class="auth-error" id="register-error"></div>
+          <button type="submit" class="btn btn-primary btn-block" id="register-submit-btn" style="border-radius:10px;">Create Account</button>
+        </form>
+        <p class="auth-toggle-text">
+          Already have an account? <button class="auth-toggle-link" id="goto-login">Log in</button>
+        </p>
       </div>
-    </div>
-  `;
 
-  // Inject to page
+    </div>
+  </div>`;
+
   const wrapper = document.createElement('div');
-  wrapper.innerHTML = modalHtml;
+  wrapper.innerHTML = html;
   document.body.appendChild(wrapper.firstElementChild);
 
-  // Bind modal DOM triggers
   const modal = document.getElementById('auth-modal');
   const closeBtn = document.getElementById('auth-modal-close');
-  const tabCandidate = document.getElementById('tab-candidate');
-  const tabRecruiter = document.getElementById('tab-recruiter');
+  const tabLogin = document.getElementById('tab-login');
+  const tabRegister = document.getElementById('tab-register');
+  const panelLogin = document.getElementById('auth-panel-login');
+  const panelRegister = document.getElementById('auth-panel-register');
+  const gotoRegister = document.getElementById('goto-register');
+  const gotoLogin = document.getElementById('goto-login');
 
-  const candFormWrapper = document.getElementById('candidate-form-wrapper');
-  const recFormWrapper = document.getElementById('recruiter-form-wrapper');
+  // Close
+  closeBtn.addEventListener('click', () => modal.classList.remove('active'));
+  modal.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('active'); });
 
-  const candToggleBtn = document.getElementById('candidate-toggle-btn');
-  const recToggleBtn = document.getElementById('recruiter-toggle-btn');
+  // Tab switching
+  function showTab(tab) {
+    tabLogin.classList.toggle('active', tab === 'login');
+    tabRegister.classList.toggle('active', tab === 'register');
+    panelLogin.style.display = tab === 'login' ? 'block' : 'none';
+    panelRegister.style.display = tab === 'register' ? 'block' : 'none';
+  }
+  tabLogin.addEventListener('click', () => showTab('login'));
+  tabRegister.addEventListener('click', () => showTab('register'));
+  if (gotoRegister) gotoRegister.addEventListener('click', () => showTab('register'));
+  if (gotoLogin) gotoLogin.addEventListener('click', () => showTab('login'));
 
-  // Close Event
-  closeBtn.addEventListener('click', () => {
-    modal.classList.remove('active');
-  });
+  // Role card selection — supports single or both selected
+  const roleCards = document.querySelectorAll('.auth-role-card');
+  const roleInput = document.getElementById('register-role');
+  const skillGroup = document.getElementById('reg-skill-group');
+  const companyGroup = document.getElementById('reg-company-group');
+  const bothNotice = document.getElementById('both-mode-notice');
 
-  // Tab Candidate Click
-  tabCandidate.addEventListener('click', () => {
-    tabCandidate.classList.add('active');
-    tabRecruiter.classList.remove('active');
-    candFormWrapper.style.display = 'block';
-    recFormWrapper.style.display = 'none';
-  });
+  roleCards.forEach(card => {
+    card.addEventListener('click', () => {
+      const clickedRole = card.getAttribute('data-role');
+      const wasSelected = card.classList.contains('selected');
+      const otherCard = document.querySelector(`.auth-role-card:not([data-role="${clickedRole}"])`);
+      const otherSelected = otherCard && otherCard.classList.contains('selected');
 
-  // Tab Recruiter Click
-  tabRecruiter.addEventListener('click', () => {
-    tabRecruiter.classList.add('active');
-    tabCandidate.classList.remove('active');
-    recFormWrapper.style.display = 'block';
-    candFormWrapper.style.display = 'none';
-  });
-
-  // Toggle Candidate Login/Signup Mode
-  candToggleBtn.addEventListener('click', () => {
-    const modeInput = document.getElementById('candidate-mode');
-    const nameGroup = document.getElementById('candidate-name-group');
-    const roleGroup = document.getElementById('candidate-role-group');
-    const submitBtn = document.getElementById('candidate-submit-btn');
-    const title = document.getElementById('candidate-auth-title');
-    const prompt = document.getElementById('candidate-toggle-prompt');
-    const err = document.getElementById('candidate-auth-error');
-
-    err.textContent = '';
-    if (modeInput.value === 'login') {
-      modeInput.value = 'signup';
-      nameGroup.style.display = 'block';
-      roleGroup.style.display = 'block';
-      document.getElementById('candidate-name').required = true;
-      submitBtn.textContent = 'Register & Create Profile';
-      title.textContent = 'Candidate Signup';
-      prompt.textContent = 'Already have an account?';
-      candToggleBtn.textContent = 'Log In';
-    } else {
-      modeInput.value = 'login';
-      nameGroup.style.display = 'none';
-      roleGroup.style.display = 'none';
-      document.getElementById('candidate-name').required = false;
-      submitBtn.textContent = 'Login as Candidate';
-      title.textContent = 'Candidate Login';
-      prompt.textContent = "Don't have a profile?";
-      candToggleBtn.textContent = 'Create Profile / Sign Up';
-    }
-  });
-
-  // Toggle Recruiter Login/Signup Mode
-  recToggleBtn.addEventListener('click', () => {
-    const modeInput = document.getElementById('recruiter-mode');
-    const nameGroup = document.getElementById('recruiter-name-group');
-    const companyGroup = document.getElementById('recruiter-company-group');
-    const submitBtn = document.getElementById('recruiter-submit-btn');
-    const title = document.getElementById('recruiter-auth-title');
-    const prompt = document.getElementById('recruiter-toggle-prompt');
-    const err = document.getElementById('recruiter-auth-error');
-
-    err.textContent = '';
-    if (modeInput.value === 'login') {
-      modeInput.value = 'signup';
-      nameGroup.style.display = 'block';
-      companyGroup.style.display = 'block';
-      document.getElementById('recruiter-name').required = true;
-      document.getElementById('recruiter-company').required = true;
-      submitBtn.textContent = 'Create Recruiter Account';
-      title.textContent = 'Recruiter Signup';
-      prompt.textContent = 'Already registered?';
-      recToggleBtn.textContent = 'Log In';
-    } else {
-      modeInput.value = 'login';
-      nameGroup.style.display = 'none';
-      companyGroup.style.display = 'none';
-      document.getElementById('recruiter-name').required = false;
-      document.getElementById('recruiter-company').required = false;
-      submitBtn.textContent = 'Login as Recruiter';
-      title.textContent = 'Recruiter Login';
-      prompt.textContent = 'New to SkillHire?';
-      recToggleBtn.textContent = 'Create Recruiter Account';
-    }
-  });
-
-  // Candidate Form Submit
-  document.getElementById('candidate-auth-form').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const mode = document.getElementById('candidate-mode').value;
-    const email = document.getElementById('candidate-email').value.trim();
-    const password = document.getElementById('candidate-password').value;
-    const errorEl = document.getElementById('candidate-auth-error');
-
-    const inSubdir = window.location.pathname.includes('/candidate/') ||
-      window.location.pathname.includes('/recruiter/') ||
-      window.location.pathname.includes('/shared/');
-    const prefix = inSubdir ? '../' : '';
-
-    try {
-      if (mode === 'login') {
-        const session = window.SessionManager.loginCandidate(email, password);
-        if (session) {
-          modal.classList.remove('active');
-          window.location.href = prefix + 'candidate/dashboard.html';
-        } else {
-          errorEl.textContent = 'Invalid candidate email or password. (Hint: Seed accounts use password123)';
-        }
+      if (wasSelected && otherSelected) {
+        // Deselect clicked one, keep other
+        card.classList.remove('selected');
+        const remaining = otherCard.getAttribute('data-role');
+        roleInput.value = remaining;
+        bothNotice.style.display = 'none';
+        skillGroup.style.display = remaining === 'freelancer' ? 'block' : 'none';
+        companyGroup.style.display = remaining === 'client' ? 'block' : 'none';
+      } else if (wasSelected && !otherSelected) {
+        // Already sole selection — no-op (keep selected)
+      } else if (!wasSelected && otherSelected) {
+        // Select both
+        card.classList.add('selected');
+        roleInput.value = 'freelancer'; // register as freelancer, mode switch available
+        bothNotice.style.display = 'block';
+        skillGroup.style.display = 'block';
+        companyGroup.style.display = 'none';
       } else {
-        const name = document.getElementById('candidate-name').value.trim();
-        const role = document.getElementById('candidate-role').value;
-        const candidate = window.CandidatesDB.signup(name, email, password, role);
-        window.SessionManager.loginCandidate(email, password);
-        modal.classList.remove('active');
-        window.location.href = prefix + 'candidate/dashboard.html';
+        // Select only this card
+        roleCards.forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        roleInput.value = clickedRole;
+        bothNotice.style.display = 'none';
+        skillGroup.style.display = clickedRole === 'freelancer' ? 'block' : 'none';
+        companyGroup.style.display = clickedRole === 'client' ? 'block' : 'none';
       }
-    } catch (err) {
-      errorEl.textContent = err.message;
-    }
+    });
   });
 
-  // Recruiter Form Submit
-  document.getElementById('recruiter-auth-form').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const mode = document.getElementById('recruiter-mode').value;
-    const email = document.getElementById('recruiter-email').value.trim();
-    const password = document.getElementById('recruiter-password').value;
-    const errorEl = document.getElementById('recruiter-auth-error');
+  // Password show/hide toggles
+  document.querySelectorAll('.pw-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const inp = document.getElementById(btn.dataset.target);
+      if (!inp) return;
+      inp.type = inp.type === 'password' ? 'text' : 'password';
+    });
+  });
 
-    const inSubdir = window.location.pathname.includes('/candidate/') ||
-      window.location.pathname.includes('/recruiter/') ||
-      window.location.pathname.includes('/shared/');
-    const prefix = inSubdir ? '../' : '';
+  // Live password validation rules
+  const regPwInput = document.getElementById('reg-password');
+  if (regPwInput) {
+    regPwInput.addEventListener('input', () => {
+      const v = regPwInput.value;
+      const rules = {
+        length: v.length >= 8,
+        upper: /[A-Z]/.test(v),
+        number: /[0-9]/.test(v),
+        special: /[^A-Za-z0-9]/.test(v)
+      };
+      document.querySelectorAll('.pw-rule').forEach(el => {
+        el.classList.toggle('met', !!rules[el.dataset.rule]);
+      });
+    });
+  }
+
+  // Prefix helper for subdirectory pages
+  function getPrefix() {
+    const path = window.location.pathname;
+    return (path.includes('/candidate/') || path.includes('/recruiter/') || path.includes('/shared/')) ? '../' : '';
+  }
+
+  // Login form
+  document.getElementById('login-form').addEventListener('submit', e => {
+    e.preventDefault();
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+    const errEl = document.getElementById('login-error');
+    errEl.textContent = '';
 
     try {
-      if (mode === 'login') {
-        const session = window.SessionManager.loginRecruiter(email, password);
-        if (session) {
-          modal.classList.remove('active');
+      const session = window.SessionManager.login(email, password);
+      if (session) {
+        modal.classList.remove('active');
+        updateNavbarState();
+        const prefix = getPrefix();
+        if (session.role === 'recruiter') {
           window.location.href = prefix + 'recruiter/dashboard.html';
         } else {
-          errorEl.textContent = 'Invalid recruiter email or password. (Hint: Try jane@acme.com with password123)';
+          window.location.href = prefix + 'candidate/dashboard.html';
         }
       } else {
-        const name = document.getElementById('recruiter-name').value.trim();
-        const company = document.getElementById('recruiter-company').value.trim();
-        const recruiter = window.RecruitersDB.signup(name, email, password, company);
-        window.SessionManager.loginRecruiter(email, password);
-        modal.classList.remove('active');
-        window.location.href = prefix + 'recruiter/dashboard.html';
+        errEl.textContent = 'Invalid email or password.';
       }
     } catch (err) {
-      errorEl.textContent = err.message;
+      errEl.textContent = err.message;
     }
   });
 
-  // Export open trigger to window
-  window.openAuthModal = function (role = 'candidate', mode = 'login') {
+  // Register form
+  document.getElementById('register-form').addEventListener('submit', e => {
+    e.preventDefault();
+    const name = document.getElementById('reg-name').value.trim();
+    const email = document.getElementById('reg-email').value.trim();
+    const password = document.getElementById('reg-password').value;
+    const role = document.getElementById('register-role').value;
+    const tc = document.getElementById('reg-tc').checked;
+    const errEl = document.getElementById('register-error');
+    errEl.textContent = '';
+
+    if (!tc) { errEl.textContent = 'Please accept the Terms of Service to continue.'; return; }
+
+    try {
+      const prefix = getPrefix();
+      if (role === 'freelancer') {
+        const skill = document.getElementById('reg-skill').value;
+        window.CandidatesDB.signup(name, email, password, skill);
+        window.SessionManager.loginCandidate(email, password);
+        modal.classList.remove('active');
+        updateNavbarState();
+        window.location.href = prefix + 'profile-setup.html';
+      } else {
+        const company = document.getElementById('reg-company').value.trim();
+        window.RecruitersDB.signup(name, email, password, company || name);
+        window.SessionManager.loginRecruiter(email, password);
+        modal.classList.remove('active');
+        updateNavbarState();
+        window.location.href = prefix + 'profile-setup.html';
+      }
+    } catch (err) {
+      errEl.textContent = err.message;
+    }
+  });
+
+  // Global open function
+  window.openAuthModal = function(tab = 'login', role = 'freelancer') {
     modal.classList.add('active');
-    if (role === 'candidate') {
-      tabCandidate.click();
-      if (mode === 'signup' && document.getElementById('candidate-mode').value === 'login') {
-        candToggleBtn.click();
-      } else if (mode === 'login' && document.getElementById('candidate-mode').value === 'signup') {
-        candToggleBtn.click();
-      }
-    } else {
-      tabRecruiter.click();
-      if (mode === 'signup' && document.getElementById('recruiter-mode').value === 'login') {
-        recToggleBtn.click();
-      } else if (mode === 'login' && document.getElementById('recruiter-mode').value === 'signup') {
-        recToggleBtn.click();
-      }
+    showTab(tab);
+    if (tab === 'register' && role) {
+      const card = document.querySelector(`.auth-role-card[data-role="${role}"]`);
+      if (card) card.click();
     }
   };
 }
 
-/**
- * Contact Modal Injection and Controller
- */
+/* --------------------------------------------------------------------------
+   Contact Modal (Recruiter → Candidate)
+   -------------------------------------------------------------------------- */
 function initContactModal() {
   if (document.getElementById('contact-modal')) return;
 
-  const contactHtml = `
-    <div id="contact-modal" class="modal-overlay">
-      <div class="modal-card">
-        <button class="modal-close-btn" id="contact-modal-close">&times;</button>
-        <h2 class="modal-title">Contact Candidate</h2>
-        <p class="modal-subtitle">Send an inquiry to the candidate. Your request will be saved to your dashboard logs.</p>
-        
-        <form id="recruiter-contact-form">
-          <input type="hidden" id="contact-candidate-id">
-          
-          <div class="form-group">
-            <label for="contact-candidate-name">Candidate Name</label>
-            <input type="text" id="contact-candidate-name" readonly style="background: rgba(255,255,255,0.05);">
-          </div>
-
-          <div class="form-group">
-            <label for="contact-subject">Inquiry Subject</label>
-            <input type="text" id="contact-subject" placeholder="Opportunity: Senior Frontend Developer" required>
-          </div>
-
-          <div class="form-group">
-            <label for="contact-body">Message Description</label>
-            <textarea id="contact-body" rows="6" placeholder="Hi! We saw your project showcase on SkillHire and would love to interview you for..." required></textarea>
-          </div>
-
-          <button type="submit" class="btn btn-primary btn-block">Log Message & Show Contact Info</button>
-        </form>
-
-        <!-- Success Reveal State (Hidden initially) -->
-        <div id="contact-reveal-section" style="display: none; text-align: center; margin-top: 16px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
-          <h3 style="color: #10B981; margin-bottom: 8px;">✓ Message Saved to Dashboard Logs</h3>
-          <p style="margin-bottom: 16px; font-size: 0.95rem; color: var(--secondary-text);">Candidate Direct Contact Email:</p>
-          <div class="reveal-email-box" style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; margin-bottom: 16px; font-size: 1.1rem; border: 1px dashed rgba(255,255,255,0.2);">
-            <span id="contact-reveal-email"></span>
-          </div>
-          <div style="display: flex; justify-content: center; gap: 12px;">
-            <button class="btn btn-secondary" id="contact-btn-copy" style="font-size: 0.85rem; padding: 8px 16px;">Copy Email Address</button>
-            <a class="btn btn-primary" id="contact-btn-mail" href="" style="font-size: 0.85rem; padding: 8px 16px;">Open in Mail Client &rarr;</a>
-          </div>
+  const html = `
+  <div id="contact-modal" class="modal-overlay">
+    <div class="modal-card">
+      <button class="modal-close-btn" id="contact-modal-close">&times;</button>
+      <h2 class="modal-title">Contact Freelancer</h2>
+      <p class="modal-subtitle">Send an inquiry. It will be saved to your dashboard.</p>
+      <form id="recruiter-contact-form">
+        <input type="hidden" id="contact-candidate-id">
+        <div class="form-group">
+          <label>Freelancer</label>
+          <input type="text" id="contact-candidate-name" readonly style="background:rgba(0,0,0,0.03);">
         </div>
-
+        <div class="form-group">
+          <label for="contact-subject">Subject</label>
+          <input type="text" id="contact-subject" placeholder="Opportunity: Frontend Developer" required>
+        </div>
+        <div class="form-group">
+          <label for="contact-body">Message</label>
+          <textarea id="contact-body" rows="5" placeholder="Hi! We saw your work on SkillBridge and would love to connect..." required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Send & Reveal Contact Info</button>
+      </form>
+      <div id="contact-reveal-section" style="display:none;text-align:center;margin-top:16px;padding-top:20px;border-top:1px solid var(--border-color);">
+        <h3 style="color:#1dbf73;margin-bottom:8px;">Message Saved!</h3>
+        <p style="margin-bottom:12px;font-size:.9rem;color:var(--secondary-text);">Freelancer contact email:</p>
+        <div style="background:#f5f5f5;padding:12px 20px;border-radius:10px;font-weight:600;font-size:1.05rem;margin-bottom:16px;display:inline-block;">
+          <span id="contact-reveal-email"></span>
+        </div>
+        <div style="display:flex;justify-content:center;gap:10px;">
+          <button class="btn btn-secondary" id="contact-btn-copy" style="font-size:.85rem;padding:8px 16px;">Copy Email</button>
+          <a class="btn btn-primary" id="contact-btn-mail" href="" style="font-size:.85rem;padding:8px 16px;">Open Mail Client</a>
+        </div>
       </div>
     </div>
-  `;
+  </div>`;
 
-  // Inject to page
   const wrapper = document.createElement('div');
-  wrapper.innerHTML = contactHtml;
+  wrapper.innerHTML = html;
   document.body.appendChild(wrapper.firstElementChild);
 
   const modal = document.getElementById('contact-modal');
   const closeBtn = document.getElementById('contact-modal-close');
-  const contactForm = document.getElementById('recruiter-contact-form');
-  const revealSection = document.getElementById('contact-reveal-section');
+  const form = document.getElementById('recruiter-contact-form');
+  const revealSec = document.getElementById('contact-reveal-section');
   const revealEmail = document.getElementById('contact-reveal-email');
   const copyBtn = document.getElementById('contact-btn-copy');
   const mailLink = document.getElementById('contact-btn-mail');
 
-  closeBtn.addEventListener('click', () => {
-    modal.classList.remove('active');
-  });
+  closeBtn.addEventListener('click', () => modal.classList.remove('active'));
 
-  contactForm.addEventListener('submit', (e) => {
+  form.addEventListener('submit', e => {
     e.preventDefault();
     const candidateId = document.getElementById('contact-candidate-id').value;
     const subject = document.getElementById('contact-subject').value.trim();
     const body = document.getElementById('contact-body').value.trim();
-
     const session = window.SessionManager.getActiveUser();
-    if (!session || session.role !== 'recruiter') {
-      alert('You must be logged in as a recruiter to contact candidates.');
-      return;
-    }
+
+    if (!session) { alert('You must be logged in to contact freelancers.'); return; }
 
     const candidate = window.CandidatesDB.getById(candidateId);
-    if (!candidate) {
-      alert('Candidate details not found.');
-      return;
-    }
+    if (!candidate) { alert('Freelancer not found.'); return; }
 
-    // Save message to simulated DB
     window.MessagesDB.send(
-      session.user.id,
-      session.user.name,
-      session.user.company,
-      session.user.email,
-      candidateId,
-      subject,
-      body
+      session.user.id, session.user.name,
+      session.user.company || session.user.name,
+      session.user.contact ? session.user.contact.email : (session.user.email || ''),
+      candidateId, subject, body
     );
 
-    // Populate contact reveal and toggle view
     const email = candidate.contact.email || 'no-email@example.com';
     revealEmail.textContent = email;
     mailLink.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-
-    // Hide form elements and show email reveal section
-    contactForm.style.display = 'none';
-    revealSection.style.display = 'block';
+    form.style.display = 'none';
+    revealSec.style.display = 'block';
   });
 
-  // Copy email action
   copyBtn.addEventListener('click', () => {
-    const text = revealEmail.textContent;
-    navigator.clipboard.writeText(text).then(() => {
+    navigator.clipboard.writeText(revealEmail.textContent).then(() => {
       copyBtn.textContent = 'Copied!';
-      setTimeout(() => {
-        copyBtn.textContent = 'Copy Email Address';
-      }, 2000);
+      setTimeout(() => { copyBtn.textContent = 'Copy Email'; }, 2000);
     });
   });
 
-  window.openContactModal = function (candidateId, candidateName) {
+  window.openContactModal = function(candidateId, candidateName) {
     const session = window.SessionManager.getActiveUser();
-    if (!session || session.role !== 'recruiter') {
-      // Prompt recruiter to log in
-      window.openAuthModal('recruiter', 'login');
-      return;
-    }
-
-    // Reset UI state
-    contactForm.reset();
-    contactForm.style.display = 'block';
-    revealSection.style.display = 'none';
-
+    if (!session) { window.openAuthModal('login'); return; }
+    form.reset();
+    form.style.display = 'block';
+    revealSec.style.display = 'none';
     document.getElementById('contact-candidate-id').value = candidateId;
     document.getElementById('contact-candidate-name').value = candidateName;
-
     modal.classList.add('active');
   };
 }
 
-/**
- * Updates floating header and mobile drawer navigation dynamically based on Login State
- */
+/* --------------------------------------------------------------------------
+   Proposal Submit Modal
+   -------------------------------------------------------------------------- */
+function initProposalModal() {
+  if (document.getElementById('proposal-modal')) return;
+
+  const html = `
+  <div id="proposal-modal" class="modal-overlay">
+    <div class="modal-card">
+      <button class="modal-close-btn" id="proposal-modal-close">&times;</button>
+      <h2 class="modal-title">Submit Proposal</h2>
+      <p class="modal-subtitle" id="proposal-job-title-display"></p>
+      <form id="proposal-form">
+        <input type="hidden" id="proposal-job-id">
+        <div class="form-group">
+          <label for="proposal-budget">Your Bid / Rate</label>
+          <input type="text" id="proposal-budget" placeholder="e.g. ₹18,000 fixed or ₹900/hr" required>
+        </div>
+        <div class="form-group">
+          <label for="proposal-timeline">Estimated Timeline</label>
+          <input type="text" id="proposal-timeline" placeholder="e.g. 2 weeks" required>
+        </div>
+        <div class="form-group">
+          <label for="proposal-cover">Cover Letter</label>
+          <textarea id="proposal-cover" rows="6" placeholder="Introduce yourself and explain why you're the right fit for this project..." required></textarea>
+        </div>
+        <div class="auth-error" id="proposal-error"></div>
+        <button type="submit" class="btn btn-primary btn-block" style="border-radius:6px;">Submit Proposal</button>
+      </form>
+      <div id="proposal-success" style="display:none;text-align:center;padding:28px 0;">
+        <div style="width:52px;height:52px;border-radius:50%;background:rgba(29,191,115,0.12);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h3 style="color:#111;font-size:1.1rem;margin-bottom:8px;">Proposal Submitted!</h3>
+        <p style="color:#666;font-size:0.88rem;">Your proposal has been sent to the client. <a href="my-proposals.html" style="color:var(--accent-color);font-weight:600;">View in My Proposals</a></p>
+      </div>
+    </div>
+  </div>`;
+
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = html;
+  document.body.appendChild(wrapper.firstElementChild);
+
+  const modal = document.getElementById('proposal-modal');
+  const closeBtn = document.getElementById('proposal-modal-close');
+  const form = document.getElementById('proposal-form');
+  const successDiv = document.getElementById('proposal-success');
+
+  closeBtn.addEventListener('click', () => modal.classList.remove('active'));
+  modal.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('active'); });
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const jobId = document.getElementById('proposal-job-id').value;
+    const budget = document.getElementById('proposal-budget').value.trim();
+    const timeline = document.getElementById('proposal-timeline').value.trim();
+    const cover = document.getElementById('proposal-cover').value.trim();
+    const errEl = document.getElementById('proposal-error');
+    errEl.textContent = '';
+
+    const session = window.SessionManager.getActiveUser();
+    if (!session) { errEl.textContent = 'You must be logged in to submit a proposal.'; return; }
+
+    try {
+      window.ProposalsDB.submit(jobId, session, { coverLetter: cover, proposedBudget: budget, proposedTimeline: timeline });
+      form.style.display = 'none';
+      successDiv.style.display = 'block';
+    } catch (err) {
+      errEl.textContent = err.message;
+    }
+  });
+
+  window.openProposalModal = function(jobId, jobTitle) {
+    const session = window.SessionManager.getActiveUser();
+    if (!session) { window.openAuthModal('login'); return; }
+    form.reset();
+    form.style.display = 'block';
+    successDiv.style.display = 'none';
+    document.getElementById('proposal-job-id').value = jobId;
+    document.getElementById('proposal-job-title-display').textContent = jobTitle;
+    document.getElementById('proposal-error').textContent = '';
+    modal.classList.add('active');
+  };
+}
+
+/* --------------------------------------------------------------------------
+   updateNavbarState — renders nav based on session + active mode
+   Mode: 'freelancer' shows Browse Projects + My Proposals
+         'client'     shows Browse Freelancers + Post Project
+   Same account can switch modes via the mode toggle button.
+   -------------------------------------------------------------------------- */
+function getActiveMode(session) {
+  const stored = localStorage.getItem('skillbridge_mode');
+  if (stored === 'client' || stored === 'freelancer') return stored;
+  return session.role === 'recruiter' ? 'client' : 'freelancer';
+}
+
 function updateNavbarState() {
   const session = window.SessionManager.getActiveUser();
+  const desktopCta = document.querySelector('.nav-cta');
+  const desktopMenu = document.getElementById('nav-menu-list');
+  const mobileCta = document.querySelector('.mobile-nav-cta');
+  const mobileMenu = document.querySelector('.mobile-nav-list');
 
-  const desktopCtaContainer = document.querySelector('.nav-cta');
-  const desktopNavMenu = document.getElementById('nav-menu-list');
+  if (!desktopMenu || !desktopCta) return;
 
-  const mobileCtaContainer = document.querySelector('.mobile-nav-cta');
-  const mobileNavMenu = document.querySelector('.mobile-nav-list');
-
-  if (!desktopNavMenu || !desktopCtaContainer) return;
-
-  const inSubdir = window.location.pathname.includes('/candidate/') ||
-    window.location.pathname.includes('/recruiter/') ||
-    window.location.pathname.includes('/shared/');
+  const path = window.location.pathname;
+  const inSubdir = path.includes('/candidate/') || path.includes('/recruiter/') || path.includes('/shared/');
   const prefix = inSubdir ? '../' : '';
 
   if (session) {
-    // Shared Logout Actions
-    const handleLogoutHtml = `
-      <button class="btn btn-secondary" id="btn-navbar-logout" style="margin-left: 10px;">Logout</button>
+    const mode = getActiveMode(session);
+    const isClient = mode === 'client';
+
+    const dashUrl = session.role === 'recruiter'
+      ? `${prefix}recruiter/dashboard.html`
+      : `${prefix}candidate/dashboard.html`;
+
+    const profileUrl = `${prefix}profile.html?id=${session.user.id}`;
+
+    // Role-specific link order — client: Home | Browse Freelancers | Post Project | Dashboard
+    //                             freelancer: Home | Find Work | Dashboard
+    desktopMenu.innerHTML = isClient ? `
+      <li><a href="${prefix}index.html" class="nav-link">Home</a></li>
+      <li><a href="${prefix}candidates.html" class="nav-link">Browse Freelancers</a></li>
+      <li><a href="${prefix}post-project.html" class="nav-link">Post Project</a></li>
+      <li><a href="${dashUrl}" class="nav-link">Dashboard</a></li>
+    ` : `
+      <li><a href="${prefix}index.html" class="nav-link">Home</a></li>
+      <li><a href="${prefix}browse-projects.html" class="nav-link">Find Work</a></li>
+      <li><a href="${dashUrl}" class="nav-link">Dashboard</a></li>
     `;
 
-    if (session.role === 'recruiter') {
-      // Update links for recruiter
-      const recruiterLinks = `
-        <li><a href="${prefix}index.html" class="nav-link">Home</a></li>
-        <li><a href="${prefix}candidates.html" class="nav-link">Candidates</a></li>
-        <li><a href="${prefix}recruiter/dashboard.html" class="nav-link" style="color: #60A5FA;">Dashboard</a></li>
-      `;
-      desktopNavMenu.innerHTML = recruiterLinks;
-      desktopCtaContainer.innerHTML = `
-        <span class="recruiter-badge" style="font-size:0.8rem; background:rgba(96,165,250,0.1); border:1px solid rgba(96,165,250,0.3); color:#93C5FD; padding:6px 12px; border-radius:100px; font-weight:600;">Recruiter: ${session.user.name.split(' ')[0]}</span>
-        ${handleLogoutHtml}
-      `;
+    const switchLabel = isClient ? 'Switch to Freelancer' : 'Switch to Client';
+    const switchMode  = isClient ? 'freelancer' : 'client';
 
-      if (mobileNavMenu) {
-        mobileNavMenu.innerHTML = `
-          <li><a href="${prefix}index.html" class="mobile-nav-link">Home</a></li>
-          <li><a href="${prefix}candidates.html" class="mobile-nav-link">Candidates</a></li>
-          <li><a href="${prefix}recruiter/dashboard.html" class="mobile-nav-link" style="color: #60A5FA;">Dashboard</a></li>
-        `;
-      }
-      if (mobileCtaContainer) {
-        mobileCtaContainer.innerHTML = `
-          <button class="btn btn-secondary btn-block" id="btn-mob-logout" style="margin-top: 10px;">Logout</button>
-        `;
-      }
+    desktopCta.innerHTML = `
+      <button class="btn-mode-switch" id="btn-mode-switch" title="${switchLabel}" data-mode="${switchMode}">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+        <span>${isClient ? 'Freelancer mode' : 'Client mode'}</span>
+      </button>
+      <div class="nav-profile-wrap" id="nav-user-pill">
+        <button type="button" class="user-pill-link" id="nav-user-badge" aria-expanded="false" aria-haspopup="true">
+          <span class="user-pill-avatar">${session.user.name.charAt(0).toUpperCase()}</span>
+          <span class="user-pill-name">${session.user.name.split(' ')[0]}</span>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.5;margin-left:2px;" id="pill-chevron"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-profile-dropdown" id="nav-profile-dropdown">
+          <a href="${profileUrl}" class="nav-dd-row">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Profile
+          </a>
+          <button class="nav-dd-row nav-dd-logout" id="btn-navbar-logout">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Log Out
+          </button>
+        </div>
+      </div>
+    `;
 
-    } else {
-      // Update links for candidate
-      const candidateLinks = `
-        <li><a href="${prefix}index.html" class="nav-link">Home</a></li>
-        <li><a href="${prefix}candidates.html" class="nav-link">Candidates</a></li>
-        <li><a href="${prefix}profile.html?id=${session.user.id}" class="nav-link">My Public Profile</a></li>
+    if (mobileMenu) {
+      mobileMenu.innerHTML = isClient ? `
+        <li><a href="${prefix}index.html" class="mobile-nav-link">Home</a></li>
+        <li><a href="${prefix}candidates.html" class="mobile-nav-link">Browse Freelancers</a></li>
+        <li><a href="${prefix}post-project.html" class="mobile-nav-link">Post Project</a></li>
+        <li><a href="${dashUrl}" class="mobile-nav-link">Dashboard</a></li>
+        <li><a href="${profileUrl}" class="mobile-nav-link">My Profile</a></li>
+      ` : `
+        <li><a href="${prefix}index.html" class="mobile-nav-link">Home</a></li>
+        <li><a href="${prefix}browse-projects.html" class="mobile-nav-link">Find Work</a></li>
+        <li><a href="${dashUrl}" class="mobile-nav-link">Dashboard</a></li>
+        <li><a href="${profileUrl}" class="mobile-nav-link">My Profile</a></li>
       `;
-      desktopNavMenu.innerHTML = candidateLinks;
-      desktopCtaContainer.innerHTML = `
-        <a href="${prefix}candidate/dashboard.html" class="btn btn-primary">My Dashboard</a>
-        ${handleLogoutHtml}
+    }
+    if (mobileCta) {
+      mobileCta.innerHTML = `
+        <button class="btn btn-secondary btn-block" id="btn-mob-mode" style="font-size:0.82rem;">${switchLabel}</button>
+        <button class="btn btn-secondary btn-block" id="btn-mob-logout" style="margin-top:8px;">Log Out</button>
       `;
-
-      if (mobileNavMenu) {
-        mobileNavMenu.innerHTML = `
-          <li><a href="${prefix}index.html" class="mobile-nav-link">Home</a></li>
-          <li><a href="${prefix}candidates.html" class="mobile-nav-link">Candidates</a></li>
-          <li><a href="${prefix}profile.html?id=${session.user.id}" class="mobile-nav-link">My Public Profile</a></li>
-          <li><a href="${prefix}candidate/dashboard.html" class="mobile-nav-link" style="color: var(--primary-color);">My Dashboard</a></li>
-        `;
-      }
-      if (mobileCtaContainer) {
-        mobileCtaContainer.innerHTML = `
-          <button class="btn btn-secondary btn-block" id="btn-mob-logout" style="margin-top: 10px;">Logout</button>
-        `;
-      }
     }
 
-    // Attach click listeners to logout buttons
-    const logOutBtn = document.getElementById('btn-navbar-logout');
-    if (logOutBtn) {
-      logOutBtn.addEventListener('click', () => {
-        window.SessionManager.logout();
-        window.location.href = `${prefix}index.html`;
+    // Profile pill — click toggles dropdown (not navigate)
+    const pillBtn = document.getElementById('nav-user-badge');
+    const pillWrap = document.getElementById('nav-user-pill');
+    const pillChevron = document.getElementById('pill-chevron');
+    if (pillBtn && pillWrap) {
+      pillBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = pillWrap.classList.toggle('open');
+        pillBtn.setAttribute('aria-expanded', String(isOpen));
+        if (pillChevron) pillChevron.style.transform = isOpen ? 'rotate(180deg)' : '';
       });
+      // Close when clicking anywhere else
+      document.addEventListener('click', function closeDropdown(e) {
+        if (!pillWrap.contains(e.target)) {
+          pillWrap.classList.remove('open');
+          pillBtn.setAttribute('aria-expanded', 'false');
+          if (pillChevron) pillChevron.style.transform = '';
+        }
+      }, { capture: true });
     }
 
-    const mobLogOutBtn = document.getElementById('btn-mob-logout');
-    if (mobLogOutBtn) {
-      mobLogOutBtn.addEventListener('click', () => {
-        window.closeMobileMenu();
-        window.SessionManager.logout();
-        window.location.href = `${prefix}index.html`;
-      });
-    }
+    // Mode switch
+    document.getElementById('btn-mode-switch')?.addEventListener('click', () => {
+      localStorage.setItem('skillbridge_mode', switchMode);
+      updateNavbarState();
+    });
+    document.getElementById('btn-mob-mode')?.addEventListener('click', () => {
+      localStorage.setItem('skillbridge_mode', switchMode);
+      window.closeMobileMenu();
+      updateNavbarState();
+    });
+
+    // Logout
+    document.getElementById('btn-navbar-logout')?.addEventListener('click', () => {
+      window.SessionManager.logout();
+      localStorage.removeItem('skillbridge_mode');
+      window.location.href = `${prefix}index.html`;
+    });
+    document.getElementById('btn-mob-logout')?.addEventListener('click', () => {
+      window.closeMobileMenu();
+      window.SessionManager.logout();
+      localStorage.removeItem('skillbridge_mode');
+      window.location.href = `${prefix}index.html`;
+    });
 
   } else {
-    // Guest User - update navbar links and setup modal action triggers
-    desktopNavMenu.innerHTML = `
-      <li><a href="${prefix}index.html" class="nav-link" id="nav-link-home">Home</a></li>
-      <li><a href="${prefix}hire-talent.html" class="nav-link" id="nav-link-hire-talent">Hire Talent</a></li>
+    // ── GUEST NAVBAR ──
+    desktopMenu.innerHTML = `
+      <li><a href="${prefix}index.html" class="nav-link">Home</a></li>
+      <li><a href="${prefix}hire-talent.html" class="nav-link">Hire Talent</a></li>
+      <li><a href="${prefix}browse-projects.html" class="nav-link">Get Hired</a></li>
+    `;
+    desktopCta.innerHTML = `
+      <button class="btn btn-secondary" id="nav-btn-login" style="margin-right:8px;padding:8px 18px;font-size:0.85rem;">Log In</button>
+      <button class="btn btn-primary" id="nav-btn-register" style="padding:8px 18px;font-size:0.85rem;">Register</button>
     `;
 
-    desktopCtaContainer.innerHTML = `
-      <button class="btn btn-secondary" id="nav-btn-signup" style="margin-right: 8px;">Sign Up</button>
-      <button class="btn btn-primary" id="nav-btn-portal-trigger">Log in</button>
-    `;
-
-    if (mobileNavMenu) {
-      mobileNavMenu.innerHTML = `
+    if (mobileMenu) {
+      mobileMenu.innerHTML = `
         <li><a href="${prefix}index.html" class="mobile-nav-link">Home</a></li>
         <li><a href="${prefix}hire-talent.html" class="mobile-nav-link">Hire Talent</a></li>
+        <li><a href="${prefix}browse-projects.html" class="mobile-nav-link">Get Hired</a></li>
+      `;
+    }
+    if (mobileCta) {
+      mobileCta.innerHTML = `
+        <button class="btn btn-secondary btn-block" id="mob-btn-login">Log In</button>
+        <button class="btn btn-primary btn-block" id="mob-btn-register" style="margin-top:8px;">Register</button>
       `;
     }
 
-    if (mobileCtaContainer) {
-      mobileCtaContainer.innerHTML = `
-        <button class="btn btn-secondary btn-block" id="mob-btn-signup">Sign Up</button>
-        <button class="btn btn-primary btn-block" id="mob-btn-portal-trigger" style="margin-top: 10px;">Log in</button>
-      `;
-    }
-
-
-    // Bind triggers to open Modal
-    document.getElementById('nav-btn-portal-trigger').addEventListener('click', () => {
-      window.openAuthModal('candidate', 'login');
-    });
-
-    document.getElementById('nav-btn-signup').addEventListener('click', () => {
-      window.openAuthModal('candidate', 'signup');
-    });
-
-    const mobPortalTrigger = document.getElementById('mob-btn-portal-trigger');
-    if (mobPortalTrigger) {
-      mobPortalTrigger.addEventListener('click', () => {
-        window.closeMobileMenu();
-        window.openAuthModal('candidate', 'login');
-      });
-    }
-
-    const mobSignupTrigger = document.getElementById('mob-btn-signup');
-    if (mobSignupTrigger) {
-      mobSignupTrigger.addEventListener('click', () => {
-        window.closeMobileMenu();
-        window.openAuthModal('candidate', 'signup');
-      });
-    }
+    document.getElementById('nav-btn-login')?.addEventListener('click', () => window.openAuthModal('login'));
+    document.getElementById('nav-btn-register')?.addEventListener('click', () => window.openAuthModal('register'));
+    document.getElementById('mob-btn-login')?.addEventListener('click', () => { window.closeMobileMenu(); window.openAuthModal('login'); });
+    document.getElementById('mob-btn-register')?.addEventListener('click', () => { window.closeMobileMenu(); window.openAuthModal('register'); });
   }
 
-  // Refresh active link visual styles
-  initActiveLinks();
+  highlightActiveNavLink();
 }
+
+/* --------------------------------------------------------------------------
+   Highlight active nav link
+   -------------------------------------------------------------------------- */
+function highlightActiveNavLink() {
+  const cur = window.location.pathname;
+  document.querySelectorAll('.nav-link, .mobile-nav-link').forEach(link => {
+    const href = link.getAttribute('href');
+    if (!href) return;
+    const isHome = (cur === '/' || cur.endsWith('index.html')) && (href.endsWith('index.html') || href === '/');
+    const matches = !isHome && href !== '#' && cur.endsWith(href.replace('../', '').replace('./', ''));
+    link.classList.toggle('active', isHome || matches);
+  });
+}
+
+// Kick off proposal modal init on pages that may need it
+document.addEventListener('DOMContentLoaded', () => {
+  if (typeof initProposalModal === 'function') initProposalModal();
+});
+// Export for pages that load main.js
+window.initProposalModal = initProposalModal;

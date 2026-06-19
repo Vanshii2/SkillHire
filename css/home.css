@@ -1054,6 +1054,34 @@ main {
   flex-grow: 1;
 }
 
+/* Green card variant */
+.hiw-card-green {
+  border-color: rgba(29, 191, 115, 0.25) !important;
+}
+.hiw-card-green:hover {
+  border-color: rgba(29, 191, 115, 0.55) !important;
+  box-shadow: 0 12px 32px rgba(29, 191, 115, 0.10) !important;
+}
+.hiw-icon-green { color: #1dbf73 !important; }
+
+/* CTA link inside card */
+.hiw-cta-link {
+  display: inline-flex;
+  align-items: center;
+  margin-top: auto;
+  color: #1dbf73;
+  font-weight: 700;
+  font-size: 0.88rem;
+  text-decoration: none;
+  letter-spacing: 0.01em;
+  transition: gap 0.15s;
+  gap: 4px;
+}
+.hiw-cta-link:hover { gap: 8px; }
+
+/* HIW toggle — active state green */
+.hiw-toggle-btn.active { background: #1dbf73 !important; color: #fff !important; }
+
 .hiw-link {
   color: #1dbf73;
   font-weight: 600;
@@ -1289,4 +1317,351 @@ main {
   .designers-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* ==========================================================================
+   SkillBridge — Hero Trending Tags
+   ========================================================================== */
+.hero-trending {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.trending-label {
+  color: rgba(255,255,255,0.7);
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+
+.trending-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 14px;
+  border-radius: 100px;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.25);
+  color: rgba(255,255,255,0.9);
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: all 0.15s ease;
+  text-decoration: none;
+}
+
+.trending-tag:hover {
+  background: rgba(255,255,255,0.25);
+  color: white;
+}
+
+/* ==========================================================================
+   SkillBridge — Two-Sided CTA Section
+   ========================================================================== */
+.two-sided-cta {
+  padding: 80px 0;
+  background: #fafafa;
+}
+
+.two-sided-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.two-sided-card {
+  padding: 48px 40px;
+  border-radius: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.two-sided-hire {
+  background: linear-gradient(135deg, #0f0f0f 0%, #1c1c2e 100%);
+  color: white;
+}
+
+.two-sided-work {
+  background: linear-gradient(135deg, #1dbf73 0%, #16a060 100%);
+  color: white;
+}
+
+.two-sided-tag {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 100px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 20px;
+  background: rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.9);
+}
+
+.two-sided-card h2 {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: white;
+  margin-bottom: 12px;
+  line-height: 1.15;
+}
+
+.two-sided-card p {
+  color: rgba(255,255,255,0.75);
+  font-size: 1rem;
+  margin-bottom: 28px;
+  max-width: 340px;
+}
+
+.btn-secondary-dark {
+  background: rgba(255,255,255,0.15);
+  color: white;
+  border: 1.5px solid rgba(255,255,255,0.35);
+  padding: 12px 24px;
+  border-radius: 100px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-decoration: none;
+}
+
+.btn-secondary-dark:hover {
+  background: rgba(255,255,255,0.25);
+  transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+  .two-sided-grid { grid-template-columns: 1fr; }
+  .two-sided-card { padding: 36px 28px; }
+  .two-sided-card h2 { font-size: 1.6rem; }
+}
+
+/* ==========================================================================
+   SkillBridge — Stats Band
+   ========================================================================== */
+.stats-band {
+  padding: 64px 0;
+  background: var(--primary-text);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  text-align: center;
+}
+
+.stat-item {}
+
+.stat-number {
+  font-family: var(--font-heading);
+  font-size: 2.4rem;
+  font-weight: 800;
+  color: var(--accent-color);
+  letter-spacing: -0.03em;
+  margin-bottom: 6px;
+}
+
+.stat-label {
+  font-size: 0.88rem;
+  color: rgba(255,255,255,0.6);
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 420px) {
+  .stats-grid { grid-template-columns: 1fr; }
+}
+
+/* ══════════════════════════════════════════
+   TESTIMONIALS
+══════════════════════════════════════════ */
+.testimonials-section {
+  background: #f9fafb;
+  padding: 80px 0 88px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.testimonials-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.testimonial-card {
+  background: #fff;
+  border: 1px solid #ebebeb;
+  border-radius: 18px;
+  padding: 28px 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.testimonial-card:hover {
+  box-shadow: 0 10px 32px rgba(0,0,0,0.08);
+  transform: translateY(-3px);
+}
+
+.testimonial-stars {
+  display: flex;
+  gap: 3px;
+}
+
+.testimonial-quote {
+  font-size: 0.925rem;
+  line-height: 1.65;
+  color: #444;
+  margin: 0;
+  flex: 1;
+  font-style: italic;
+}
+
+.testimonial-author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid #f2f2f2;
+}
+
+.testimonial-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 800;
+  font-family: var(--font-heading);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.testimonial-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #111;
+}
+
+.testimonial-role {
+  font-size: 0.78rem;
+  color: #888;
+  margin-top: 2px;
+}
+
+/* ══════════════════════════════════════════
+   FAQ
+══════════════════════════════════════════ */
+.faq-section {
+  background: #fff;
+  padding: 80px 0 96px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.faq-inner {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 64px;
+  align-items: start;
+}
+
+.faq-header h2 {
+  font-size: clamp(1.7rem, 3.5vw, 2.4rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.15;
+  color: #111;
+  position: sticky;
+  top: 88px;
+}
+
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.faq-item {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.faq-item:first-child {
+  border-top: 1px solid #f0f0f0;
+}
+
+.faq-question {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+.faq-question::-webkit-details-marker { display: none; }
+
+.faq-chevron {
+  flex-shrink: 0;
+  color: #aaa;
+  transition: transform 0.22s ease;
+}
+
+details[open] .faq-chevron {
+  transform: rotate(180deg);
+  color: #1dbf73;
+}
+
+details[open] .faq-question {
+  color: #1dbf73;
+}
+
+.faq-answer {
+  padding: 0 0 22px;
+}
+
+.faq-answer p {
+  font-size: 0.925rem;
+  line-height: 1.7;
+  color: #555;
+  max-width: 600px;
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .testimonials-grid { grid-template-columns: 1fr 1fr; }
+  .faq-inner { grid-template-columns: 1fr; gap: 32px; }
+  .faq-header h2 { position: static; }
+}
+
+@media (max-width: 640px) {
+  .testimonials-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Designers panel uses same Upwork card CSS from candidates.css ── */
+#panel-designers .candidates-grid {
+  grid-template-columns: repeat(3, 1fr);
+}
+@media (max-width: 900px) {
+  #panel-designers .candidates-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 560px) {
+  #panel-designers .candidates-grid { grid-template-columns: 1fr; }
 }

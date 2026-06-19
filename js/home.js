@@ -84,7 +84,7 @@ function initHeroToggle() {
 }
 
 /* ==========================================================================
-   SkillHire Homepage Logic
+   SkillBridge Homepage Logic
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -173,9 +173,10 @@ function renderProjectsShowcase(activeFilter) {
   if (!container) return;
 
   const allProjects = window.ProjectsDB.getAll();
-  const filtered = activeFilter === 'all'
+  const filtered = (activeFilter === 'all'
     ? allProjects
-    : allProjects.filter(p => p.tags.some(t => t.toLowerCase() === activeFilter.toLowerCase()));
+    : allProjects.filter(p => p.tags.some(t => t.toLowerCase() === activeFilter.toLowerCase()))
+  ).slice(0, 3);
 
   if (filtered.length === 0) {
     container.innerHTML = '<p style="text-align:center;color:var(--secondary-text);padding:40px 0;">No projects found for this category.</p>';
@@ -316,106 +317,88 @@ function setupShowcaseTabs() {
       const view = btn.getAttribute('data-view');
 
       if (view === 'shots') {
-        heading.textContent  = 'Shots';
+        heading.textContent  = 'Projects';
         subtext.textContent  = 'Browse real work from talented creators — hover to interact.';
         panelShots.style.display     = '';
         panelDesigners.style.display = 'none';
         if (browseAll) { browseAll.textContent = 'Browse All Talent →'; browseAll.href = 'candidates.html'; }
       } else {
-        heading.textContent  = 'Designers';
+        heading.textContent  = 'Freelancers';
         subtext.textContent  = 'Discover skilled designers and developers ready to work with you.';
         panelShots.style.display     = 'none';
         panelDesigners.style.display = '';
         renderDesigners();
-        if (browseAll) { browseAll.textContent = 'Browse All Designers →'; browseAll.href = 'candidates.html'; }
+        if (browseAll) { browseAll.textContent = 'Browse All Freelancers →'; browseAll.href = 'candidates.html'; }
       }
     });
   });
 }
 
 /**
- * Renders candidate profile cards in the Designers panel.
+ * Renders candidate profile cards in the Freelancers panel — Upwork style.
  */
 function renderDesigners() {
   const container = document.getElementById('designers-grid');
   if (!container || container.dataset.rendered) return;
 
   const candidates = window.CandidatesDB.getAll();
-
   if (!candidates || candidates.length === 0) {
-    container.innerHTML = '<p style="text-align:center;color:var(--secondary-text);padding:40px 0;">No designers found.</p>';
+    container.innerHTML = '<p style="text-align:center;color:var(--secondary-text);padding:40px 0;">No freelancers found.</p>';
     return;
   }
 
   container.innerHTML = candidates.map((candidate, idx) => {
-    // Same UI logic as candidates.js
-    const showCount = 3;
-    const initialSkills = candidate.skills.slice(0, showCount);
-    const hiddenSkills = candidate.skills.slice(showCount);
-    
-    let skillsHtml = initialSkills.map(skill => 
-      `<span class="skill-tag">${escapeHTML(skill)}</span>`
-    ).join('');
-
-    if (hiddenSkills.length > 0) {
-      skillsHtml += `
-        <span class="skill-tag-more" id="more-skills-home-${idx}">+${hiddenSkills.length}</span>
-        <span class="hidden-skills" id="hidden-skills-home-${idx}" style="display:none;">
-          ${hiddenSkills.map(skill => `<span class="skill-tag">${escapeHTML(skill)}</span>`).join('')}
-        </span>
-      `;
-    }
-
-    const hourlyRateHtml = candidate.hourlyRate 
-      ? `<div class="hourly-rate-text">${candidate.hourlyRate}/hr</div>` 
+    const rating = candidate.rating || 4.8;
+    const reviewCount = candidate.reviewCount || 12;
+    const rateNum = candidate.hourlyRate;
+    const rate = rateNum ? `₹${rateNum}/hr` : '₹500/hr';
+    const initial = candidate.name.charAt(0).toUpperCase();
+    const bio = candidate.about
+      ? (candidate.about.length > 95 ? candidate.about.slice(0, 95) + '…' : candidate.about)
       : '';
 
-    // No bookmark logic for home page guests, keeping it clean
-    const bookmarkHtml = '';
-    
+    const visibleSkills = candidate.skills.slice(0, 4);
+    const extraCount = candidate.skills.length - visibleSkills.length;
+    const skillPills = visibleSkills.map(s => `<span class="upw-skill">${escapeHTML(s)}</span>`).join('');
+    const hiddenPills = candidate.skills.slice(4).map(s =>
+      `<span class="upw-skill upw-skill-hidden" style="display:none">${escapeHTML(s)}</span>`
+    ).join('');
+    const moreBtn = extraCount > 0
+      ? `<button class="upw-skill-more" onclick="this.closest('.upw-skills').querySelectorAll('.upw-skill-hidden').forEach(function(e){e.style.display='inline-flex'});this.style.display='none'">
+           +${extraCount}
+           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+         </button>` : '';
+
     return `
-      <div class="candidate-card fade-in-section is-visible">
-        ${bookmarkHtml}
-        <div class="candidate-header">
-          <div class="candidate-avatar-wrapper">
-            <img src="${escapeHTML(candidate.avatar)}" alt="${escapeHTML(candidate.name)}" class="candidate-avatar">
-            <div class="candidate-status-indicator"></div>
+      <div class="candidate-card">
+        <div class="upw-card-top">
+          <div class="upw-avatar-wrap">
+            <div class="upw-avatar-letter">${initial}</div>
+            <img src="${escapeHTML(candidate.avatar)}" alt="${escapeHTML(candidate.name)}" class="upw-avatar-img" onerror="this.style.display='none'">
+            <div class="upw-online-dot"></div>
           </div>
-          <div class="candidate-header-info">
-            <h3>${escapeHTML(candidate.name)}</h3>
-            <div class="role">${escapeHTML(candidate.role)}</div>
-          </div>
-        </div>
-        
-        <div class="candidate-skills" id="skills-container-home-${idx}">
-          ${skillsHtml}
-        </div>
-        
-        <div class="candidate-footer">
-          <div class="footer-stats">
-            <div class="candidate-projects-count">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-              ${candidate.projects.length} Project${candidate.projects.length === 1 ? '' : 's'}
+          <div class="upw-info">
+            <div class="upw-name">${escapeHTML(candidate.name)}</div>
+            <div class="upw-role">${escapeHTML(candidate.role)}</div>
+            <div class="upw-meta-row">
+              <span class="upw-rate">${escapeHTML(rate)}</span>
+              <span class="upw-sep">·</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="#f59e0b" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <span class="upw-rating">${rating.toFixed(1)}</span>
+              <span class="upw-review-cnt">(${reviewCount})</span>
             </div>
-            ${hourlyRateHtml}
           </div>
-          <a href="profile.html?id=${escapeHTML(candidate.id)}" class="btn-view-profile">View Profile &rarr;</a>
         </div>
+        <p class="upw-bio">${escapeHTML(bio)}</p>
+        <div class="upw-skills">
+          ${skillPills}${hiddenPills}${moreBtn}
+        </div>
+        <a href="profile.html?id=${escapeHTML(candidate.id)}" class="upw-see-profile">
+          See Profile
+        </a>
       </div>
     `;
   }).join('');
-
-  // Setup expanding skills
-  candidates.forEach((candidate, idx) => {
-    const moreBtn = document.getElementById(`more-skills-home-${idx}`);
-    const hiddenSkills = document.getElementById(`hidden-skills-home-${idx}`);
-    if (moreBtn && hiddenSkills) {
-      moreBtn.addEventListener('click', () => {
-        moreBtn.style.display = 'none';
-        hiddenSkills.style.display = 'inline';
-      });
-    }
-  });
 
   container.dataset.rendered = 'true';
   if (typeof initScrollAnimations === 'function') initScrollAnimations();
@@ -431,14 +414,14 @@ function toggleProjectLike(btn, projectId, idx) {
   if (isLiked) {
     // Unlike
     const newLiked = liked.filter(id => id !== projectId);
-    localStorage.setItem('skillhire_liked_projects', JSON.stringify(newLiked));
+    localStorage.setItem('skillbridge_liked_projects', JSON.stringify(newLiked));
     btn.classList.remove('liked');
     btn.querySelector('svg').setAttribute('fill', 'none');
     btn.querySelector('svg').setAttribute('stroke', 'currentColor');
   } else {
     // Like
     liked.push(projectId);
-    localStorage.setItem('skillhire_liked_projects', JSON.stringify(liked));
+    localStorage.setItem('skillbridge_liked_projects', JSON.stringify(liked));
     btn.classList.add('liked');
     btn.querySelector('svg').setAttribute('fill', '#1dbf73');
     btn.querySelector('svg').setAttribute('stroke', '#1dbf73');
@@ -479,7 +462,7 @@ function toggleProjectSave(btn, projectId) {
  */
 function getLikedProjects() {
   try {
-    return JSON.parse(localStorage.getItem('skillhire_liked_projects')) || [];
+    return JSON.parse(localStorage.getItem('skillbridge_liked_projects')) || [];
   } catch {
     return [];
   }

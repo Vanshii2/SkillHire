@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Exhibitly Request & Hiring Flow Controller
+   SkillBridge Request & Hiring Flow Controller
    ========================================================================== */
 
 class RequestsController {

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terms of Service &amp; Privacy Policy — SkillBridge</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/footer.css">
+  <style>
+    main { padding-top: 80px; }
+    .pol-body { max-width: 780px; margin: 0 auto; padding: 48px 24px 80px; }
+    .pol-nav { display: flex; gap: 12px; margin-bottom: 48px; flex-wrap: wrap; }
+    .pol-nav a {
+      padding: 8px 16px; border-radius: 100px; border: 1px solid var(--border-color);
+      font-size: 0.85rem; font-weight: 600; color: var(--secondary-text); text-decoration: none;
+      transition: all 0.15s;
+    }
+    .pol-nav a:hover, .pol-nav a.active { background: var(--accent-color); color: white; border-color: var(--accent-color); }
+    .pol-section { margin-bottom: 56px; }
+    .pol-section h1 { font-size: clamp(1.6rem,3.5vw,2.2rem); font-weight: 800; letter-spacing:-0.03em; margin-bottom: 8px; }
+    .pol-section .pol-meta { color: var(--secondary-text); font-size: 0.88rem; margin-bottom: 32px; }
+    .pol-section h2 { font-size: 1.1rem; font-weight: 700; margin: 28px 0 10px; color: #111; }
+    .pol-section p { color: var(--secondary-text); font-size: 0.9rem; line-height: 1.75; margin-bottom: 12px; }
+    .pol-section ul { padding-left: 20px; margin-bottom: 14px; }
+    .pol-section ul li { color: var(--secondary-text); font-size: 0.9rem; line-height: 1.75; margin-bottom: 6px; }
+    .pol-divider { border: none; border-top: 1px solid var(--border-color); margin: 56px 0; }
+    .pol-highlight {
+      background: rgba(29,191,115,0.06); border: 1px solid rgba(29,191,115,0.2);
+      border-radius: 12px; padding: 16px 20px; margin: 20px 0;
+    }
+    .pol-highlight p { color: #15803d; margin: 0; font-size: 0.88rem; }
+  </style>
+</head>
+<body>
+
+  <header id="site-header">
+    <div class="nav-container">
+      <a href="index.html" class="logo">SkillBridge</a>
+      <ul class="nav-menu" id="nav-menu-list">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+      </ul>
+      <div class="nav-cta">
+        <button class="btn btn-secondary" id="nav-btn-login" style="margin-right:8px;">Log In</button>
+        <button class="btn btn-primary" id="nav-btn-register">Register</button>
+      </div>
+      <button class="mobile-toggle" id="mobile-hamburger" aria-label="Toggle Menu">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+    </div>
+  </header>
+  <div class="mobile-drawer-overlay" id="mobile-overlay"></div>
+  <div class="mobile-drawer" id="mobile-drawer-menu">
+    <ul class="mobile-nav-list"><li><a href="index.html" class="mobile-nav-link">Home</a></li></ul>
+    <div class="mobile-nav-cta">
+      <button class="btn btn-secondary btn-block" id="mob-btn-login">Log In</button>
+      <button class="btn btn-primary btn-block" id="mob-btn-register" style="margin-top:10px;">Register</button>
+    </div>
+  </div>
+
+  <main>
+    <div class="pol-body">
+
+      <div class="pol-nav">
+        <a href="#terms" class="active" onclick="setActive(this)">Terms of Service</a>
+        <a href="#privacy" onclick="setActive(this)">Privacy Policy</a>
+        <a href="#community" onclick="setActive(this)">Community Guidelines</a>
+      </div>
+
+      <!-- TERMS OF SERVICE -->
+      <div class="pol-section" id="terms">
+        <h1>Terms of Service</h1>
+        <p class="pol-meta">Last updated: June 2026 &bull; Effective immediately upon account creation</p>
+
+        <div class="pol-highlight">
+          <p>By creating a SkillBridge account, you agree to these Terms. Please read them carefully. If you do not agree, you may not use the platform.</p>
+        </div>
+
+        <h2>1. Acceptance of Terms</h2>
+        <p>These Terms of Service ("Terms") govern your access to and use of the SkillBridge platform, including our website, APIs, and related services ("Services"). By registering or using SkillBridge, you agree to be bound by these Terms.</p>
+
+        <h2>2. Eligibility</h2>
+        <p>You must be at least 18 years of age to use SkillBridge. By using the Services, you represent and warrant that you meet this requirement. Users under 18 may not register accounts.</p>
+
+        <h2>3. Account Registration</h2>
+        <ul>
+          <li>You must provide accurate, complete, and current information during registration.</li>
+          <li>You are responsible for maintaining the confidentiality of your account credentials.</li>
+          <li>You must notify SkillBridge immediately of any unauthorized use of your account.</li>
+          <li>One person may not maintain more than one active account.</li>
+        </ul>
+
+        <h2>4. User Roles</h2>
+        <p>SkillBridge supports two roles — <strong>Freelancer</strong> and <strong>Client</strong>. You may switch between these modes using the mode selector in the navbar. The same account can operate in both capacities.</p>
+        <ul>
+          <li><strong>Freelancers</strong> may browse posted projects, submit proposals, and build public profiles.</li>
+          <li><strong>Clients</strong> may post projects, review proposals, and hire freelancers.</li>
+        </ul>
+
+        <h2>5. Prohibited Activities</h2>
+        <p>You agree not to:</p>
+        <ul>
+          <li>Post false, misleading, or fraudulent content or profiles.</li>
+          <li>Circumvent the platform to conduct transactions off-platform.</li>
+          <li>Harass, abuse, or harm any other user of the platform.</li>
+          <li>Upload content that violates third-party intellectual property rights.</li>
+          <li>Use automated tools to scrape, crawl, or mass-contact users.</li>
+          <li>Attempt to gain unauthorized access to any system or account.</li>
+        </ul>
+
+        <h2>6. Project Listings and Proposals</h2>
+        <p>Clients are responsible for the accuracy of posted projects. SkillBridge does not guarantee the availability, quality, or completion of any project. Freelancers are responsible for the accuracy of submitted proposals.</p>
+        <p>SkillBridge reserves the right to remove any listing or proposal that violates these Terms or our Community Guidelines.</p>
+
+        <h2>7. Payments and Fees</h2>
+        <p>Creating a freelancer profile on SkillBridge is free. Posting a project for the first time is free. Additional project postings and premium features may require a subscription or per-use payment. Fees are communicated clearly before any charge is made.</p>
+        <p>All payments made through SkillBridge are subject to our escrow system. Funds are held securely and released only upon confirmation of work completion.</p>
+
+        <h2>8. Intellectual Property</h2>
+        <p>All content you submit to SkillBridge remains your property. By posting content, you grant SkillBridge a non-exclusive, royalty-free license to display, distribute, and promote your content on the platform for the purpose of providing the Services.</p>
+
+        <h2>9. Disclaimers</h2>
+        <p>SkillBridge is provided "as is" without warranty of any kind. We do not guarantee the outcome of any freelance engagement, the quality of work delivered, or the behavior of any user.</p>
+
+        <h2>10. Limitation of Liability</h2>
+        <p>To the maximum extent permitted by law, SkillBridge shall not be liable for any indirect, incidental, or consequential damages arising from your use of the platform, including loss of revenue, projects, or data.</p>
+
+        <h2>11. Termination</h2>
+        <p>SkillBridge may terminate or suspend your account at any time, without notice, for conduct that violates these Terms. You may delete your account at any time through account settings.</p>
+
+        <h2>12. Changes to Terms</h2>
+        <p>We may update these Terms from time to time. Continued use of the platform after changes are posted constitutes acceptance of the revised Terms. We will notify registered users of significant changes via email.</p>
+
+        <h2>13. Contact</h2>
+        <p>For questions about these Terms, contact us at <strong>legal@skillbridge.in</strong></p>
+      </div>
+
+      <hr class="pol-divider">
+
+      <!-- PRIVACY POLICY -->
+      <div class="pol-section" id="privacy">
+        <h1>Privacy Policy</h1>
+        <p class="pol-meta">Last updated: June 2026</p>
+
+        <div class="pol-highlight">
+          <p>Your privacy matters. This policy explains what data we collect, how we use it, and your rights.</p>
+        </div>
+
+        <h2>1. Information We Collect</h2>
+        <p>We collect the following types of information when you use SkillBridge:</p>
+        <ul>
+          <li><strong>Account data:</strong> Your name, email address, and password (hashed).</li>
+          <li><strong>Profile data:</strong> Skills, bio, hourly rate, portfolio links, and avatar.</li>
+          <li><strong>Activity data:</strong> Projects posted, proposals submitted, messages sent.</li>
+          <li><strong>Device data:</strong> Browser type, IP address, and usage patterns via analytics.</li>
+        </ul>
+
+        <h2>2. How We Use Your Information</h2>
+        <ul>
+          <li>To create and manage your account.</li>
+          <li>To display your profile to clients and other users of the platform.</li>
+          <li>To match clients with relevant freelancers based on skills.</li>
+          <li>To send transactional emails (e.g. proposal confirmations, payment receipts).</li>
+          <li>To improve the platform through aggregated, anonymized usage analytics.</li>
+        </ul>
+
+        <h2>3. Data Storage</h2>
+        <p>SkillBridge is currently a client-side application. Your data is stored locally in your browser's localStorage. We do not transmit personal data to external servers at this time. This means your data remains on your device.</p>
+
+        <h2>4. Data Sharing</h2>
+        <p>We do not sell your personal information. Your public profile (name, skills, bio, portfolio) is visible to other logged-in users. Your email and password are never shared with third parties.</p>
+
+        <h2>5. Cookies</h2>
+        <p>We use localStorage (a browser storage technology) to maintain your session and preferences. We do not use third-party tracking cookies or advertising pixels.</p>
+
+        <h2>6. Your Rights</h2>
+        <ul>
+          <li><strong>Access:</strong> You can view all profile data in your account settings.</li>
+          <li><strong>Correction:</strong> You can update your information at any time via the profile edit page.</li>
+          <li><strong>Deletion:</strong> You can delete your account and all associated data through account settings.</li>
+          <li><strong>Portability:</strong> Contact support to request an export of your data.</li>
+        </ul>
+
+        <h2>7. Security</h2>
+        <p>We take reasonable precautions to protect your information. Passwords are not stored in plain text. However, no online system is completely secure — please use a strong, unique password.</p>
+
+        <h2>8. Children's Privacy</h2>
+        <p>SkillBridge is not intended for users under 18. We do not knowingly collect information from minors. If you believe a minor has registered, contact us immediately.</p>
+
+        <h2>9. Contact</h2>
+        <p>For privacy-related inquiries: <strong>privacy@skillbridge.in</strong></p>
+      </div>
+
+      <hr class="pol-divider">
+
+      <!-- COMMUNITY GUIDELINES -->
+      <div class="pol-section" id="community">
+        <h1>Community Guidelines</h1>
+        <p class="pol-meta">Last updated: June 2026</p>
+
+        <p>SkillBridge is a professional marketplace. We expect all users to treat each other with respect and integrity.</p>
+
+        <h2>Be Honest</h2>
+        <p>Only list skills, experience, and portfolios that accurately represent your abilities. Misrepresentation will result in account suspension.</p>
+
+        <h2>Be Professional</h2>
+        <p>Communicate with clients and freelancers in a respectful, professional manner. Harassment, threats, or discriminatory language will not be tolerated.</p>
+
+        <h2>Protect Confidentiality</h2>
+        <p>Respect the confidentiality of projects and information shared with you. Do not share proprietary client data outside the engagement.</p>
+
+        <h2>No Spam</h2>
+        <p>Do not send unsolicited messages or submit generic, copy-paste proposals. Quality over quantity earns better results for everyone.</p>
+
+        <h2>No Off-Platform Transactions</h2>
+        <p>Arranging payments outside the SkillBridge platform circumvents our protections for both parties. This violates our Terms and may result in account termination.</p>
+
+        <h2>Report Violations</h2>
+        <p>If you encounter behavior that violates these Guidelines, use the "Report" feature or contact us at <strong>support@skillbridge.in</strong></p>
+      </div>
+
+    </div>
+  </main>
+
+  <footer id="site-footer">
+    <div class="footer-bottom-strip">
+      <div class="container footer-bottom-inner">
+        <div class="footer-copy">&copy; 2026 SkillBridge. All rights reserved.</div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/db.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+  function setActive(el) {
+    document.querySelectorAll('.pol-nav a').forEach(a => a.classList.remove('active'));
+    el.classList.add('active');
+  }
+  // Highlight nav based on scroll
+  window.addEventListener('scroll', () => {
+    const sections = ['terms', 'privacy', 'community'];
+    let active = 'terms';
+    sections.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && el.getBoundingClientRect().top < 200) active = id;
+    });
+    document.querySelectorAll('.pol-nav a').forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + active);
+    });
+  });
+  </script>
+</body>
+</html>

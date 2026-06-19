@@ -3,11 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Contracts — Exhibitly</title>
+  <title>My Contracts — SkillBridge</title>
   <meta name="description" content="View and manage active developer contracts and escrow status.">
   
   <!-- CSS Stylesheets -->
-  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/navbar.css">
+  <link rel="stylesheet" href="../css/footer.css">
   <link rel="stylesheet" href="../css/dashboard.css">
   <link rel="stylesheet" href="../css/contracts.css">
 </head>
@@ -17,7 +19,7 @@
   <header id="site-header">
     <div class="nav-container">
       <a href="../index.html" class="logo" id="nav-logo">
-        Exhibitly
+        SkillBridge
       </a>
       <ul class="nav-menu" id="nav-menu-list">
         <li><a href="../index.html" class="nav-link active" id="nav-link-home">Home</a></li>
@@ -62,13 +64,13 @@
           </div>
           <nav class="dashboard-menu">
             <a href="dashboard.html" class="menu-item">
-              <span class="menu-icon">👤</span> Profile & Projects
+              <span class="menu-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span> Profile & Projects
             </a>
             <a href="requests.html" class="menu-item">
-              <span class="menu-icon">📋</span> Project Requests
+              <span class="menu-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span> Project Requests
             </a>
             <a href="contracts.html" class="menu-item active">
-              <span class="menu-icon">📄</span> My Contracts
+              <span class="menu-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span> My Contracts
             </a>
           </nav>
         </aside>
@@ -96,7 +98,7 @@
     <div class="footer-top">
       <div class="container footer-top-inner">
         <a href="../index.html" class="footer-logo" id="footer-logo">
-          Exhibitly
+          SkillBridge
         </a>
         <div class="footer-nav-groups" style="display: flex; gap: 64px; margin-left: 64px; flex-wrap: wrap;">
           <div class="footer-column">
@@ -139,7 +141,7 @@
     </div>
     <div class="footer-bottom-strip">
       <div class="container footer-bottom-inner">
-        <div class="footer-copy">&copy; 2026 Exhibitly. All rights reserved.</div>
+        <div class="footer-copy">&copy; 2026 SkillBridge. All rights reserved.</div>
       </div>
     </div>
   </footer>
@@ -182,7 +184,7 @@
       if (myContracts.length === 0) {
         container.innerHTML = `
           <div style="text-align: center; padding: 80px 24px; color: var(--secondary-text); background: var(--bg-color); border-radius: var(--radius-lg); border: 1px dashed var(--border-color);">
-            <span style="font-size: 3rem; display: block; margin-bottom: 16px;">📄</span>
+            
             <h3 style="font-weight: 700; color: var(--primary-text); margin-bottom: 8px;">No Contracts Found</h3>
             <p>When you accept a project proposal and a contract is generated, it will show up here.</p>
           </div>

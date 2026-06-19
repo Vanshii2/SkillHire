@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Exhibitly Review & Ratings Controller
+   SkillBridge Review & Ratings Controller
    ========================================================================== */
 
 class ReviewsController {
@@ -55,7 +55,7 @@ class ReviewsController {
       window.Storage.set('profiles', profiles);
     }
 
-    // Sync to skillhire_candidates
+    // Sync to skillbridge_candidates
     if (window.CandidatesDB) {
       const fullCand = window.CandidatesDB.getById(candidateId);
       if (fullCand) {

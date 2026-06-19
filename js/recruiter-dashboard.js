@@ -1,5 +1,5 @@
 /* ==========================================================================
-   SkillHire Recruiter Dashboard Page Controller
+   SkillBridge Recruiter Dashboard Page Controller
    ========================================================================== */
 
 let activeRecruiter = null;
@@ -68,7 +68,7 @@ function renderShortlistedCandidates() {
   if (savedIds.length === 0) {
     grid.innerHTML = `
       <div class="empty-state" style="grid-column: 1/-1; padding: 60px 40px; text-align: center; background: rgba(0,0,0,0.01); border: 1px dashed var(--border-color); border-radius: var(--radius-md); display: flex; flex-direction: column; align-items: center; gap: 12px;">
-        <span style="font-size: 2.5rem;">⭐</span>
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         <h3>Your Shortlist is empty</h3>
         <p>Go to the Candidates Directory to search and save fresher portfolios to your shortlist.</p>
         <a href="candidates.html" class="btn btn-primary" style="margin-top: 10px;">Explore Candidates</a>

@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Browse Fresh Talents — SkillHire Platform</title>
-  <meta name="description" content="Browse fresh software developers, full-stack engineers, and UI/UX designers by their actual portfolios and tech stacks instead of work history.">
+  <title>Browse Freelancers — SkillBridge</title>
+  <meta name="description" content="Find skilled freelancers on SkillBridge — developers, designers, and more. Filter by skills, ratings, and availability.">
   
   <!-- CSS Stylesheets -->
   <link rel="stylesheet" href="css/base.css">
@@ -18,7 +18,7 @@
   <header id="site-header">
     <div class="nav-container">
       <a href="index.html" class="logo" id="nav-logo">
-        Exhibitly
+        SkillBridge
       </a>
       <ul class="nav-menu" id="nav-menu-list">
         <li><a href="index.html" class="nav-link active" id="nav-link-home">Home</a></li>
@@ -51,6 +51,12 @@
 
 
   <main>
+    <div style="background:linear-gradient(135deg,#0f0f0f 0%,#1a1a2e 100%);padding:52px 0 40px;color:white;">
+      <div class="container">
+        <h1 style="font-size:clamp(1.8rem,4vw,2.6rem);font-weight:800;letter-spacing:-0.03em;color:white;margin-bottom:8px;">Browse Freelancers</h1>
+        <p style="color:rgba(255,255,255,0.7);font-size:1rem;">Find talented professionals for your next project. Filter by skill, availability, and more.</p>
+      </div>
+    </div>
     <section class="directory-section">
       <div class="ht-page-wrap">
         
@@ -84,12 +90,26 @@
             <span class="filter-group-label">Skills</span>
             <div class="filter-options">
               <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="React"> <span>React</span></label>
-              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="Java"> <span>Java</span></label>
-              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="Python"> <span>Python</span></label>
-              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="MERN"> <span>MERN</span></label>
               <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="Node.js"> <span>Node.js</span></label>
+              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="Python"> <span>Python</span></label>
+              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="TypeScript"> <span>TypeScript</span></label>
+              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="Vue.js"> <span>Vue.js</span></label>
+              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="Next.js"> <span>Next.js</span></label>
               <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="UI/UX"> <span>UI/UX</span></label>
+              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="Flutter"> <span>Flutter</span></label>
+              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="Docker"> <span>Docker</span></label>
+              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="MongoDB"> <span>MongoDB</span></label>
+              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="Django"> <span>Django</span></label>
+              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="React Native"> <span>React Native</span></label>
+              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="AWS"> <span>AWS</span></label>
+              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="PostgreSQL"> <span>PostgreSQL</span></label>
               <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="Figma"> <span>Figma</span></label>
+              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="Redis"> <span>Redis</span></label>
+              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="Firebase"> <span>Firebase</span></label>
+              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="GraphQL"> <span>GraphQL</span></label>
+              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="Swift"> <span>Swift</span></label>
+              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="WordPress"> <span>WordPress</span></label>
+              <label class="checkbox-label"><input type="checkbox" class="skill-filter-checkbox" value="PHP"> <span>PHP</span></label>
             </div>
           </div>
         </aside>
@@ -97,7 +117,7 @@
         <!-- Right Main Candidates Showcase -->
         <div class="directory-content fade-in-section is-visible">
           <div class="directory-meta">
-            <div class="results-count" id="results-count-number">Showing 0 candidates</div>
+            <div class="results-count" id="results-count-number" style="display:none;"></div>
           </div>
           <div class="candidates-grid" id="candidates-list-grid">
             <!-- Dynamic Candidate Cards -->
@@ -113,15 +133,15 @@
     <div class="footer-top">
       <div class="container footer-top-inner">
         <a href="index.html" class="footer-logo" id="footer-logo">
-          Exhibitly
+          SkillBridge
         </a>
         <div class="footer-nav-groups" style="display: flex; gap: 64px; margin-left: 64px; flex-wrap: wrap;">
           <div class="footer-column">
             <div class="footer-title">Platform</div>
             <ul class="footer-list">
-              <li><a href="candidates.html" class="footer-link">Browse Talent</a></li>
-              <li><a href="posts.html" class="footer-link">Job Posts</a></li>
-              <li><a href="index.html" class="footer-link">Post a Project</a></li>
+              <li><a href="candidates.html" class="footer-link">Browse Freelancers</a></li>
+              <li><a href="browse-projects.html" class="footer-link">Browse Projects</a></li>
+              <li><a href="post-project.html" class="footer-link">Post a Project</a></li>
             </ul>
           </div>
           <div class="footer-column">
@@ -156,7 +176,7 @@
     </div>
     <div class="footer-bottom-strip">
       <div class="container footer-bottom-inner">
-        <div class="footer-copy">&copy; 2026 Exhibitly. All rights reserved.</div>
+        <div class="footer-copy">&copy; 2026 SkillBridge. All rights reserved.</div>
       </div>
     </div>
   </footer>

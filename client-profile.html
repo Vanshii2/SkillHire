@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Client Profile — SkillBridge</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/footer.css">
+  <style>
+    main { padding-top: 80px; }
+
+    .cp-body {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+
+    .cp-card {
+      background: #fff;
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+
+    .cp-cover {
+      height: 120px;
+      background: linear-gradient(135deg, #0f0f0f 0%, #1a1a2e 100%);
+      position: relative;
+    }
+
+    .cp-avatar-wrap {
+      position: absolute;
+      bottom: -32px;
+      left: 32px;
+    }
+    .cp-avatar {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      border: 3px solid #fff;
+      background: var(--accent-color);
+      color: white;
+      font-size: 1.6rem;
+      font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-heading);
+    }
+
+    .cp-info { padding: 44px 32px 28px; }
+    .cp-name { font-size: 1.5rem; font-weight: 800; letter-spacing:-0.02em; margin-bottom: 4px; }
+    .cp-company { color: var(--secondary-text); font-size: 0.95rem; margin-bottom: 16px; }
+    .cp-meta { display: flex; gap: 20px; flex-wrap: wrap; }
+    .cp-meta-item {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 0.85rem; color: var(--secondary-text);
+    }
+
+    .cp-section { margin-top: 32px; }
+    .cp-section-title { font-size: 1rem; font-weight: 700; margin-bottom: 16px; letter-spacing:-0.01em; }
+
+    .cp-job-card {
+      background: #fafafa;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 18px 20px;
+      margin-bottom: 12px;
+      transition: border-color 0.15s;
+    }
+    .cp-job-card:hover { border-color: rgba(29,191,115,0.4); background: #fff; }
+    .cp-job-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 4px; }
+    .cp-job-meta { font-size: 0.8rem; color: var(--secondary-text); display: flex; gap: 12px; flex-wrap: wrap; }
+    .cp-job-skills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .cp-skill { padding: 3px 10px; border-radius: 100px; background: #f0f0f0; font-size: 0.75rem; font-weight: 500; color: #555; }
+
+    .cp-empty { text-align: center; padding: 40px 24px; color: var(--secondary-text); font-size: 0.9rem; }
+
+    .cp-not-found { text-align: center; padding: 80px 24px; }
+    .cp-not-found h2 { font-size: 1.5rem; margin-bottom: 10px; }
+    .cp-not-found p { color: var(--secondary-text); margin-bottom: 24px; }
+  </style>
+</head>
+<body>
+
+  <header id="site-header">
+    <div class="nav-container">
+      <a href="index.html" class="logo">SkillBridge</a>
+      <ul class="nav-menu" id="nav-menu-list">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+      </ul>
+      <div class="nav-cta">
+        <button class="btn btn-secondary" id="nav-btn-login" style="margin-right:8px;">Log In</button>
+        <button class="btn btn-primary" id="nav-btn-register">Register</button>
+      </div>
+      <button class="mobile-toggle" id="mobile-hamburger" aria-label="Toggle Menu">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+    </div>
+  </header>
+  <div class="mobile-drawer-overlay" id="mobile-overlay"></div>
+  <div class="mobile-drawer" id="mobile-drawer-menu">
+    <ul class="mobile-nav-list"><li><a href="index.html" class="mobile-nav-link">Home</a></li></ul>
+    <div class="mobile-nav-cta">
+      <button class="btn btn-secondary btn-block" id="mob-btn-login">Log In</button>
+      <button class="btn btn-primary btn-block" id="mob-btn-register" style="margin-top:10px;">Register</button>
+    </div>
+  </div>
+
+  <main>
+    <div class="cp-body" id="cp-body">
+      <div class="cp-not-found" id="cp-not-found" style="display:none;">
+        <h2>Profile Not Found</h2>
+        <p>This client profile doesn't exist or has been removed.</p>
+        <a href="browse-projects.html" class="btn btn-primary">Browse Projects</a>
+      </div>
+    </div>
+  </main>
+
+  <footer id="site-footer">
+    <div class="footer-bottom-strip">
+      <div class="container footer-bottom-inner">
+        <div class="footer-copy">&copy; 2026 SkillBridge. All rights reserved.</div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/db.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
+    if (!id) { document.getElementById('cp-not-found').style.display = 'block'; return; }
+
+    const recruiter = window.RecruitersDB.getById(id);
+    if (!recruiter) { document.getElementById('cp-not-found').style.display = 'block'; return; }
+
+    const jobs = window.JobsDB.getByClient(id);
+    const initial = recruiter.name.charAt(0).toUpperCase();
+    document.title = `${recruiter.name} — SkillBridge`;
+
+    const body = document.getElementById('cp-body');
+    body.innerHTML = `
+      <div class="cp-card">
+        <div class="cp-cover"></div>
+        <div class="cp-avatar-wrap"><div class="cp-avatar">${initial}</div></div>
+        <div class="cp-info">
+          <div class="cp-name">${recruiter.name}</div>
+          ${recruiter.company ? `<div class="cp-company">${recruiter.company}</div>` : ''}
+          <div class="cp-meta">
+            <div class="cp-meta-item">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              India
+            </div>
+            <div class="cp-meta-item">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+              ${jobs.length} project${jobs.length !== 1 ? 's' : ''} posted
+            </div>
+          </div>
+
+          ${jobs.length ? `
+          <div class="cp-section">
+            <div class="cp-section-title">Posted Projects</div>
+            ${jobs.map(j => `
+              <div class="cp-job-card">
+                <div class="cp-job-title">${j.title}</div>
+                <div class="cp-job-meta">
+                  <span>${j.budget}</span>
+                  <span>${j.deadline}</span>
+                  <span>${j.proposals || 0} proposals</span>
+                </div>
+                ${j.skills.length ? `<div class="cp-job-skills">${j.skills.slice(0,5).map(s => `<span class="cp-skill">${s}</span>`).join('')}</div>` : ''}
+              </div>
+            `).join('')}
+          </div>
+          ` : `<div class="cp-empty" style="padding:24px 0 0;">No projects posted yet.</div>`}
+        </div>
+      </div>
+      <a href="browse-projects.html" style="color:var(--secondary-text);font-size:0.88rem;display:inline-flex;align-items:center;gap:5px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        Back to Projects
+      </a>
+    `;
+  });
+  </script>
+</body>
+</html>

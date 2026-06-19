@@ -1,5 +1,5 @@
 /* ==========================================================================
-   SkillHire Create Profile Redirect Logic
+   SkillBridge Create Profile Redirect Logic
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {

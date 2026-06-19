@@ -1,5 +1,5 @@
 /* ==========================================================================
-   SkillHire Candidate Dashboard Page Script
+   SkillBridge Candidate Dashboard Page Script
    ========================================================================== */
 
 let activeCandidate = null;
@@ -375,7 +375,7 @@ function renderMessages() {
   if (messages.length === 0) {
     inbox.innerHTML = `
       <div class="empty-state" style="padding: 60px 40px; text-align: center; background: rgba(0,0,0,0.01); border: 1px dashed var(--border-color); border-radius: var(--radius-md);">
-        <span style="font-size: 2rem;">✉️</span>
+        
         <h3 style="margin-top: 10px;">Your inbox is empty</h3>
         <p>When recruiters search for your skills and contact you, their inquiries will display here.</p>
       </div>

@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Post a Project — SkillBridge</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/footer.css">
+  <style>
+    main { padding-top: 64px; }
+    .req-star { color: #e53e3e; font-size: 0.85em; margin-left: 2px; }
+
+    .pp-hero {
+      background: linear-gradient(135deg, #0f0f0f 0%, #1a1a2e 100%);
+      padding: 56px 0 44px;
+      color: white;
+    }
+    .pp-hero h1 { font-size: clamp(1.8rem,4vw,2.6rem); font-weight:800; letter-spacing:-0.03em; color:white; margin-bottom:8px; }
+    .pp-hero p { color:rgba(255,255,255,0.7); font-size:1rem; }
+
+    .pp-body {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+      display: grid;
+      grid-template-columns: 1fr 260px;
+      gap: 36px;
+      align-items: start;
+    }
+    @media (max-width: 860px) { .pp-body { grid-template-columns: 1fr; } }
+
+    /* Form Card */
+    .pp-form-card {
+      background: #fff;
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 40px 44px;
+    }
+    .pp-form-card h2 { font-size: 1.5rem; font-weight: 800; margin-bottom: 4px; letter-spacing:-0.02em; }
+    .pp-form-card > .form-sub { color: var(--secondary-text); font-size: 0.9rem; margin-bottom: 32px; }
+
+    /* Poster-type toggle */
+    .poster-toggle {
+      display: flex;
+      gap: 0;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 0;
+    }
+    .poster-toggle-btn {
+      flex: 1;
+      padding: 11px 16px;
+      background: #fafafa;
+      border: none;
+      font-family: var(--font-body);
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--secondary-text);
+      cursor: pointer;
+      transition: all 0.15s;
+      text-align: center;
+    }
+    .poster-toggle-btn + .poster-toggle-btn { border-left: 1px solid var(--border-color); }
+    .poster-toggle-btn.active { background: var(--accent-color); color: #fff; }
+
+    .form-group { margin-bottom: 22px; }
+    .form-group label { display:block; font-size:0.88rem; font-weight:600; color:var(--primary-text); margin-bottom:7px; }
+    .form-group label .opt { color:#aaa; font-weight:400; font-size:0.82rem; }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 13px 16px;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      color: var(--primary-text);
+      background: #fafafa;
+      outline: none;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus { border-color: var(--accent-color); background: #fff; box-shadow: 0 0 0 3px rgba(29,191,115,0.08); }
+    .form-group textarea { resize: vertical; min-height: 150px; }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    @media (max-width: 480px) { .form-row { grid-template-columns: 1fr; } }
+
+    /* Skills input */
+    .skills-input-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 10px 14px;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      background: #fafafa;
+      cursor: text;
+      min-height: 50px;
+      align-items: center;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .skills-input-wrap:focus-within { border-color: var(--accent-color); background: #fff; box-shadow: 0 0 0 3px rgba(29,191,115,0.08); }
+    .skill-chip {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: rgba(29,191,115,0.1); color: #15803d;
+      border: 1px solid rgba(29,191,115,0.25);
+      padding: 4px 10px; border-radius: 100px; font-size: 0.82rem; font-weight: 600;
+    }
+    .skill-chip button {
+      background: none; border: none; cursor: pointer; color: inherit;
+      line-height: 1; padding: 0 0 0 2px; font-size: 1.1rem; opacity: 0.6;
+    }
+    .skill-chip button:hover { opacity: 1; }
+    .skills-input-wrap input {
+      border: none; background: transparent; outline: none;
+      font-family: var(--font-body); font-size: 0.88rem; min-width: 120px; flex: 1;
+    }
+
+    .char-hint { font-size: 0.78rem; color: #aaa; margin-top: 5px; }
+
+    .btn-submit-project {
+      width: 100%; padding: 15px; font-size: 1rem; font-weight: 700;
+      background: var(--accent-color); color: white; border: none;
+      border-radius: 10px; cursor: pointer; transition: all 0.15s;
+      margin-top: 8px; letter-spacing: 0.01em;
+    }
+    .btn-submit-project:hover { background: #16a060; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(29,191,115,0.3); }
+
+    .form-error { color: #EF4444; font-size: 0.85rem; margin-bottom: 12px; font-weight: 500; }
+
+    /* Section divider in form */
+    .form-section-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #aaa;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin: 28px 0 18px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    /* Pricing cards */
+    .pricing-card {
+      border: 1px solid var(--border-color); border-radius: 16px; padding: 24px 20px;
+      display: flex; flex-direction: column; gap: 12px; background: #fafafa;
+    }
+    .pricing-card--popular { border-color: #1dbf73; background: #fff; box-shadow: 0 4px 24px rgba(29,191,115,0.12); }
+    .pricing-badge { font-size: 0.85rem; font-weight: 700; color: #111; }
+    .pricing-price { font-size: 1.6rem; font-weight: 800; color: #111; letter-spacing: -0.03em; }
+    .pricing-price span { font-size: 0.85rem; font-weight: 500; color: #888; }
+    .pricing-features { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 7px; flex: 1; }
+    .pricing-features li { font-size: 0.82rem; color: #555; display: flex; align-items: center; gap: 7px; }
+    .pricing-features li::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #1dbf73; flex-shrink: 0; }
+    .pricing-cta { width: 100%; margin-top: auto; }
+    @media (max-width: 640px) { #pricing-cards { grid-template-columns: 1fr; } }
+
+    /* Success state */
+    .pp-success {
+      display: none;
+      text-align: center;
+      padding: 56px 24px;
+    }
+    .pp-success-check {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: rgba(29,191,115,0.12);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 20px;
+    }
+    .pp-success h2 { font-size: 1.8rem; font-weight: 800; margin-bottom: 10px; color: #111; }
+    .pp-success p { color: var(--secondary-text); max-width: 400px; margin: 0 auto 28px; }
+
+    /* Auth Gate */
+    .auth-gate {
+      background: linear-gradient(135deg, #1dbf73 0%, #16a060 100%);
+      border-radius: 20px;
+      padding: 48px 40px;
+      text-align: center;
+      color: white;
+    }
+    .auth-gate h2 { color: white; font-size: 1.5rem; margin-bottom: 10px; }
+    .auth-gate p { color: rgba(255,255,255,0.85); margin-bottom: 24px; }
+
+    /* Freelancer Gate */
+    .freelancer-gate {
+      display: none;
+      background: #fff;
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 48px 40px;
+      text-align: center;
+    }
+    .freelancer-gate .gate-icon {
+      width: 60px; height: 60px; background: #f5f5f5; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 20px; color: #888;
+    }
+    .freelancer-gate h2 { font-size: 1.4rem; font-weight: 800; margin-bottom: 10px; }
+    .freelancer-gate p { color: var(--secondary-text); max-width: 380px; margin: 0 auto 24px; }
+    .freelancer-gate .cta-label {
+      display: inline-block;
+      background: rgba(29,191,115,0.1); color: #16a060;
+      border: 1px solid rgba(29,191,115,0.3);
+      padding: 10px 20px; border-radius: 100px;
+      font-weight: 700; font-size: 0.9rem;
+    }
+
+    /* Tips Sidebar — Vertical Stepper */
+    .pp-tips {
+      background: #fff;
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 28px 24px;
+      position: sticky;
+      top: 84px;
+    }
+    .pp-tips h3 { font-size: 0.95rem; font-weight: 800; margin-bottom: 24px; color: #111; letter-spacing: -0.01em; }
+
+    .step-list { list-style: none; }
+    .step-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      position: relative;
+      padding-bottom: 22px;
+    }
+    .step-item:last-child { padding-bottom: 0; }
+
+    .step-item::before {
+      content: '';
+      position: absolute;
+      left: 11px;
+      top: 24px;
+      bottom: 0;
+      width: 1px;
+      background: #e8e8e8;
+    }
+    .step-item:last-child::before { display: none; }
+
+    .step-num {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      background: #f5f5f5;
+      border: 1.5px solid #e0e0e0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem; font-weight: 700; color: #888;
+      flex-shrink: 0;
+      position: relative; z-index: 1;
+    }
+    .step-item.done .step-num {
+      background: var(--accent-color);
+      border-color: var(--accent-color);
+      color: white;
+    }
+    .step-label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--primary-text);
+      line-height: 1.4;
+      padding-top: 3px;
+    }
+    .step-item.active-step .step-label { color: var(--accent-color); }
+    .step-item.active-step .step-num {
+      background: rgba(29,191,115,0.1);
+      border-color: var(--accent-color);
+      color: var(--accent-color);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <header id="site-header">
+    <div class="nav-container">
+      <a href="index.html" class="logo">SkillBridge</a>
+      <ul class="nav-menu" id="nav-menu-list">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="hire-talent.html" class="nav-link">Hire Talent</a></li>
+        <li><a href="browse-projects.html" class="nav-link">Get Hired</a></li>
+      </ul>
+      <div class="nav-cta">
+        <button class="btn btn-secondary" id="nav-btn-login" style="margin-right:8px;">Log In</button>
+        <button class="btn btn-primary" id="nav-btn-register">Register</button>
+      </div>
+      <button class="mobile-toggle" id="mobile-hamburger" aria-label="Toggle Menu">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+    </div>
+  </header>
+  <div class="mobile-drawer-overlay" id="mobile-overlay"></div>
+  <div class="mobile-drawer" id="mobile-drawer-menu">
+    <ul class="mobile-nav-list">
+      <li><a href="index.html" class="mobile-nav-link">Home</a></li>
+      <li><a href="hire-talent.html" class="mobile-nav-link">Hire Talent</a></li>
+      <li><a href="browse-projects.html" class="mobile-nav-link">Get Hired</a></li>
+    </ul>
+    <div class="mobile-nav-cta">
+      <button class="btn btn-secondary btn-block" id="mob-btn-login">Log In</button>
+      <button class="btn btn-primary btn-block" id="mob-btn-register" style="margin-top:10px;">Register</button>
+    </div>
+  </div>
+
+  <main>
+    <div class="pp-hero">
+      <div class="container">
+        <h1>Post a Project</h1>
+        <p>Describe your project and receive tailored proposals from top freelancers.</p>
+      </div>
+    </div>
+
+    <div class="pp-body">
+
+      <div id="form-area">
+
+        <!-- Auth Gate -->
+        <div class="auth-gate" id="auth-gate" style="display:none;">
+          <h2>Sign In to Post a Project</h2>
+          <p>Create a free account or log in to start receiving proposals from skilled freelancers.</p>
+          <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+            <button class="btn" style="background:rgba(255,255,255,0.15);color:white;border:1.5px solid rgba(255,255,255,0.4);padding:11px 24px;font-size:0.9rem;border-radius:100px;" onclick="window.openAuthModal('login')">Log In</button>
+            <button class="btn" style="background:white;color:#111;font-size:0.9rem;padding:11px 24px;border-radius:100px;" onclick="window.openAuthModal('register','client')">Create Account</button>
+          </div>
+        </div>
+
+        <!-- Freelancer Gate -->
+        <div class="freelancer-gate" id="freelancer-gate">
+          <div class="gate-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          <h2>Freelancers Can't Post Projects</h2>
+          <p>Switch to Client mode to post projects. As a freelancer, you can browse and apply to open projects — completely free.</p>
+          <a href="browse-projects.html" class="cta-label">Post your first proposal for free →</a>
+          <div style="margin-top:20px;">
+            <button class="btn btn-secondary" onclick="switchToClient()" style="font-size:0.88rem;padding:10px 22px;">Switch to Client Mode</button>
+          </div>
+        </div>
+
+        <!-- Project Form -->
+        <div class="pp-form-card" id="project-form-card" style="display:none;">
+          <h2>Project Details</h2>
+          <p class="form-sub">Be specific — detailed descriptions attract better proposals.</p>
+
+          <form id="post-project-form">
+
+            <div class="form-section-label">Who is posting?</div>
+
+            <div class="form-group">
+              <label>Posting As</label>
+              <div class="poster-toggle">
+                <button type="button" class="poster-toggle-btn active" data-type="individual" id="btn-individual">Individual</button>
+                <button type="button" class="poster-toggle-btn" data-type="company" id="btn-company">Company / Organization</button>
+              </div>
+            </div>
+
+            <div class="form-group" id="company-name-group" style="display:none;">
+              <label for="proj-company">Company Name <span class="opt">(optional)</span></label>
+              <input type="text" id="proj-company" placeholder="e.g. TechCorp Solutions">
+            </div>
+
+            <div class="form-section-label">Project Info</div>
+
+            <div class="form-group">
+              <label for="proj-title">Project Title <span class="req-star">*</span></label>
+              <input type="text" id="proj-title" placeholder="e.g. Build a React E-Commerce Website" required maxlength="100">
+              <div class="char-hint">Be specific and concise (max 100 chars)</div>
+            </div>
+
+            <div class="form-group">
+              <label for="proj-category">Category <span class="req-star">*</span></label>
+              <select id="proj-category" required>
+                <option value="">Select a category...</option>
+                <option value="Web Development">Web Development</option>
+                <option value="Mobile Development">Mobile Development</option>
+                <option value="Design">Design / UI/UX</option>
+                <option value="Backend Development">Backend Development</option>
+                <option value="Full-Stack">Full-Stack Development</option>
+                <option value="Data Science">Data Science / AI</option>
+                <option value="Content Writing">Content Writing</option>
+                <option value="Digital Marketing">Digital Marketing</option>
+                <option value="General">Other / General</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="proj-desc">Project Description <span class="req-star">*</span></label>
+              <textarea id="proj-desc" placeholder="Describe your project in detail — deliverables, requirements, preferred tech stack, and any other relevant context." required></textarea>
+            </div>
+
+            <div class="form-group">
+              <label>Required Skills <span class="opt">(press Enter or comma to add)</span></label>
+              <div class="skills-input-wrap" id="skills-wrap">
+                <input type="text" id="skills-input" placeholder="e.g. React, Node.js, Python...">
+              </div>
+              <input type="hidden" id="proj-skills-hidden">
+            </div>
+
+            <div class="form-section-label">Budget &amp; Timeline</div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="proj-budget-type">Budget Type <span class="req-star">*</span></label>
+                <select id="proj-budget-type" required>
+                  <option value="fixed">Fixed Price</option>
+                  <option value="hourly">Hourly Rate</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="proj-budget" id="budget-label">Budget Range <span class="req-star">*</span></label>
+                <input type="text" id="proj-budget" placeholder="e.g. ₹15,000 – ₹30,000" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="proj-deadline">Timeline <span class="req-star">*</span></label>
+
+              <select id="proj-deadline" required>
+                <option value="">Select timeline...</option>
+                <option value="Less than 1 week">Less than 1 week</option>
+                <option value="1 – 2 weeks">1 – 2 weeks</option>
+                <option value="14 days">2 weeks</option>
+                <option value="30 days">1 month</option>
+                <option value="45 days">6 weeks</option>
+                <option value="60 days">2 months</option>
+                <option value="90 days">3 months</option>
+                <option value="Ongoing">Ongoing / Long-term</option>
+              </select>
+            </div>
+
+            <div class="form-error" id="post-error"></div>
+
+            <button type="submit" class="btn-submit-project" id="submit-project-btn">Post Project →</button>
+          </form>
+
+          <!-- Pricing Gate (shown for 2nd+ post) -->
+          <div id="pricing-gate" style="display:none;">
+            <div style="text-align:center;padding:48px 24px 16px;">
+              <div style="width:56px;height:56px;background:rgba(29,191,115,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              </div>
+              <h2 style="font-size:1.4rem;font-weight:800;margin-bottom:8px;">Upgrade to Post More Projects</h2>
+              <p style="color:#888;font-size:0.9rem;max-width:420px;margin:0 auto 32px;">Your first project post was free. Choose a plan to continue posting and reach thousands of top freelancers.</p>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;padding:0 0 32px;" id="pricing-cards">
+              <div class="pricing-card">
+                <div class="pricing-badge">Starter</div>
+                <div class="pricing-price">₹499<span>/post</span></div>
+                <ul class="pricing-features">
+                  <li>1 Project Post</li>
+                  <li>30-day visibility</li>
+                  <li>Up to 20 proposals</li>
+                </ul>
+                <button class="btn btn-secondary pricing-cta" onclick="selectPlan('starter')">Get Started</button>
+              </div>
+              <div class="pricing-card pricing-card--popular">
+                <div class="pricing-badge">Pro <span style="background:#1dbf73;color:#fff;font-size:0.65rem;padding:2px 7px;border-radius:100px;margin-left:6px;">Popular</span></div>
+                <div class="pricing-price">₹1,299<span>/month</span></div>
+                <ul class="pricing-features">
+                  <li>5 Project Posts / month</li>
+                  <li>60-day visibility</li>
+                  <li>Unlimited proposals</li>
+                  <li>Featured listing</li>
+                </ul>
+                <button class="btn btn-primary pricing-cta" onclick="selectPlan('pro')">Choose Pro</button>
+              </div>
+              <div class="pricing-card">
+                <div class="pricing-badge">Business</div>
+                <div class="pricing-price">₹3,499<span>/month</span></div>
+                <ul class="pricing-features">
+                  <li>Unlimited Posts</li>
+                  <li>90-day visibility</li>
+                  <li>Priority support</li>
+                  <li>Dedicated manager</li>
+                </ul>
+                <button class="btn btn-secondary pricing-cta" onclick="selectPlan('business')">Go Business</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Success -->
+          <div class="pp-success" id="post-success">
+            <div class="pp-success-check">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <h2>Project Posted!</h2>
+            <p>Your project is now live. Freelancers will start sending proposals soon.</p>
+            <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+              <a href="browse-projects.html" class="btn btn-secondary">Browse All Projects</a>
+              <button class="btn btn-primary" onclick="resetForm()">Post Another</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Tips Sidebar — vertical stepper -->
+      <div class="pp-tips">
+        <h3>Steps to a Great Post</h3>
+        <ul class="step-list">
+          <li class="step-item active-step">
+            <div class="step-num">1</div>
+            <span class="step-label">Write a Clear Title</span>
+          </li>
+          <li class="step-item">
+            <div class="step-num">2</div>
+            <span class="step-label">Describe Requirements in Detail</span>
+          </li>
+          <li class="step-item">
+            <div class="step-num">3</div>
+            <span class="step-label">Add Relevant Skills</span>
+          </li>
+          <li class="step-item">
+            <div class="step-num">4</div>
+            <span class="step-label">Set a Realistic Budget</span>
+          </li>
+          <li class="step-item">
+            <div class="step-num">5</div>
+            <span class="step-label">Define a Clear Timeline</span>
+          </li>
+          <li class="step-item">
+            <div class="step-num">6</div>
+            <span class="step-label">Post &amp; Receive Proposals</span>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer id="site-footer">
+    <div class="footer-top">
+      <div class="container footer-top-inner">
+        <a href="index.html" class="footer-logo">SkillBridge</a>
+      </div>
+    </div>
+    <div class="footer-bottom-strip">
+      <div class="container footer-bottom-inner">
+        <div class="footer-copy">&copy; 2026 SkillBridge. All rights reserved.</div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/db.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+  let posterType = 'individual';
+  const skills = [];
+
+  document.addEventListener('DOMContentLoaded', () => {
+    checkAuth();
+    initSkillsInput();
+    initBudgetTypeToggle();
+    initPosterToggle();
+    document.getElementById('post-project-form').addEventListener('submit', handleSubmit);
+  });
+
+  function getMode() {
+    const stored = localStorage.getItem('skillbridge_mode');
+    const session = window.SessionManager.getActiveUser();
+    if (stored === 'client' || stored === 'freelancer') return stored;
+    return session && session.role === 'recruiter' ? 'client' : 'freelancer';
+  }
+
+  function checkAuth() {
+    const session = window.SessionManager.getActiveUser();
+    if (!session) {
+      document.getElementById('auth-gate').style.display = 'block';
+      return;
+    }
+    const mode = getMode();
+    if (mode === 'freelancer') {
+      document.getElementById('freelancer-gate').style.display = 'block';
+      return;
+    }
+    // First post is free; subsequent require a plan
+    const existingJobs = window.JobsDB.getByClient(session.user.id);
+    const planKey = 'skillbridge_plan_' + session.user.id;
+    const hasPlan = localStorage.getItem(planKey);
+    if (existingJobs.length > 0 && !hasPlan) {
+      document.getElementById('project-form-card').style.display = 'block';
+      document.getElementById('post-project-form').style.display = 'none';
+      document.getElementById('pricing-gate').style.display = 'block';
+      return;
+    }
+    document.getElementById('project-form-card').style.display = 'block';
+    document.getElementById('submit-project-btn').textContent = existingJobs.length === 0 ? 'Post Project for Free →' : 'Post Project →';
+  }
+
+  function switchToClient() {
+    localStorage.setItem('skillbridge_mode', 'client');
+    document.getElementById('freelancer-gate').style.display = 'none';
+    document.getElementById('project-form-card').style.display = 'block';
+    if (window.updateNavbarState) window.updateNavbarState();
+  }
+
+  function initPosterToggle() {
+    document.querySelectorAll('.poster-toggle-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.poster-toggle-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        posterType = btn.dataset.type;
+        document.getElementById('company-name-group').style.display = posterType === 'company' ? 'block' : 'none';
+      });
+    });
+  }
+
+  function initSkillsInput() {
+    const wrap = document.getElementById('skills-wrap');
+    const input = document.getElementById('skills-input');
+    const hidden = document.getElementById('proj-skills-hidden');
+
+    function addSkill(skill) {
+      const s = skill.trim().replace(/,/g, '');
+      if (!s || skills.includes(s) || skills.length >= 10) return;
+      skills.push(s);
+      hidden.value = skills.join(',');
+      const chip = document.createElement('div');
+      chip.className = 'skill-chip';
+      chip.innerHTML = `${s} <button type="button" onclick="removeSkill('${s}', this)">&times;</button>`;
+      wrap.insertBefore(chip, input);
+    }
+
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ',') {
+        e.preventDefault();
+        addSkill(input.value);
+        input.value = '';
+      }
+      if (e.key === 'Backspace' && !input.value && skills.length) {
+        removeSkillByName(skills[skills.length - 1]);
+      }
+    });
+    input.addEventListener('blur', () => {
+      if (input.value.trim()) { addSkill(input.value); input.value = ''; }
+    });
+    wrap.addEventListener('click', () => input.focus());
+  }
+
+  function removeSkill(skillName, btn) {
+    removeSkillByName(skillName);
+    btn.parentElement.remove();
+  }
+
+  function removeSkillByName(name) {
+    const i = skills.indexOf(name);
+    if (i !== -1) skills.splice(i, 1);
+    document.getElementById('proj-skills-hidden').value = skills.join(',');
+  }
+
+  function initBudgetTypeToggle() {
+    const select = document.getElementById('proj-budget-type');
+    const label = document.getElementById('budget-label');
+    const input = document.getElementById('proj-budget');
+    select.addEventListener('change', () => {
+      if (select.value === 'hourly') {
+        label.textContent = 'Hourly Rate';
+        input.placeholder = 'e.g. ₹800 – ₹1,200/hr';
+      } else {
+        label.textContent = 'Budget Range';
+        input.placeholder = 'e.g. ₹15,000 – ₹30,000';
+      }
+    });
+  }
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    const session = window.SessionManager.getActiveUser();
+    const errEl = document.getElementById('post-error');
+    errEl.textContent = '';
+
+    if (!session) { errEl.textContent = 'Please log in to post a project.'; return; }
+
+    const title = document.getElementById('proj-title').value.trim();
+    const category = document.getElementById('proj-category').value;
+    const description = document.getElementById('proj-desc').value.trim();
+    const budget = document.getElementById('proj-budget').value.trim();
+    const budgetType = document.getElementById('proj-budget-type').value;
+    const deadline = document.getElementById('proj-deadline').value;
+    const companyName = document.getElementById('proj-company').value.trim();
+
+    if (!category) { errEl.textContent = 'Please select a category.'; return; }
+    if (!deadline) { errEl.textContent = 'Please select a timeline.'; return; }
+
+    try {
+      window.JobsDB.post({
+        title, category, description, budget, budgetType, deadline,
+        skills: [...skills],
+        posterType,
+        companyName: posterType === 'company' ? companyName : ''
+      }, session);
+      document.getElementById('post-project-form').style.display = 'none';
+      document.getElementById('post-success').style.display = 'block';
+    } catch (err) {
+      errEl.textContent = err.message;
+    }
+  }
+
+  function selectPlan(plan) {
+    // Simulate plan purchase — unlock posting for this session
+    localStorage.setItem('skillbridge_plan_' + window.SessionManager.getActiveUser().user.id, plan);
+    document.getElementById('pricing-gate').style.display = 'none';
+    document.getElementById('post-project-form').style.display = 'block';
+  }
+
+  function resetForm() {
+    document.getElementById('post-project-form').reset();
+    document.getElementById('post-success').style.display = 'none';
+    // After posting, subsequent posts need plan
+    const session = window.SessionManager.getActiveUser();
+    const existingJobs = window.JobsDB.getByClient(session.user.id);
+    const planKey = 'skillbridge_plan_' + session.user.id;
+    const hasPlan = localStorage.getItem(planKey);
+    if (existingJobs.length > 0 && !hasPlan) {
+      document.getElementById('pricing-gate').style.display = 'block';
+      document.getElementById('post-project-form').style.display = 'none';
+    } else {
+      document.getElementById('post-project-form').style.display = 'block';
+      document.getElementById('pricing-gate').style.display = 'none';
+    }
+    skills.length = 0;
+    document.querySelectorAll('.skill-chip').forEach(c => c.remove());
+    document.getElementById('proj-skills-hidden').value = '';
+    document.getElementById('post-error').textContent = '';
+    posterType = 'individual';
+    document.querySelectorAll('.poster-toggle-btn').forEach((b, i) => b.classList.toggle('active', i === 0));
+    document.getElementById('company-name-group').style.display = 'none';
+  }
+  </script>
+</body>
+</html>

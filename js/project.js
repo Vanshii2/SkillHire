@@ -1,5 +1,5 @@
 /* ==========================================================================
-   SkillHire Project Detail Page Logic
+   SkillBridge Project Detail Page Logic
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Update document title with the project name
-  document.title = `${project.title} — SkillHire`;
+  document.title = `${project.title} — SkillBridge`;
   const metaDesc = document.querySelector('meta[name="description"]');
   if (metaDesc) metaDesc.setAttribute('content', project.description.slice(0, 155));
 
@@ -191,7 +191,7 @@ function toggleDetailLike(projectId) {
   if (isLiked) {
     // Unlike
     const newLiked = liked.filter(id => id !== projectId);
-    localStorage.setItem('skillhire_liked_projects', JSON.stringify(newLiked));
+    localStorage.setItem('skillbridge_liked_projects', JSON.stringify(newLiked));
     btn.classList.remove('liked');
     btn.innerHTML = `
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -203,7 +203,7 @@ function toggleDetailLike(projectId) {
   } else {
     // Like
     liked.push(projectId);
-    localStorage.setItem('skillhire_liked_projects', JSON.stringify(liked));
+    localStorage.setItem('skillbridge_liked_projects', JSON.stringify(liked));
     btn.classList.add('liked');
     btn.innerHTML = `
       <svg viewBox="0 0 24 24" fill="#1dbf73" stroke="#1dbf73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -230,7 +230,7 @@ function renderNotFound(root) {
 
 function getLikedProjects() {
   try {
-    return JSON.parse(localStorage.getItem('skillhire_liked_projects')) || [];
+    return JSON.parse(localStorage.getItem('skillbridge_liked_projects')) || [];
   } catch {
     return [];
   }

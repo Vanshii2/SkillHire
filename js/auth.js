@@ -1,11 +1,11 @@
 /* ==========================================================================
-   Exhibitly Authentication Controller
+   SkillBridge Authentication Controller
    ========================================================================== */
 
 class Auth {
   static getActiveUser() {
-    const role = localStorage.getItem('skillhire_active_role');
-    const id = localStorage.getItem('skillhire_active_id');
+    const role = localStorage.getItem('skillbridge_active_role');
+    const id = localStorage.getItem('skillbridge_active_id');
     if (!role || !id) return null;
 
     const profiles = window.Storage.get(window.KEYS.profiles);
@@ -20,8 +20,8 @@ class Auth {
     const matchedUser = users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === password && u.role === role);
     
     if (matchedUser) {
-      localStorage.setItem('skillhire_active_role', role);
-      localStorage.setItem('skillhire_active_id', matchedUser.id);
+      localStorage.setItem('skillbridge_active_role', role);
+      localStorage.setItem('skillbridge_active_id', matchedUser.id);
       return matchedUser;
     }
     return null;
@@ -31,7 +31,7 @@ class Auth {
     const users = window.Storage.get(window.KEYS.users);
     const exists = users.some(u => u.email.toLowerCase() === email.toLowerCase());
     if (exists) {
-      throw new Error('Email is already registered on Exhibitly.');
+      throw new Error('Email is already registered on SkillBridge.');
     }
 
     const id = name.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Date.now().toString().slice(-4);
@@ -64,15 +64,15 @@ class Auth {
     window.Storage.add(window.KEYS.profiles, newProfile);
 
     // Log in
-    localStorage.setItem('skillhire_active_role', role);
-    localStorage.setItem('skillhire_active_id', id);
+    localStorage.setItem('skillbridge_active_role', role);
+    localStorage.setItem('skillbridge_active_id', id);
     
     return newUser;
   }
 
   static logout() {
-    localStorage.removeItem('skillhire_active_role');
-    localStorage.removeItem('skillhire_active_id');
+    localStorage.removeItem('skillbridge_active_role');
+    localStorage.removeItem('skillbridge_active_id');
   }
 }
 

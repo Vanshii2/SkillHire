@@ -3,11 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Contract Workspace — Exhibitly</title>
+  <title>Contract Workspace — SkillBridge</title>
   <meta name="description" content="Manage contract details, milestones, payments, and deliverables.">
   
   <!-- CSS Stylesheets -->
-  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/navbar.css">
+  <link rel="stylesheet" href="../css/footer.css">
   <link rel="stylesheet" href="../css/dashboard.css">
   <link rel="stylesheet" href="../css/contracts.css">
 </head>
@@ -17,7 +19,7 @@
   <header>
     <div class="nav-container">
       <a href="../index.html" class="logo" id="nav-logo">
-        Exhibitly
+        SkillBridge
         
       </a>
       <ul class="nav-menu" id="nav-menu-list">
@@ -66,7 +68,7 @@
     <div class="footer-top">
       <div class="container footer-top-inner">
         <a href="../index.html" class="footer-logo" id="footer-logo">
-          Exhibitly
+          SkillBridge
         </a>
         <div class="footer-nav-groups" style="display: flex; gap: 64px; margin-left: 64px; flex-wrap: wrap;">
           <div class="footer-column">
@@ -109,7 +111,7 @@
     </div>
     <div class="footer-bottom-strip">
       <div class="container footer-bottom-inner">
-        <div class="footer-copy">&copy; 2026 Exhibitly. All rights reserved.</div>
+        <div class="footer-copy">&copy; 2026 SkillBridge. All rights reserved.</div>
       </div>
     </div>
   </footer>
@@ -170,7 +172,7 @@
     function renderWorkspaceError(title, msg) {
       document.getElementById('details-main-container').innerHTML = `
         <div class="profile-error-card">
-          <span style="font-size: 3rem;">⚠️</span>
+          
           <h1>${escapeHTML(title)}</h1>
           <p>${escapeHTML(msg)}</p>
           <a href="../index.html" class="btn btn-primary">Go to Home</a>
@@ -306,7 +308,7 @@
           pane.innerHTML = `
             <div style="background: rgba(234,88,12,0.03); border: 1px dashed var(--accent-color); border-radius: var(--radius-sm); padding: 20px; text-align: center;">
               <p style="font-weight: 600; margin-bottom: 14px;">This contract is locked until the escrow budget of <strong>$${activeContract.budget}</strong> is funded.</p>
-              <button onclick="window.EscrowController.openEscrowCheckout('${activeContract.id}')" class="btn btn-primary">💳 Fund Escrow Safely</button>
+              <button onclick="window.EscrowController.openEscrowCheckout('${activeContract.id}')" class="btn btn-primary">Fund Escrow Safely</button>
             </div>
           `;
         } else {
@@ -359,7 +361,7 @@
               </div>
 
               <button type="submit" class="btn btn-primary" style="margin-top: 10px; background-color:#22c55e; border-color:#22c55e;">
-                🚀 Submit Work for Review
+                Submit Work for Review
               </button>
             </form>
           `;
@@ -408,7 +410,7 @@
         if (isRecruiter) {
           pane.innerHTML = `
             <div class="deliverable-box" style="margin-top: 0; margin-bottom: 24px;">
-              <h4 class="deliverable-title">📋 Candidate Deliverables Received</h4>
+              <h4 class="deliverable-title">Deliverables Received</h4>
               <div class="deliverable-links">
                 <div class="deliverable-link-item">
                   GitHub Repository: <a href="${escapeHTML(delivery.githubUrl)}" target="_blank">${escapeHTML(delivery.githubUrl)}</a>
@@ -508,9 +510,9 @@
           // Candidate perspective
           pane.innerHTML = `
             <div class="deliverable-box" style="margin-top:0;">
-              <h4 class="deliverable-title">🚀 Work Submitted Successfully</h4>
+              <h4 class="deliverable-title">Work Submitted</h4>
               <p style="font-size: 0.9rem; color: #1b4332; line-height: 1.5; margin-bottom: 12px;">
-                Your deliverables are pending review from the recruiter. Escrow funds will remain held by Exhibitly SafePay until acceptance.
+                Your deliverables are pending review from the recruiter. Escrow funds will remain held by SkillBridge SafePay until acceptance.
               </p>
               <div class="deliverable-links">
                 <div class="deliverable-link-item">GitHub: <a href="${escapeHTML(delivery.githubUrl)}" target="_blank">${escapeHTML(delivery.githubUrl)}</a></div>
@@ -535,10 +537,10 @@
 
         pane.innerHTML = `
           <div style="background: rgba(34,197,94,0.03); border: 1px solid #bbf7d0; border-radius: var(--radius-md); padding: 24px; text-align: center;">
-            <span style="font-size: 3.5rem; display: block; margin-bottom: 12px; filter: drop-shadow(0 4px 8px rgba(34,197,94,0.1));">🏆</span>
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:12px"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
             <h4 style="font-family: var(--font-heading); font-size: 1.3rem; color: #166534; font-weight: 800; margin-bottom: 6px;">Contract Successfully Completed</h4>
             <p style="font-size: 0.9rem; color: #166534; max-width: 440px; margin: 0 auto 20px auto;">
-              Escrow payment has been fully released to the contractor, and the project is now publicly displayed inside their Exhibitly project showcase gallery.
+              Escrow payment has been fully released to the contractor, and the project is now publicly displayed inside their SkillBridge project showcase gallery.
             </p>
 
             <div class="review-display-card" style="text-align: left; background: white; margin-top: 10px;">

@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Browse Projects — SkillBridge</title>
+  <meta name="description" content="Browse live freelance projects on SkillBridge. Submit proposals and get hired by great clients.">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/footer.css">
+  <style>
+    main { padding-top: 64px; }
+
+    .bp-hero {
+      background: linear-gradient(135deg, #0f0f0f 0%, #1a1a2e 100%);
+      padding: 56px 0 44px;
+      color: white;
+    }
+    .bp-hero h1 { font-size: clamp(1.8rem,4vw,2.6rem); font-weight:800; letter-spacing:-0.03em; color:white; margin-bottom:8px; }
+    .bp-hero p { color:rgba(255,255,255,0.7); font-size:1rem; max-width:500px; }
+
+    .bp-body {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 32px;
+      align-items: start;
+    }
+
+    /* Sidebar */
+    .bp-sidebar {
+      background: #fff;
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 24px;
+      position: sticky;
+      top: 84px;
+    }
+    .bp-sidebar h3 { font-size: 1rem; font-weight: 700; margin-bottom: 16px; }
+
+    .filter-label { font-size: 0.78rem; font-weight: 600; color: var(--secondary-text); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; display: block; }
+    .filter-divider { border: none; border-top: 1px solid var(--border-color); margin: 16px 0; }
+
+    .bp-search-wrap {
+      position: relative;
+      margin-bottom: 4px;
+    }
+    .bp-search-wrap svg { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#999; }
+    .bp-search-input {
+      width: 100%;
+      padding: 9px 12px 9px 36px;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      font-family: var(--font-body);
+      font-size: 0.88rem;
+      outline: none;
+      background: #fafafa;
+    }
+    .bp-search-input:focus { border-color: var(--accent-color); background:#fff; }
+
+    .category-btn {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: 9px 12px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--secondary-text);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: all 0.15s;
+      margin-bottom: 2px;
+    }
+    .category-btn:hover { background: #f5f5f5; color: var(--primary-text); }
+    .category-btn.active { background: rgba(29,191,115,0.1); color: var(--accent-color); font-weight: 600; }
+
+    /* Job listings */
+    .job-count { font-size: 0.88rem; color: var(--secondary-text); margin-bottom: 20px; }
+
+    .job-card {
+      background: #fff;
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 24px 28px;
+      margin-bottom: 16px;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+    .job-card:hover { border-color: rgba(29,191,115,0.4); box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+
+    .job-header { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; margin-bottom:10px; }
+    .job-title { font-size: 1.1rem; font-weight: 700; color: var(--primary-text); margin-bottom:4px; }
+    .job-title a { color: inherit; text-decoration: none; }
+    .job-title a:hover { color: var(--accent-color); }
+    .job-meta { font-size: 0.8rem; color: var(--secondary-text); }
+
+    .job-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .badge-open { background: rgba(29,191,115,0.1); color: #15803d; }
+    .badge-fixed { background: rgba(59,130,246,0.1); color: #1d4ed8; }
+    .badge-hourly { background: rgba(139,92,246,0.1); color: #6d28d9; }
+
+    .job-desc {
+      font-size: 0.9rem;
+      color: var(--secondary-text);
+      line-height: 1.6;
+      margin-bottom: 16px;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .job-skills { display:flex; flex-wrap:wrap; gap:6px; margin-bottom: 16px; }
+    .job-skill-tag {
+      padding: 4px 10px;
+      border-radius: 100px;
+      background: #f5f5f5;
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: #555;
+      border: 1px solid #e8e8e8;
+    }
+
+    .job-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 14px;
+      border-top: 1px solid #f0f0f0;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .job-footer-meta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 0.8rem;
+      color: var(--secondary-text);
+      flex-wrap: wrap;
+    }
+
+    .job-footer-meta span {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .job-budget {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--primary-text);
+    }
+
+    .btn-apply {
+      padding: 9px 20px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      background: var(--accent-color);
+      color: white;
+      border: none;
+      border-radius: 100px;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+    }
+    .btn-apply:hover { background: #16a060; transform: translateY(-1px); }
+    .btn-apply.applied { background: #f5f5f5; color: #888; cursor: default; }
+    .btn-apply.applied:hover { transform: none; }
+
+    .post-cta-banner {
+      background: linear-gradient(135deg, #1dbf73 0%, #16a060 100%);
+      border-radius: 16px;
+      padding: 32px;
+      margin-top: 24px;
+      color: white;
+      text-align: center;
+    }
+    .post-cta-banner h3 { color: white; font-size:1.3rem; margin-bottom:8px; }
+    .post-cta-banner p { color: rgba(255,255,255,0.8); font-size:0.9rem; margin-bottom:20px; }
+
+    @media (max-width: 768px) {
+      .bp-body { grid-template-columns: 1fr; }
+      .bp-sidebar { position: static; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <header id="site-header">
+    <div class="nav-container">
+      <a href="index.html" class="logo">SkillBridge</a>
+      <ul class="nav-menu" id="nav-menu-list">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="hire-talent.html" class="nav-link">Hire Talent</a></li>
+        <li><a href="browse-projects.html" class="nav-link active">Get Hired</a></li>
+      </ul>
+      <div class="nav-cta">
+        <button class="btn btn-secondary" id="nav-btn-login" style="margin-right:8px;">Log In</button>
+        <button class="btn btn-primary" id="nav-btn-register">Register</button>
+      </div>
+      <button class="mobile-toggle" id="mobile-hamburger" aria-label="Toggle Menu">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+    </div>
+  </header>
+  <div class="mobile-drawer-overlay" id="mobile-overlay"></div>
+  <div class="mobile-drawer" id="mobile-drawer-menu">
+    <ul class="mobile-nav-list">
+      <li><a href="index.html" class="mobile-nav-link">Home</a></li>
+      <li><a href="hire-talent.html" class="mobile-nav-link">Hire Talent</a></li>
+      <li><a href="browse-projects.html" class="mobile-nav-link active">Get Hired</a></li>
+    </ul>
+    <div class="mobile-nav-cta">
+      <button class="btn btn-secondary btn-block" id="mob-btn-login">Log In</button>
+      <button class="btn btn-primary btn-block" id="mob-btn-register" style="margin-top:10px;">Register</button>
+    </div>
+  </div>
+
+  <main>
+    <div class="bp-hero">
+      <div class="container">
+        <h1>Browse Projects</h1>
+        <p>Discover live projects posted by clients. Submit your proposal and start earning.</p>
+      </div>
+    </div>
+
+    <div class="bp-body">
+
+      <!-- Sidebar Filters -->
+      <aside class="bp-sidebar">
+        <h3>Filter Projects</h3>
+
+        <div class="bp-search-wrap">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" class="bp-search-input" id="proj-search" placeholder="Search projects...">
+        </div>
+
+        <hr class="filter-divider">
+
+        <span class="filter-label">Category</span>
+        <button class="category-btn active" data-cat="">All Projects</button>
+        <button class="category-btn" data-cat="Web Development">Web Development</button>
+        <button class="category-btn" data-cat="Mobile Development">Mobile Development</button>
+        <button class="category-btn" data-cat="Design">Design</button>
+        <button class="category-btn" data-cat="Backend Development">Backend Development</button>
+        <button class="category-btn" data-cat="Full-Stack">Full-Stack</button>
+        <button class="category-btn" data-cat="General">General</button>
+
+        <hr class="filter-divider">
+
+        <div class="post-cta-banner" id="post-project-cta">
+          <h3>Have a project?</h3>
+          <p>Post it for free and receive proposals from skilled freelancers.</p>
+          <a href="post-project.html" class="btn btn-secondary-dark" style="font-size:0.85rem;padding:10px 20px;">Post a Project</a>
+        </div>
+      </aside>
+
+      <!-- Job Listings -->
+      <div class="bp-main">
+        <p class="job-count" id="job-count-label">Loading projects...</p>
+        <div id="jobs-list"></div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer id="site-footer">
+    <div class="footer-top">
+      <div class="container footer-top-inner">
+        <a href="index.html" class="footer-logo">SkillBridge</a>
+        <div class="footer-nav-groups" style="display:flex;gap:48px;margin-left:48px;flex-wrap:wrap;">
+          <div class="footer-column">
+            <div class="footer-title">Platform</div>
+            <ul class="footer-list">
+              <li><a href="hire-talent.html" class="footer-link">Browse Freelancers</a></li>
+              <li><a href="browse-projects.html" class="footer-link">Browse Projects</a></li>
+              <li><a href="post-project.html" class="footer-link">Post a Project</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom-strip">
+      <div class="container footer-bottom-inner">
+        <div class="footer-copy">&copy; 2026 SkillBridge. All rights reserved.</div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/db.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    if (window.initProposalModal) window.initProposalModal();
+    renderJobs();
+
+    // Search
+    document.getElementById('proj-search').addEventListener('input', renderJobs);
+
+    // Category buttons
+    document.querySelectorAll('.category-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderJobs();
+      });
+    });
+  });
+
+  function timeAgo(isoStr) {
+    const diff = Date.now() - new Date(isoStr).getTime();
+    const mins = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+    if (mins < 60) return `${mins}m ago`;
+    if (hours < 24) return `${hours}h ago`;
+    return `${days}d ago`;
+  }
+
+  function renderJobs() {
+    const search = document.getElementById('proj-search').value;
+    const cat = document.querySelector('.category-btn.active')?.getAttribute('data-cat') || '';
+    const jobs = window.JobsDB.query({ search, category: cat });
+    const session = window.SessionManager.getActiveUser();
+    const list = document.getElementById('jobs-list');
+    const countLabel = document.getElementById('job-count-label');
+
+    countLabel.textContent = `${jobs.length} project${jobs.length !== 1 ? 's' : ''} found`;
+
+    if (!jobs.length) {
+      list.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#d0d0d0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+          <h3>No projects found</h3>
+          <p>Try different keywords or clear filters to see all projects.</p>
+          <a href="post-project.html" class="btn btn-primary">Post a Project</a>
+        </div>`;
+      return;
+    }
+
+    list.innerHTML = jobs.map(job => {
+      const applied = session ? window.ProposalsDB.hasApplied(job.id, session.user.id) : false;
+      const badgeType = job.budgetType === 'hourly' ? 'badge-hourly' : 'badge-fixed';
+      const budgetLabel = job.budgetType === 'hourly' ? 'Hourly' : 'Fixed';
+
+      // Resolve poster display name from RecruitersDB first, then fall back to stored clientName
+      const posterRecord = window.RecruitersDB && window.RecruitersDB.getById(job.clientId);
+      const posterName = posterRecord ? posterRecord.name : (job.clientName || 'Unknown');
+      const posterInitial = posterName.charAt(0).toUpperCase();
+
+      return `
+        <div class="job-card">
+          <div class="job-header">
+            <div>
+              <div class="job-title">${job.title}</div>
+              <div class="job-meta" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                <span style="display:inline-flex;align-items:center;gap:6px;">
+                  <span style="width:22px;height:22px;border-radius:50%;background:#1dbf73;color:white;font-size:0.68rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">${posterInitial}</span>
+                  <a href="client-profile.html?id=${job.clientId}" style="color:var(--primary-text);font-weight:600;text-decoration:none;" onmouseover="this.style.color='var(--accent-color)'" onmouseout="this.style.color='var(--primary-text)'">${posterName}</a>
+                </span>
+                <span style="color:#ccc;">&bull;</span>
+                <span>${timeAgo(job.postedAt)}</span>
+              </div>
+            </div>
+            <span class="job-badge badge-open">Open</span>
+          </div>
+          <p class="job-desc">${job.description}</p>
+          <div class="job-skills">
+            ${job.skills.map(s => `<span class="job-skill-tag">${s}</span>`).join('')}
+          </div>
+          <div class="job-footer">
+            <div class="job-footer-meta">
+              <span class="job-budget">${job.budget}</span>
+              <span class="job-badge ${badgeType}" style="font-size:0.72rem;">${budgetLabel}</span>
+              <span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                ${job.deadline}
+              </span>
+              <span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                ${job.proposals} proposals
+              </span>
+            </div>
+            <button class="btn-apply ${applied ? 'applied' : ''}"
+              onclick="${applied ? '' : `applyToJob('${job.id}', '${job.title.replace(/'/g, "\\'")}')`}"
+              ${applied ? 'disabled' : ''}>
+              ${applied ? 'Applied' : 'Submit Proposal'}
+            </button>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function applyToJob(jobId, jobTitle) {
+    const session = window.SessionManager.getActiveUser();
+    if (!session) {
+      window.openAuthModal('login');
+      return;
+    }
+    if (window.openProposalModal) {
+      window.openProposalModal(jobId, jobTitle);
+    }
+  }
+  </script>
+</body>
+</html>

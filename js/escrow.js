@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Exhibitly Escrow Payment Checkout Controller
+   SkillBridge Escrow Payment Checkout Controller
    ========================================================================== */
 
 class EscrowController {
@@ -18,7 +18,7 @@ class EscrowController {
           
           <div style="text-align: center; margin-bottom: 24px;">
             <h2 style="font-family: var(--font-heading); font-size: 1.4rem;">Secure Escrow Checkout</h2>
-            <p style="font-size: 0.85rem; color: var(--secondary-text); margin-top: 4px;">Exhibitly SafePay Escrow Protection</p>
+            <p style="font-size: 0.85rem; color: var(--secondary-text); margin-top: 4px;">SkillBridge SafePay Escrow Protection</p>
           </div>
 
           <!-- Credit Card Mockup -->
@@ -198,7 +198,7 @@ class EscrowController {
       submitBtn.style.opacity = '1';
 
       if (success) {
-        alert('Payment processed successfully! Escrow funds are secured in Exhibitly SafePay.');
+        alert('Payment processed successfully! Escrow funds are secured in SkillBridge SafePay.');
         document.getElementById('escrow-checkout-overlay').classList.remove('active');
         location.reload();
       } else {

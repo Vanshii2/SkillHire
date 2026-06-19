@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — SkillBridge</title>
+  <style>
+    body { margin: 0; background: #0f0f0f; display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: 'Inter', sans-serif; }
+    .loader { text-align: center; color: #fff; }
+    .loader-logo { font-size: 1.8rem; font-weight: 800; color: #1dbf73; letter-spacing: -0.03em; margin-bottom: 24px; }
+    .loader-spinner { width: 36px; height: 36px; border: 3px solid rgba(255,255,255,0.15); border-top-color: #1dbf73; border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loader-text { font-size: 0.9rem; color: rgba(255,255,255,0.5); }
+  </style>
+</head>
+<body>
+  <div class="loader">
+    <div class="loader-logo">SkillBridge</div>
+    <div class="loader-spinner"></div>
+    <div class="loader-text">Loading your dashboard...</div>
+  </div>
+
+  <script src="js/db.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const session = window.SessionManager.getActiveUser();
+
+      if (!session) {
+        window.location.href = 'index.html?action=login';
+        return;
+      }
+
+      if (session.role === 'candidate') {
+        window.location.replace('candidate/dashboard.html');
+      } else {
+        window.location.replace('recruiter/dashboard.html');
+      }
+    });
+  </script>
+</body>
+</html>

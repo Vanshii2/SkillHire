@@ -212,6 +212,207 @@ header.scrolled {
   }
 }
 
+/* ── Profile wrapper with dropdown ── */
+.nav-profile-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* ── User pill (after login) ── */
+.nav-user-pill,
+.nav-profile-wrap .user-pill-link {
+  display: inline-flex;
+  align-items: center;
+  background: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  border-radius: 100px;
+  overflow: visible;
+  height: 36px;
+}
+
+/* ── Profile dropdown ── */
+.nav-profile-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 14px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+  min-width: 160px;
+  padding: 6px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-6px);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  z-index: 1200;
+}
+
+.nav-profile-wrap.open .nav-profile-dropdown {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+/* Also keep hover for mouse users as fallback */
+.nav-profile-wrap:hover .nav-profile-dropdown {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.nav-dd-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: 9px;
+  font-size: 0.86rem;
+  font-weight: 500;
+  color: #111;
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-body);
+  transition: background 0.12s;
+  text-align: left;
+}
+.nav-dd-row:hover { background: #f5f5f5; }
+.nav-dd-logout { color: #e53e3e; }
+.nav-dd-logout:hover { background: #fff5f5; }
+
+.user-pill-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 12px 0 6px;
+  text-decoration: none;
+  color: #111;
+  font-size: 0.85rem;
+  font-weight: 600;
+  height: 100%;
+  transition: background 0.15s;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-body);
+}
+.user-pill-link:hover { background: rgba(0,0,0,0.04); }
+/* chevron transition */
+#pill-chevron { transition: transform 0.18s ease; }
+
+.user-pill-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--accent-color);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.user-pill-logout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 100%;
+  background: none;
+  border: none;
+  border-left: 1px solid #e0e0e0;
+  cursor: pointer;
+  color: #aaa;
+  transition: color 0.15s, background 0.15s;
+}
+.user-pill-logout:hover { color: #333; background: rgba(0,0,0,0.04); }
+
+/* ── Mode switch button ── */
+.btn-mode-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 100px;
+  border: 1px solid #e0e0e0;
+  background: #fff;
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #666;
+  cursor: pointer;
+  margin-right: 8px;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.btn-mode-switch:hover { border-color: #1dbf73; color: #1dbf73; background: rgba(29,191,115,0.04); }
+
+/* ── Auth modal close button fix ── */
+.modal-close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  font-size: inherit;
+  border-radius: 8px;
+}
+.modal-close-btn:hover { background: #f5f5f5; color: #111; }
+
+/* ── Auth T&C row ── */
+.auth-tc-row {
+  margin: 12px 0;
+}
+.auth-tc-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  color: #555;
+  line-height: 1.4;
+}
+.auth-tc-label input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid #d0d0d0;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+  margin-top: 1px;
+  transition: all 0.15s;
+}
+.auth-tc-label input[type="checkbox"]:checked {
+  background: #1dbf73;
+  border-color: #1dbf73;
+}
+.auth-tc-label input[type="checkbox"]:checked::after {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: 0px;
+  width: 5px;
+  height: 8px;
+  border: 1.5px solid #fff;
+  border-top: none;
+  border-left: none;
+  transform: rotate(45deg);
+}
+
+/* ── Auth subtitle removed (using just the role cards) ── */
+.auth-subtitle { display: none; }
+
 /* ==========================================================================
    DROPDOWN — Hire Talent
    ========================================================================== */

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   SkillHire Candidate Directory Page Logic - Premium Edition
+   SkillBridge Candidate Directory Page Logic - Premium Edition
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -108,9 +108,11 @@ function filterAndRender() {
   if (matches.length === 0) {
     gridContainer.innerHTML = `
       <div class="empty-state">
-        <div class="empty-state-icon">🔍</div>
-        <h3>No candidates found</h3>
-        <p>Try clearing some filters or searching for another keyword or skill tag.</p>
+        <div class="empty-state-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </div>
+        <h3>No freelancers found</h3>
+        <p>Try clearing some filters or searching for a different skill or keyword.</p>
       </div>
     `;
     return;
@@ -120,115 +122,89 @@ function filterAndRender() {
   const isRecruiter = session && session.role === 'recruiter';
 
   // Render cards
+  const inSubdir = window.location.pathname.includes('/candidate/') ||
+                   window.location.pathname.includes('/recruiter/') ||
+                   window.location.pathname.includes('/shared/');
+  const prefix = inSubdir ? '../' : '';
+
   gridContainer.innerHTML = matches.map((candidate, idx) => {
-    // Determine how many skills to show initially
-    const showCount = 3;
-    const initialSkills = candidate.skills.slice(0, showCount);
-    const hiddenSkills = candidate.skills.slice(showCount);
-    
-    let skillsHtml = initialSkills.map(skill => 
-      `<span class="skill-tag">${escapeHTML(skill)}</span>`
-    ).join('');
+    const rating = candidate.rating || 4.8;
+    const reviewCount = candidate.reviewCount || 12;
+    const isSaved = isRecruiter && window.RecruitersDB && window.RecruitersDB.isSaved(session && session.user.id, candidate.id);
 
-    if (hiddenSkills.length > 0) {
-      skillsHtml += `
-        <span class="skill-tag-more" id="more-skills-${idx}">+${hiddenSkills.length}</span>
-        <span class="hidden-skills" id="hidden-skills-${idx}" style="display:none;">
-          ${hiddenSkills.map(skill => `<span class="skill-tag">${escapeHTML(skill)}</span>`).join('')}
-        </span>
-      `;
-    }
+    let avatarSrc = candidate.avatar || '';
+    if (avatarSrc.startsWith('assets/')) avatarSrc = prefix + avatarSrc;
+    else if (avatarSrc.startsWith('../assets/')) avatarSrc = avatarSrc.replace(/^\.\.\//, '');
 
-    const hourlyRateHtml = candidate.hourlyRate 
-      ? `<div class="hourly-rate-text">${candidate.hourlyRate}/hr</div>` 
+    const rateNum = candidate.hourlyRate;
+    const rate = rateNum ? `₹${rateNum}/hr` : '₹500/hr';
+    const initial = candidate.name.charAt(0).toUpperCase();
+
+    const bio = candidate.about
+      ? (candidate.about.length > 95 ? candidate.about.slice(0, 95) + '…' : candidate.about)
       : '';
 
-    const isSaved = isRecruiter && window.RecruitersDB && window.RecruitersDB.isSaved(session.user.id, candidate.id);
-    const bookmarkHtml = isRecruiter ? `
-      <button class="bookmark-btn ${isSaved ? 'active' : ''}" data-id="${candidate.id}" title="${isSaved ? 'Remove from shortlist' : 'Save to shortlist'}">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="${isSaved ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-        </svg>
-      </button>
-    ` : '';
-
-    const inSubdir = window.location.pathname.includes('/candidate/') || 
-                     window.location.pathname.includes('/recruiter/') || 
-                     window.location.pathname.includes('/shared/');
-    const prefix = inSubdir ? '../' : '';
-    
-    // Resolve avatar path
-    let avatarSrc = candidate.avatar;
-    if (avatarSrc && avatarSrc.startsWith('assets/')) {
-      avatarSrc = prefix + avatarSrc;
-    } else if (avatarSrc && avatarSrc.startsWith('../assets/')) {
-      avatarSrc = (inSubdir ? '../' : '') + avatarSrc.replace(/^\.\.\//, '');
-    }
+    const visibleSkills = candidate.skills.slice(0, 4);
+    const extraCount = candidate.skills.length - visibleSkills.length;
+    const skillPills = visibleSkills.map(s => `<span class="upw-skill">${escapeHTML(s)}</span>`).join('');
+    const hiddenPills = candidate.skills.slice(4).map(s =>
+      `<span class="upw-skill upw-skill-hidden" style="display:none">${escapeHTML(s)}</span>`
+    ).join('');
+    const moreBtn = extraCount > 0
+      ? `<button class="upw-skill-more" onclick="this.closest('.upw-skills').querySelectorAll('.upw-skill-hidden').forEach(function(e){e.style.display='inline-flex'});this.style.display='none'">
+           +${extraCount}
+           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+         </button>`
+      : '';
 
     return `
-      <div class="candidate-card fade-in-section is-visible">
-        ${bookmarkHtml}
-        <div class="candidate-header">
-          <div class="candidate-avatar-wrapper">
-            <img src="${escapeHTML(avatarSrc)}" alt="${escapeHTML(candidate.name)}" class="candidate-avatar">
-            <div class="candidate-status-indicator"></div>
+      <div class="candidate-card">
+        ${isRecruiter ? `<button class="card-save-btn ${isSaved ? 'active' : ''}" data-id="${candidate.id}" title="${isSaved ? 'Saved' : 'Save'}" aria-label="Save freelancer">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="${isSaved ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </button>` : ''}
+        <div class="upw-card-top">
+          <div class="upw-avatar-wrap">
+            <div class="upw-avatar-letter">${initial}</div>
+            <img src="${escapeHTML(avatarSrc)}" alt="${escapeHTML(candidate.name)}" class="upw-avatar-img" onerror="this.style.display='none'">
+            <div class="upw-online-dot"></div>
           </div>
-          <div class="candidate-header-info">
-            <h3>${escapeHTML(candidate.name)}</h3>
-            <div class="role">${escapeHTML(candidate.role)}</div>
-          </div>
-        </div>
-        
-        <div class="candidate-skills" id="skills-container-${idx}">
-          ${skillsHtml}
-        </div>
-        
-        <div class="candidate-footer">
-          <div class="footer-stats">
-            <div class="candidate-projects-count">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-              ${candidate.projects.length} Project${candidate.projects.length === 1 ? '' : 's'}
+          <div class="upw-info">
+            <div class="upw-name">${escapeHTML(candidate.name)}</div>
+            <div class="upw-role">${escapeHTML(candidate.role)}</div>
+            <div class="upw-meta-row">
+              <span class="upw-rate">${escapeHTML(rate)}</span>
+              <span class="upw-sep">·</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="#f59e0b" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <span class="upw-rating">${rating.toFixed(1)}</span>
+              <span class="upw-review-cnt">(${reviewCount})</span>
+              <span class="upw-sep">·</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+              <span class="upw-jobs">${(candidate.projects ? candidate.projects.length : 1) + 2} jobs</span>
             </div>
-            ${hourlyRateHtml}
           </div>
-          <a href="${prefix}profile.html?id=${escapeHTML(candidate.id)}" class="btn-view-profile">View Profile &rarr;</a>
         </div>
+        <p class="upw-bio">${escapeHTML(bio)}</p>
+        <div class="upw-skills">
+          ${skillPills}${hiddenPills}${moreBtn}
+        </div>
+        <a href="${prefix}profile.html?id=${escapeHTML(candidate.id)}" class="upw-see-profile">
+          See Profile
+        </a>
       </div>
     `;
   }).join('');
 
-  // Expand skills functionality
-  matches.forEach((candidate, idx) => {
-    const moreBtn = document.getElementById(`more-skills-${idx}`);
-    const hiddenSkills = document.getElementById(`hidden-skills-${idx}`);
-    if (moreBtn && hiddenSkills) {
-      moreBtn.addEventListener('click', () => {
-        moreBtn.style.display = 'none';
-        hiddenSkills.style.display = 'inline';
-      });
-    }
-  });
-
-  // Bind click event listeners for bookmark buttons
+  // Bookmark button handlers
   if (isRecruiter) {
-    const bookmarkButtons = gridContainer.querySelectorAll('.bookmark-btn');
-    bookmarkButtons.forEach(btn => {
-      btn.addEventListener('click', (e) => {
+    gridContainer.querySelectorAll('.card-save-btn').forEach(btn => {
+      btn.addEventListener('click', e => {
         e.preventDefault();
         e.stopPropagation();
         const candId = btn.getAttribute('data-id');
-        const activeRecId = session.user.id;
-        const nowSaved = window.RecruitersDB.toggleSaveCandidate(activeRecId, candId);
-        
-        if (nowSaved) {
-          btn.classList.add('active');
-          btn.title = 'Remove from shortlist';
-          btn.querySelector('svg').setAttribute('fill', 'currentColor');
-        } else {
-          btn.classList.remove('active');
-          btn.title = 'Save to shortlist';
-          btn.querySelector('svg').setAttribute('fill', 'none');
-        }
+        const nowSaved = window.RecruitersDB.toggleSaveCandidate(session.user.id, candId);
+        btn.classList.toggle('active', nowSaved);
+        btn.title = nowSaved ? 'Saved' : 'Save';
+        btn.querySelector('svg').setAttribute('fill', nowSaved ? 'currentColor' : 'none');
       });
     });
   }
