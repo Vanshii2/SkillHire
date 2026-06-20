@@ -611,6 +611,21 @@ class JobsDB {
           dirty = true;
         }
       });
+      // Ensure directHire / invitedFreelancerId fields exist.
+      // Recover old directHire jobs by cross-referencing "Project Invite:" messages.
+      const msgs = JSON.parse(localStorage.getItem(MESSAGES_KEY) || '[]');
+      jobs.forEach(j => {
+        if (j.directHire === undefined || j.invitedFreelancerId === undefined) {
+          // Try to recover: look for a "Project Invite: <title>" message from the same client
+          const inviteMsg = msgs.find(m =>
+            m.recruiterId === j.clientId &&
+            m.subject === 'Project Invite: ' + j.title
+          );
+          j.directHire = !!inviteMsg;
+          j.invitedFreelancerId = inviteMsg ? inviteMsg.candidateId : null;
+          dirty = true;
+        }
+      });
       if (dirty) localStorage.setItem(JOBS_KEY, JSON.stringify(jobs));
     }
   }
@@ -645,7 +660,9 @@ class JobsDB {
       postedAt: new Date().toISOString(),
       proposals: 0,
       status: 'open',
-      category: jobData.category || 'General'
+      category: jobData.category || 'General',
+      directHire: jobData.directHire || false,
+      invitedFreelancerId: jobData.invitedFreelancerId || null
     };
     jobs.unshift(newJob);
     localStorage.setItem(JOBS_KEY, JSON.stringify(jobs));
@@ -664,7 +681,8 @@ class JobsDB {
   }
 
   static query({ search = '', category = '', skills = [] } = {}) {
-    let jobs = this.getAll().filter(j => j.status === 'open');
+    // Never expose directHire (private invite) jobs in public listings
+    let jobs = this.getAll().filter(j => j.status === 'open' && !j.directHire);
     if (search.trim()) {
       const q = search.toLowerCase();
       jobs = jobs.filter(j =>
@@ -720,6 +738,7 @@ class ProposalsDB {
       coverLetter: formData.coverLetter,
       proposedBudget: formData.proposedBudget,
       proposedTimeline: formData.proposedTimeline,
+      proposalType: formData.proposalType || 'bid',
       status: 'pending',
       submittedAt: new Date().toISOString()
     };
@@ -885,6 +904,76 @@ class EscrowDB {
     e.status = status;
     Object.assign(e, extra);
     localStorage.setItem(ESCROW_KEY, JSON.stringify(escrows));
+    const rawAmt = String(e.amount).replace(/[₹,\s]/g, '');
+    const now = new Date().toLocaleString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+    // ── FUNDED: notify both parties ──────────────────────────────────────
+    if (status === 'funded') {
+      const notifKey = 'sb_escrow_notif_' + escrowId;
+      if (!localStorage.getItem(notifKey)) {
+        localStorage.setItem(notifKey, '1');
+        // → Freelancer: work can begin
+        if (e.freelancerId) {
+          MessagesDB.send(
+            e.clientId || 'system', e.clientName || 'Client', 'Client', '',
+            e.freelancerId,
+            '💰 Escrow Funded — Work Can Begin: ' + e.jobTitle,
+            `Great news! ${e.clientName || 'Your client'} has funded the escrow for "${e.jobTitle}".\n\nAmount secured: ₹${rawAmt}\n\nYou can now start working. Submit your deliverables from your My Contracts tab when done — the client will review and release payment.\n\nFunded at: ${now}`
+          );
+        }
+        // → Client: payment receipt confirmation
+        if (e.clientId) {
+          MessagesDB.send(
+            e.clientId, e.clientName || 'Client', '', '',
+            e.freelancerId || 'system',
+            '✅ Payment Confirmed — Escrow Active: ' + e.jobTitle,
+            `Your escrow payment of ₹${rawAmt} for "${e.jobTitle}" has been successfully funded.\n\nThe freelancer ${e.freelancerName || ''} has been notified and will begin work.\n\nYou can release payment once you've reviewed and approved the delivered work from your Payments & Escrow tab.\n\nFunded at: ${now}`
+          );
+        }
+      }
+    }
+
+    // ── RELEASED: notify both parties ────────────────────────────────────
+    if (status === 'released') {
+      const relKey = 'sb_release_notif_' + escrowId;
+      if (!localStorage.getItem(relKey)) {
+        localStorage.setItem(relKey, '1');
+        // → Freelancer: payment in hand
+        if (e.freelancerId) {
+          MessagesDB.send(
+            e.clientId || 'system', e.clientName || 'Client', 'Client', '',
+            e.freelancerId,
+            '🎉 Payment Released: ' + e.jobTitle,
+            `Your payment of ₹${rawAmt} for "${e.jobTitle}" has been approved and released by ${e.clientName || 'the client'}.\n\nThe funds are now available to you. Thank you for completing this project!\n\nPlease take a moment to rate your experience from your My Contracts tab.\n\nReleased at: ${now}`
+          );
+        }
+        // → Client: project complete confirmation
+        if (e.clientId) {
+          MessagesDB.send(
+            e.clientId, e.clientName || 'Client', '', '',
+            e.freelancerId || 'system',
+            '✅ Project Complete — Payment Released: ' + e.jobTitle,
+            `You have successfully released ₹${rawAmt} to ${e.freelancerName || 'the freelancer'} for "${e.jobTitle}".\n\nThe project is now marked as complete. Thank you for using SkillBridge!\n\nReleased at: ${now}`
+          );
+        }
+      }
+    }
+
+    // ── DISPUTED: notify both parties ────────────────────────────────────
+    if (status === 'disputed') {
+      const disKey = 'sb_dispute_notif_' + escrowId;
+      if (!localStorage.getItem(disKey)) {
+        localStorage.setItem(disKey, '1');
+        const disputeMsg = (who) => `A dispute has been raised for "${e.jobTitle}" (₹${rawAmt}).\n\nOur support team will review the case and contact both parties within 24–48 hours. The escrow amount is held safely until the dispute is resolved.\n\nRaised at: ${now}`;
+        if (e.freelancerId) {
+          MessagesDB.send(e.clientId || 'system', e.clientName || 'Client', '', '', e.freelancerId, '⚠️ Dispute Raised: ' + e.jobTitle, disputeMsg('freelancer'));
+        }
+        if (e.clientId) {
+          MessagesDB.send(e.clientId, e.clientName || 'Client', '', '', e.freelancerId || 'system', '⚠️ Dispute Raised: ' + e.jobTitle, disputeMsg('client'));
+        }
+      }
+    }
+
     return e;
   }
 }

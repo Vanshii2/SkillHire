@@ -13,16 +13,19 @@
       display: flex;
       align-items: flex-start;
       justify-content: center;
-      padding: 60px 24px 80px;
+      padding: 80px 40px 80px;
       background: var(--bg-color);
     }
     .payment-wrap {
       display: grid;
-      grid-template-columns: 1fr 420px;
+      grid-template-columns: 1fr 400px;
       gap: 40px;
-      max-width: 900px;
+      max-width: 1200px;
       width: 100%;
       align-items: start;
+    }
+    @media (max-width: 960px) {
+      .payment-wrap { grid-template-columns: 1fr 340px; }
     }
     @media (max-width: 780px) {
       .payment-wrap { grid-template-columns: 1fr; }
@@ -96,23 +99,44 @@
       margin-top: 16px;
     }
 
+    /* Payment method tabs */
+    .pay-method-tabs { display: flex; gap: 8px; margin-bottom: 24px; }
+    .pay-method-tab {
+      flex: 1; padding: 10px 0; border-radius: 10px;
+      border: 1.5px solid var(--border-color); background: var(--bg-color);
+      font-size: 0.85rem; font-weight: 700; cursor: pointer;
+      color: var(--secondary-text); transition: all 0.15s; font-family: var(--font-body);
+    }
+    .pay-method-tab.active { background: #0d1b2a; color: #fff; border-color: #0d1b2a; }
+    .pay-method-section { display: none; }
+    .pay-method-section.active { display: block; }
+    .bank-select {
+      width: 100%; padding: 11px 14px; border: 1.5px solid var(--border-color);
+      border-radius: 10px; font-family: var(--font-body); font-size: 0.9rem;
+      color: var(--primary-text); background: var(--bg-color); box-sizing: border-box;
+    }
+    .bank-select:focus { outline: none; border-color: var(--accent-color); }
+
     /* Payment form card */
     .payment-form-card {
       background: var(--surface-color);
       border: 1px solid var(--border-color);
       border-radius: 20px;
-      padding: 36px;
+      padding: 48px 52px;
       box-shadow: var(--shadow-sm);
     }
+    @media (max-width: 960px) {
+      .payment-form-card { padding: 36px 36px; }
+    }
     .payment-form-card h1 {
-      font-size: 1.5rem;
+      font-size: 1.7rem;
       font-weight: 800;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
     .payment-form-card .subtitle {
-      font-size: 0.88rem;
+      font-size: 0.9rem;
       color: var(--secondary-text);
-      margin-bottom: 32px;
+      margin-bottom: 36px;
     }
     .pay-section-label {
       font-size: 0.72rem;
@@ -279,50 +303,93 @@
       <!-- LEFT: Payment form -->
       <div class="payment-form-card">
         <div id="pay-form-wrap">
-          <h1>Complete your payment</h1>
-          <p class="subtitle">You're one step away from posting unlimited projects on SkillBridge.</p>
+          <h1 id="pay-page-title">Complete your payment</h1>
+          <p class="subtitle" id="pay-page-subtitle">You're one step away from posting unlimited projects on SkillBridge.</p>
 
-          <div class="pay-section-label">Billing details</div>
-          <div class="pay-field" id="field-billing-name">
-            <label for="billing-name">Full Name on card</label>
-            <input type="text" id="billing-name" placeholder="e.g. Vanshita Tripathi" autocomplete="cc-name">
-            <div class="field-error">Please enter the name as it appears on your card.</div>
-          </div>
-          <div class="pay-field" id="field-billing-email">
-            <label for="billing-email">Email address</label>
-            <input type="email" id="billing-email" placeholder="you@example.com" autocomplete="email">
-            <div class="field-error">Please enter a valid email address.</div>
+          <!-- Payment method tabs -->
+          <div class="pay-method-tabs">
+            <button class="pay-method-tab active" onclick="switchPayMethod('upi')">UPI</button>
+            <button class="pay-method-tab" onclick="switchPayMethod('card')">Card</button>
+            <button class="pay-method-tab" onclick="switchPayMethod('netbanking')">Net Banking</button>
           </div>
 
-          <div class="pay-section-label">Card details</div>
-          <div class="card-icons">
-            <div class="card-icon visa">VISA</div>
-            <div class="card-icon mc"></div>
-            <div class="card-icon rupay">RuPay</div>
-          </div>
-
-          <div class="pay-field" id="field-card-number">
-            <label for="card-number">Card number</label>
-            <input type="text" id="card-number" placeholder="1234 5678 9012 3456" maxlength="19" autocomplete="cc-number" inputmode="numeric">
-            <div class="field-error">Please enter a valid 16-digit card number.</div>
-          </div>
-          <div class="pay-row">
-            <div class="pay-field" id="field-card-expiry">
-              <label for="card-expiry">Expiry date</label>
-              <input type="text" id="card-expiry" placeholder="MM / YY" maxlength="7" autocomplete="cc-exp" inputmode="numeric">
-              <div class="field-error">Enter a valid future date (MM / YY).</div>
+          <!-- UPI section -->
+          <div id="pm-upi" class="pay-method-section active">
+            <div class="pay-field">
+              <label for="upi-id">UPI ID</label>
+              <input type="text" id="upi-id" placeholder="e.g. yourname@upi" readonly onfocus="this.removeAttribute('readonly')" autocomplete="off" name="upi_id_field">
             </div>
-            <div class="pay-field" id="field-card-cvv">
-              <label for="card-cvv">CVV / CVC</label>
-              <input type="password" id="card-cvv" placeholder="•••" maxlength="4" autocomplete="cc-csc" inputmode="numeric">
-              <div class="field-error">Enter the 3 or 4 digit CVV.</div>
+            <p style="font-size:0.78rem;color:var(--secondary-text);margin-top:8px;">Works with Google Pay, PhonePe, Paytm, BHIM and any UPI app.</p>
+          </div>
+
+          <!-- Card section -->
+          <div id="pm-card" class="pay-method-section">
+            <div class="pay-section-label">Billing details</div>
+            <div class="pay-field" id="field-billing-name">
+              <label for="billing-name">Full Name</label>
+              <input type="text" id="billing-name" placeholder="Full name" autocomplete="cc-name">
+              <div class="field-error">Please enter your name.</div>
+            </div>
+            <div class="pay-field" id="field-billing-email">
+              <label for="billing-email">Email address</label>
+              <input type="email" id="billing-email" placeholder="you@example.com" autocomplete="email">
+              <div class="field-error">Please enter a valid email.</div>
+            </div>
+            <div class="pay-section-label">Card details</div>
+            <div class="card-icons">
+              <div class="card-icon visa">VISA</div>
+              <div class="card-icon mc"></div>
+              <div class="card-icon rupay">RuPay</div>
+            </div>
+            <div class="pay-field" id="field-card-number">
+              <label for="card-number">Card number</label>
+              <input type="text" id="card-number" placeholder="1234 5678 9012 3456" maxlength="19" autocomplete="cc-number" inputmode="numeric">
+              <div class="field-error">Please enter a valid 16-digit card number.</div>
+            </div>
+            <div class="pay-row">
+              <div class="pay-field" id="field-card-expiry">
+                <label for="card-expiry">Expiry date</label>
+                <input type="text" id="card-expiry" placeholder="MM / YY" maxlength="7" autocomplete="cc-exp" inputmode="numeric">
+                <div class="field-error">Enter a valid future date.</div>
+              </div>
+              <div class="pay-field" id="field-card-cvv">
+                <label for="card-cvv">CVV / CVC</label>
+                <input type="password" id="card-cvv" placeholder="•••" maxlength="4" autocomplete="cc-csc" inputmode="numeric">
+                <div class="field-error">Enter the 3–4 digit CVV.</div>
+              </div>
+            </div>
+            <div class="pay-field" id="field-card-name">
+              <label for="card-name">Name on card</label>
+              <input type="text" id="card-name" placeholder="e.g. VANSHITA TRIPATHI" autocomplete="cc-name">
+              <div class="field-error">Please enter the cardholder name.</div>
             </div>
           </div>
 
-          <div class="pay-field" id="field-card-name">
-            <label for="card-name">Name on card</label>
-            <input type="text" id="card-name" placeholder="e.g. VANSHITA TRIPATHI" autocomplete="cc-name">
-            <div class="field-error">Please enter the cardholder name.</div>
+          <!-- Net Banking section -->
+          <div id="pm-netbanking" class="pay-method-section">
+            <div class="pay-field">
+              <label for="nb-bank">Select Bank</label>
+              <select id="nb-bank" class="bank-select">
+                <option value="">— Choose your bank —</option>
+                <option>State Bank of India (SBI)</option>
+                <option>HDFC Bank</option>
+                <option>ICICI Bank</option>
+                <option>Axis Bank</option>
+                <option>Kotak Mahindra Bank</option>
+                <option>Punjab National Bank</option>
+                <option>Bank of Baroda</option>
+                <option>Yes Bank</option>
+                <option>IndusInd Bank</option>
+              </select>
+            </div>
+            <div class="pay-field">
+              <label for="nb-uid">Net Banking User ID</label>
+              <input type="text" id="nb-uid" placeholder="Your user ID">
+            </div>
+            <div class="pay-field">
+              <label for="nb-pwd">Password</label>
+              <input type="password" id="nb-pwd" placeholder="Net banking password">
+            </div>
           </div>
 
           <button type="button" id="pay-submit">Pay now — <span id="pay-amount-btn"></span></button>
@@ -333,8 +400,8 @@
           <div class="success-icon-wrap">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
-          <h2>Payment successful!</h2>
-          <p>Your <strong id="success-plan-name"></strong> plan is now active. You can post projects freely. A receipt has been sent to your email.</p>
+          <h2 id="success-heading">Payment successful!</h2>
+          <p id="success-body">Your <strong id="success-plan-name"></strong> is now active.</p>
           <a id="btn-back-post" href="post-project.html" class="btn-back-post">Post your project now</a>
         </div>
       </div>
@@ -388,6 +455,13 @@
   <script src="js/db.js"></script>
   <script src="js/main.js"></script>
   <script>
+    const params = new URLSearchParams(window.location.search);
+    const escrowId  = params.get('escrow');
+    const escrowAmt = params.get('amount');  // e.g. "₹5000"
+    const escrowLbl = params.get('label');   // e.g. "Logo Design for Startup"
+    const returnUrl = params.get('return') || 'index.html';
+    const isEscrow  = !!escrowId;
+
     const PLANS = {
       starter: {
         name: 'Starter Plan',
@@ -409,92 +483,163 @@
       },
     };
 
-    const params = new URLSearchParams(window.location.search);
-    const planKey = params.get('plan') || 'pro';
-    const returnUrl = params.get('return') || 'post-project.html';
-    const plan = PLANS[planKey] || PLANS.pro;
+    // Active payment method state
+    let activeMethod = 'upi';
 
-    document.getElementById('order-plan-name').textContent = plan.name;
-    document.getElementById('order-plan-desc').textContent = plan.desc;
-    document.getElementById('order-total').textContent = '₹' + plan.amount.toLocaleString('en-IN');
-    document.getElementById('pay-amount-btn').textContent = '₹' + plan.amount.toLocaleString('en-IN');
-    document.getElementById('order-gst').textContent = 'Incl. 18% GST';
-    const featEl = document.getElementById('order-features');
-    featEl.innerHTML = plan.features.map(f => `
-      <li>
+    function switchPayMethod(method) {
+      activeMethod = method;
+      document.querySelectorAll('.pay-method-tab').forEach((t, i) => {
+        t.classList.toggle('active', ['upi','card','netbanking'][i] === method);
+      });
+      ['upi','card','netbanking'].forEach(m => {
+        const s = document.getElementById('pm-' + m);
+        if (s) s.classList.toggle('active', m === method);
+      });
+    }
+    window.switchPayMethod = switchPayMethod;
+
+
+    // Setup order summary panel
+    if (isEscrow) {
+      // Escrow mode
+      document.title = 'Fund Escrow — SkillBridge';
+      document.getElementById('pay-page-title').textContent = 'Fund Escrow';
+      document.getElementById('pay-page-subtitle').textContent = 'Your payment is held securely until work is approved — then released to the freelancer.';
+      document.getElementById('order-plan-name').textContent = escrowLbl || 'Freelance Project';
+      document.getElementById('order-plan-desc').textContent = 'Escrow-protected payment';
+      const rawAmt = (escrowAmt || '0').replace(/[₹,\s]/g, '');
+      const numAmt = parseFloat(rawAmt) || 0;
+      const displayAmt = '₹' + rawAmt;
+      document.getElementById('order-total').textContent = displayAmt;
+      document.getElementById('pay-amount-btn').textContent = displayAmt;
+      document.getElementById('order-gst').textContent = 'Funds held in secure escrow';
+      const featEl = document.getElementById('order-features');
+      featEl.innerHTML = [
+        'Money held until work approved',
+        'Full refund if work not delivered',
+        'Dispute resolution support',
+        'Instant release on approval'
+      ].map(f => `<li>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
         ${f}
       </li>`).join('');
+    } else {
+      // Plan purchase mode
+      const planKey = params.get('plan') || 'pro';
+      const plan = PLANS[planKey] || PLANS.pro;
+      document.getElementById('order-plan-name').textContent = plan.name;
+      document.getElementById('order-plan-desc').textContent = plan.desc;
+      document.getElementById('order-total').textContent = '₹' + plan.amount.toLocaleString('en-IN');
+      document.getElementById('pay-amount-btn').textContent = '₹' + plan.amount.toLocaleString('en-IN');
+      document.getElementById('order-gst').textContent = 'Incl. 18% GST';
+      const featEl = document.getElementById('order-features');
+      featEl.innerHTML = plan.features.map(f => `<li>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        ${f}
+      </li>`).join('');
+    }
 
-    // Pre-fill email if logged in
+
+    // Clear any browser-autofilled value from UPI field
     window.addEventListener('DOMContentLoaded', () => {
-      const session = window.SessionManager && window.SessionManager.getActiveUser();
-      if (session) {
-        document.getElementById('billing-email').value = session.user.email || '';
-        document.getElementById('billing-name').value = session.user.name || '';
-      }
+      const upiEl = document.getElementById('upi-id');
+      if (upiEl) { upiEl.value = ''; setTimeout(() => { upiEl.value = ''; }, 300); }
     });
 
-    // Format card number with spaces
-    document.getElementById('card-number').addEventListener('input', function () {
+    // Card formatters
+    const cardNumEl = document.getElementById('card-number');
+    if (cardNumEl) cardNumEl.addEventListener('input', function () {
       let v = this.value.replace(/\D/g, '').slice(0, 16);
       this.value = v.match(/.{1,4}/g)?.join(' ') || v;
     });
-
-    // Format expiry MM / YY
-    document.getElementById('card-expiry').addEventListener('input', function () {
+    const cardExpEl = document.getElementById('card-expiry');
+    if (cardExpEl) cardExpEl.addEventListener('input', function () {
       let v = this.value.replace(/\D/g, '').slice(0, 4);
       if (v.length > 2) v = v.slice(0, 2) + ' / ' + v.slice(2);
       this.value = v;
     });
-
-    // CVV — digits only
-    document.getElementById('card-cvv').addEventListener('input', function () {
+    const cardCvvEl = document.getElementById('card-cvv');
+    if (cardCvvEl) cardCvvEl.addEventListener('input', function () {
       this.value = this.value.replace(/\D/g, '').slice(0, 4);
     });
-
-    function setError(fieldId, show) {
-      const el = document.getElementById(fieldId);
-      if (show) el.classList.add('has-error');
-      else el.classList.remove('has-error');
-    }
 
     function validateExpiry(val) {
       const clean = val.replace(/\s/g, '').replace('/', '');
       if (clean.length < 4) return false;
       const month = parseInt(clean.slice(0, 2), 10);
-      const year = parseInt('20' + clean.slice(2, 4), 10);
+      const year  = parseInt('20' + clean.slice(2, 4), 10);
       if (month < 1 || month > 12) return false;
       const now = new Date();
-      const exp = new Date(year, month - 1, 1);
-      return exp >= new Date(now.getFullYear(), now.getMonth(), 1);
+      return new Date(year, month - 1, 1) >= new Date(now.getFullYear(), now.getMonth(), 1);
+    }
+
+    function showErr(msg) {
+      const errEl = document.getElementById('pay-error');
+      errEl.textContent = msg;
+      errEl.style.display = 'block';
+    }
+    function hideErr() {
+      document.getElementById('pay-error').style.display = 'none';
+    }
+    function markField(id, bad) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (bad) el.classList.add('has-error'); else el.classList.remove('has-error');
+    }
+    function highlightInput(id, bad) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.style.borderColor = bad ? '#e53e3e' : '';
     }
 
     document.getElementById('pay-submit').addEventListener('click', () => {
-      const billingName = document.getElementById('billing-name').value.trim();
-      const billingEmail = document.getElementById('billing-email').value.trim();
-      const cardNumber = document.getElementById('card-number').value.replace(/\s/g, '');
-      const cardExpiry = document.getElementById('card-expiry').value.trim();
-      const cardCvv = document.getElementById('card-cvv').value.trim();
-      const cardName = document.getElementById('card-name').value.trim();
-      const errEl = document.getElementById('pay-error');
-
+      hideErr();
       let valid = true;
 
-      setError('field-billing-name', false);
-      setError('field-billing-email', false);
-      setError('field-card-number', false);
-      setError('field-card-expiry', false);
-      setError('field-card-cvv', false);
-      setError('field-card-name', false);
-      errEl.style.display = 'none';
+      if (activeMethod === 'upi') {
+        const inp = document.getElementById('upi-id');
+        const uid = (inp?.value || '').trim();
+        // Valid UPI ID: alphanumeric/dots/hyphens, then @, then 3+ letters (e.g. name@okaxis)
+        const upiRegex = /^[a-zA-Z0-9._\-]+@[a-zA-Z]{3,}$/;
+        highlightInput('upi-id', false);
+        if (!uid) {
+          highlightInput('upi-id', true);
+          showErr('Please enter your UPI ID (e.g. name@okaxis).');
+          valid = false;
+        } else if (!upiRegex.test(uid)) {
+          highlightInput('upi-id', true);
+          showErr('Invalid UPI ID. It must be in the format name@bankname (e.g. yourname@okaxis, name@upi).');
+          valid = false;
+        }
 
-      if (!billingName) { setError('field-billing-name', true); valid = false; }
-      if (!billingEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(billingEmail)) { setError('field-billing-email', true); valid = false; }
-      if (cardNumber.length !== 16 || !/^\d+$/.test(cardNumber)) { setError('field-card-number', true); valid = false; }
-      if (!validateExpiry(cardExpiry)) { setError('field-card-expiry', true); valid = false; }
-      if (cardCvv.length < 3 || cardCvv.length > 4) { setError('field-card-cvv', true); valid = false; }
-      if (!cardName) { setError('field-card-name', true); valid = false; }
+      } else if (activeMethod === 'card') {
+        const billingName  = (document.getElementById('billing-name')?.value || '').trim();
+        const billingEmail = (document.getElementById('billing-email')?.value || '').trim();
+        const cardNumber   = (document.getElementById('card-number')?.value || '').replace(/\s/g, '');
+        const cardExpiry   = (document.getElementById('card-expiry')?.value || '').trim();
+        const cardCvv      = (document.getElementById('card-cvv')?.value || '').trim();
+        const cardName     = (document.getElementById('card-name')?.value || '').trim();
+        ['field-billing-name','field-billing-email','field-card-number','field-card-expiry','field-card-cvv','field-card-name'].forEach(id => markField(id, false));
+        if (!billingName)  { markField('field-billing-name', true);  valid = false; }
+        if (!billingEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(billingEmail)) { markField('field-billing-email', true); valid = false; }
+        if (cardNumber.length !== 16 || !/^\d+$/.test(cardNumber))  { markField('field-card-number', true);  valid = false; }
+        if (!validateExpiry(cardExpiry)) { markField('field-card-expiry', true); valid = false; }
+        if (cardCvv.length < 3)  { markField('field-card-cvv', true);  valid = false; }
+        if (!cardName) { markField('field-card-name', true); valid = false; }
+        if (!valid) showErr('Please fill in all card details correctly.');
+
+      } else if (activeMethod === 'netbanking') {
+        const bank = (document.getElementById('nb-bank')?.value || '').trim();
+        const uid  = (document.getElementById('nb-uid')?.value || '').trim();
+        const pwd  = (document.getElementById('nb-pwd')?.value || '');
+        highlightInput('nb-bank', false);
+        highlightInput('nb-uid', false);
+        highlightInput('nb-pwd', false);
+        if (!bank)  { highlightInput('nb-bank', true); valid = false; }
+        if (!uid)   { highlightInput('nb-uid', true);  valid = false; }
+        if (!pwd)   { highlightInput('nb-pwd', true);  valid = false; }
+        if (!valid) showErr('Please fill in all net banking details.');
+      }
 
       if (!valid) return;
 
@@ -502,18 +647,31 @@
       btn.textContent = 'Processing…';
       btn.disabled = true;
 
-      // Simulate payment processing delay
       setTimeout(() => {
-        const session = window.SessionManager && window.SessionManager.getActiveUser();
-        if (session) {
-          localStorage.setItem('skillbridge_plan_' + session.user.id, planKey);
-          localStorage.removeItem('skillbridge_pending_plan_' + session.user.id);
+        if (isEscrow) {
+          if (window.EscrowDB && escrowId) {
+            window.EscrowDB.updateStatus(escrowId, 'funded', { fundedAt: new Date().toISOString() });
+          }
+          document.getElementById('pay-form-wrap').style.display = 'none';
+          document.getElementById('pay-success').style.display = 'block';
+          document.getElementById('success-heading').textContent = 'Escrow Funded!';
+          document.getElementById('success-body').innerHTML = '<strong>' + displayAmt + '</strong> is now held securely in escrow for <strong>' + (escrowLbl || 'this project') + '</strong>. Funds will be released to the freelancer once you approve the work.';
+          const backBtn = document.getElementById('btn-back-post');
+          backBtn.textContent = 'Back to Dashboard';
+          backBtn.href = returnUrl;
+        } else {
+          const planKey = params.get('plan') || 'pro';
+          const plan = PLANS[planKey] || PLANS.pro;
+          const session = window.SessionManager && window.SessionManager.getActiveUser();
+          if (session) {
+            localStorage.setItem('skillbridge_plan_' + session.user.id, planKey);
+            localStorage.removeItem('skillbridge_pending_plan_' + session.user.id);
+          }
+          document.getElementById('pay-form-wrap').style.display = 'none';
+          document.getElementById('pay-success').style.display = 'block';
+          document.getElementById('success-body').innerHTML = 'Your <strong id="success-plan-name">' + plan.name + '</strong> plan is now active. You can post projects freely.';
+          document.getElementById('btn-back-post').href = returnUrl;
         }
-
-        document.getElementById('pay-form-wrap').style.display = 'none';
-        document.getElementById('pay-success').style.display = 'block';
-        document.getElementById('success-plan-name').textContent = plan.name;
-        document.getElementById('btn-back-post').href = returnUrl;
       }, 1800);
     });
   </script>

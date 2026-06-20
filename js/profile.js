@@ -383,6 +383,47 @@ function openHireModal(candidate, session) {
   const existing = document.getElementById('hire-modal-overlay');
   if (existing) existing.remove();
 
+  // Check if there's already an active direct-hire or accepted escrow for this pair
+  const allJobs = window.JobsDB ? window.JobsDB.getAll() : [];
+  const activeHire = allJobs.find(j =>
+    j.clientId === session.user.id &&
+    j.invitedFreelancerId === candidate.id &&
+    j.directHire &&
+    ['open', 'in_progress'].includes(j.status || 'open')
+  );
+  const allEscrows = window.EscrowDB ? window.EscrowDB.getAll() : [];
+  const activeEscrow = allEscrows.find(e =>
+    e.clientId === session.user.id && e.freelancerId === candidate.id &&
+    !['released', 'disputed'].includes(e.status)
+  );
+
+  if (activeHire || activeEscrow) {
+    const overlay2 = document.createElement('div');
+    overlay2.id = 'hire-modal-overlay';
+    overlay2.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:2000;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px);';
+    overlay2.innerHTML = `
+      <div style="background:#fff;border-radius:20px;padding:40px 36px;max-width:420px;width:100%;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,0.18);position:relative;">
+        <button onclick="document.getElementById('hire-modal-overlay').remove()" style="position:absolute;top:14px;right:14px;background:none;border:none;cursor:pointer;color:#aaa;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+        <div style="width:56px;height:56px;background:rgba(29,191,115,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h3 style="font-size:1.05rem;font-weight:800;color:#111;margin-bottom:8px;">Already Working Together</h3>
+        <p style="font-size:0.88rem;color:#555;line-height:1.6;margin-bottom:20px;">
+          You already have an active contract or pending invite with <strong>${escapeHTML(candidate.name)}</strong>.
+          ${activeEscrow ? `The escrow status is <strong>${activeEscrow.status.replace('_',' ')}</strong>.` : 'The invite is awaiting their response.'}
+        </p>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+          <a href="${(function(){const p=window.location.pathname;const pre=p.includes('/candidate/')||p.includes('/recruiter/')||p.includes('/shared/')?'../':'';return pre+'recruiter/dashboard.html';})()}" style="padding:10px 20px;background:#1dbf73;color:#fff;border-radius:8px;font-weight:700;font-size:0.88rem;text-decoration:none;">Go to Dashboard</a>
+          <button onclick="document.getElementById('hire-modal-overlay').remove()" style="padding:10px 20px;background:#f5f5f5;color:#555;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:0.88rem;font-family:inherit;">Close</button>
+        </div>
+      </div>`;
+    overlay2.addEventListener('click', e => { if (e.target === overlay2) overlay2.remove(); });
+    document.body.appendChild(overlay2);
+    return;
+  }
+
   const overlay = document.createElement('div');
   overlay.id = 'hire-modal-overlay';
   overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:2000;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px);';
@@ -484,15 +525,14 @@ function openHireModal(candidate, session) {
     }
 
     setTimeout(() => {
-      const jobLink = newJob ? `<p style="margin:12px 0 0;font-size:0.82rem;color:#1dbf73;">Job ID: ${newJob.id} — visible in Browse Projects</p>` : '';
       overlay.innerHTML = `
         <div style="background:#fff;border-radius:20px;padding:48px 36px;max-width:420px;width:100%;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,0.18);">
           <div style="width:60px;height:60px;background:#f0fdf7;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
           <h3 style="font-size:1.2rem;font-weight:800;color:#111;margin-bottom:8px;">Invite Sent!</h3>
-          <p style="font-size:0.9rem;color:#666;line-height:1.6;margin-bottom:8px;"><strong>${escapeHTML(candidate.name)}</strong> has been notified and can now view the project and submit a bid from their dashboard.</p>
-          ${jobLink}
+          <p style="font-size:0.9rem;color:#666;line-height:1.6;margin-bottom:16px;"><strong>${escapeHTML(candidate.name)}</strong> has been notified. The invite will appear in their <strong>dashboard under Invites Received</strong> — it is private and not listed publicly.</p>
+          <p style="font-size:0.82rem;color:#888;margin-bottom:4px;">You'll be notified in your <strong>Responses</strong> tab when they Accept, Counter, or Reject.</p>
           <button onclick="document.getElementById('hire-modal-overlay').remove()" style="margin-top:20px;padding:10px 28px;background:#1dbf73;color:#fff;border:none;border-radius:8px;font-family:var(--font-body);font-weight:700;cursor:pointer;font-size:0.9rem;">Done</button>
         </div>`;
     }, 600);

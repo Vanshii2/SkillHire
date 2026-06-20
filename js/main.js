@@ -804,3 +804,26 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 // Export for pages that load main.js
 window.initProposalModal = initProposalModal;
+
+/* ==========================================================================
+   Escrow Payment — redirect to payment.html (full-page experience)
+   ========================================================================== */
+(function () {
+  // Resolve path to payment.html from current page location
+  function _payPath() {
+    const segs = window.location.pathname.split('/').filter(Boolean);
+    // If we're in a subdirectory (e.g. /recruiter/dashboard.html), go up one level
+    return segs.length > 1 ? '../payment.html' : 'payment.html';
+  }
+
+  // openPaymentModal(escrowId, amount, label) — redirects to payment.html
+  window.openPaymentModal = function (escrowId, amount, label) {
+    const returnUrl = window.location.href;
+    const url = _payPath()
+      + '?escrow=' + encodeURIComponent(escrowId)
+      + '&amount=' + encodeURIComponent(amount)
+      + '&label='  + encodeURIComponent(label)
+      + '&return=' + encodeURIComponent(returnUrl);
+    window.location.href = url;
+  };
+}());

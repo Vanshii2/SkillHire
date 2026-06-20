@@ -380,7 +380,7 @@
   function renderJobs() {
     const search = document.getElementById('proj-search').value;
     const cat = document.querySelector('.category-btn.active')?.getAttribute('data-cat') || '';
-    const jobs = window.JobsDB.query({ search, category: cat });
+    const jobs = window.JobsDB.query({ search, category: cat }).filter(j => !j.directHire);
     const session = window.SessionManager.getActiveUser();
     const list = document.getElementById('jobs-list');
     const countLabel = document.getElementById('job-count-label');

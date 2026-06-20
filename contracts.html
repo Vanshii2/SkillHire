@@ -21,8 +21,9 @@
     .contracts-hero h1 {
       font-size: clamp(1.6rem, 3.5vw, 2.2rem);
       font-weight: 800; letter-spacing: -0.03em; margin-bottom: 6px;
+      color: #ffffff;
     }
-    .contracts-hero p { color: rgba(255,255,255,0.6); font-size: 0.9rem; }
+    .contracts-hero p { color: #ffffff; font-size: 0.9rem; }
 
     .contracts-body {
       max-width: 960px; margin: 0 auto; padding: 32px 32px 80px;
@@ -242,7 +243,10 @@
   }
 
   function renderContractCard(e, session, job) {
-    const isClient = e.clientId === session.user.id;
+    // Role-gated: a user acting as freelancer (candidate) must never see client-only buttons,
+    // even if their ID happens to match clientId (dual-role accounts).
+    const isClient = session.role === 'recruiter' && e.clientId === session.user.id;
+    const isFreelancer = session.role === 'candidate' && e.freelancerId === session.user.id;
     const otherName = isClient ? e.freelancerName : e.clientName;
     const otherRole = isClient ? 'Freelancer' : 'Client';
     const tl = e.status === 'funded' || e.status === 'work_submitted'
@@ -253,17 +257,69 @@
       <div class="timeline-label">${tl.remaining} day${tl.remaining !== 1 ? 's' : ''} remaining of ${tl.total}</div>
     ` : '';
 
+    const rawAmt = String(e.amount).replace(/[₹,\s]/g, '');
+    const dispAmt = '₹' + rawAmt;
+    const sub = JSON.parse(localStorage.getItem('sb_work_submission_' + e.id) || '{}');
+
     let actionsHtml = '';
     if (e.status === 'awaiting_payment' && isClient) {
-      actionsHtml = `<button class="btn-fund" onclick="fundContract('${e.id}')">Fund Escrow — ₹${escH(e.amount)}</button>`;
-    } else if (e.status === 'funded' && !isClient) {
-      actionsHtml = `<button class="btn-done" onclick="markDone('${e.id}')">Mark Work as Done</button>`;
-    } else if ((e.status === 'funded' || e.status === 'work_submitted') && isClient) {
+      actionsHtml = `<button class="btn-fund" onclick="fundContract('${e.id}')">Fund Escrow — ${dispAmt}</button>`;
+    } else if (e.status === 'awaiting_payment' && isFreelancer) {
       actionsHtml = `
-        <button class="btn-release" onclick="releaseContract('${e.id}')">Release Payment</button>
-        <button class="btn-dispute" onclick="disputeContract('${e.id}')">Raise Dispute</button>`;
+        <div style="padding:11px 14px;background:#fff8e6;border:1px solid #fde68a;border-radius:8px;font-size:0.83rem;color:#b45309;">
+          ⏳ <strong>Waiting for ${escH(e.clientName)} to fund escrow.</strong> You'll receive a notification as soon as payment is secured.
+        </div>`;
+    } else if (e.status === 'funded' && isFreelancer) {
+      actionsHtml = `
+        <div style="padding:10px 14px;background:rgba(29,191,115,0.06);border:1px solid rgba(29,191,115,0.2);border-radius:8px;font-size:0.82rem;color:#16a060;margin-bottom:12px;">
+          💰 ${dispAmt} is secured in escrow. Complete your work then submit it below for client review.
+        </div>
+        <button class="btn-done" onclick="openSubmitWorkModal('${e.id}')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          Submit Work for Approval
+        </button>`;
+    } else if (e.status === 'funded' && isClient) {
+      actionsHtml = `
+        <div style="padding:10px 14px;background:#fff8e6;border:1px solid #fde68a;border-radius:8px;font-size:0.81rem;color:#92400e;margin-bottom:12px;">
+          ⚠️ Only release payment after reviewing and approving the freelancer's delivered work.
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn-release" onclick="releaseContract('${e.id}')">Release Payment</button>
+          <button class="btn-dispute" onclick="disputeContract('${e.id}')">Raise Dispute</button>
+        </div>`;
+    } else if (e.status === 'work_submitted' && isClient) {
+      actionsHtml = `
+        ${sub.submittedAt ? `
+        <div style="padding:14px;background:rgba(59,130,246,0.06);border:1.5px solid rgba(59,130,246,0.25);border-radius:10px;margin-bottom:14px;">
+          <div style="font-size:0.78rem;font-weight:800;color:#2563eb;text-transform:uppercase;margin-bottom:8px;">🔔 Work Submitted — ${new Date(sub.submittedAt).toLocaleDateString('en-IN',{day:'numeric',month:'short'})}</div>
+          ${sub.message ? `<div style="font-size:0.83rem;color:#444;line-height:1.5;margin-bottom:8px;font-style:italic;">"${escH(sub.message.slice(0,200))}${sub.message.length>200?'…':''}"</div>` : ''}
+          ${sub.fileName ? `<div style="font-size:0.78rem;color:#1dbf73;font-weight:600;margin-bottom:4px;">📎 ${escH(sub.fileName)}</div>` : ''}
+          ${sub.liveLink ? `<div style="font-size:0.78rem;margin-bottom:4px;"><a href="${escH(sub.liveLink)}" target="_blank" style="color:#2563eb;font-weight:600;">🔗 View Live Link</a></div>` : ''}
+        </div>` : ''}
+        <div style="padding:10px 14px;background:#fff8e6;border:1px solid #fde68a;border-radius:8px;font-size:0.81rem;color:#92400e;margin-bottom:12px;">
+          ⚠️ Review the work above carefully. Only approve once you are satisfied.
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn-release" onclick="releaseContract('${e.id}')">✓ Approve & Release Payment</button>
+          <button data-eid="${e.id}" data-fn="${escH(e.freelancerName)}" data-jt="${escH(e.jobTitle)}" onclick="requestRevision(this.dataset.eid,this.dataset.fn,this.dataset.jt)" style="padding:8px 16px;background:#fff;color:#0d1b2a;border:1.5px solid #cbd5e0;border-radius:8px;font-weight:700;cursor:pointer;font-family:inherit;font-size:0.85rem;">Request Revision</button>
+          <button class="btn-dispute" onclick="disputeContract('${e.id}')">Raise Dispute</button>
+        </div>`;
+    } else if (e.status === 'work_submitted' && isFreelancer) {
+      actionsHtml = `
+        <div style="padding:12px 14px;background:rgba(59,130,246,0.07);border:1px solid rgba(59,130,246,0.2);border-radius:10px;font-size:0.83rem;color:#2563eb;">
+          ✓ Work submitted on ${sub.submittedAt ? new Date(sub.submittedAt).toLocaleDateString('en-IN',{day:'numeric',month:'short'}) : '—'}. Waiting for ${escH(e.clientName)} to review and approve.
+        </div>`;
     } else if (e.status === 'released') {
-      actionsHtml = `<span style="color:#15803d;font-weight:700;font-size:0.88rem;">✓ Payment released</span>`;
+      const completionBanner = `<div style="padding:10px 14px;background:rgba(22,160,96,0.07);border:1px solid rgba(22,160,96,0.2);border-radius:8px;font-size:0.82rem;color:#16a060;margin-bottom:14px;">🎉 <strong>Project complete!</strong> Payment was released${e.releasedAt ? ' on ' + new Date(e.releasedAt).toLocaleDateString('en-IN',{day:'numeric',month:'short'}) : ''}.</div>`;
+      if (isFreelancer && !localStorage.getItem('sb_rated_' + e.id)) {
+        // Freelancer rates client
+        actionsHtml = completionBanner + ratingFormHtml(e.id, e.clientId, e.clientName, e.jobTitle);
+      } else if (isClient && !localStorage.getItem('sb_client_rated_' + e.id)) {
+        // Client rates freelancer
+        actionsHtml = completionBanner + clientRatingFormHtml(e.id, e.freelancerId, e.freelancerName, e.jobTitle);
+      } else {
+        actionsHtml = completionBanner + `<span style="color:#15803d;font-weight:700;font-size:0.88rem;">✓ Rating submitted — thank you!</span>`;
+      }
     } else if (e.status === 'disputed') {
       actionsHtml = `<span style="color:#c53030;font-weight:700;font-size:0.88rem;">⚠ Under review by support</span>`;
     }
@@ -288,7 +344,7 @@
       <div class="contract-meta">
         <span>
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-          Escrow: <strong>₹${escH(e.amount)}</strong>
+          Escrow: <strong>${dispAmt}</strong>
         </span>
         <span>
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -340,25 +396,185 @@
   }
 
   function fundContract(escrowId) {
-    if (!confirm('Fund the escrow? The money will be held securely until you release it.')) return;
-    window.EscrowDB.updateStatus(escrowId, 'funded', { fundedAt: new Date().toISOString() });
-    toast('Escrow funded! The freelancer has been notified and work can begin.', '#1dbf73');
+    const e = window.EscrowDB && window.EscrowDB.getAll().find(x => x.id === escrowId);
+    const amt = e ? String(e.amount).replace(/[₹,\s]/g, '') : '0';
+    const lbl = e ? (e.jobTitle || 'Project') : 'Escrow Payment';
+    window.openPaymentModal(escrowId, amt, lbl);
+  }
+
+  // ── Submit Work Modal (same flow as freelancer dashboard) ──
+  let _cActiveSubmitId = null, _cSelectedFile = '', _cSelectedLink = '';
+
+  function openSubmitWorkModal(escrowId) {
+    _cActiveSubmitId = escrowId; _cSelectedFile = ''; _cSelectedLink = '';
+    const overlay = document.createElement('div');
+    overlay.id = '_sw-overlay';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:3000;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);';
+    overlay.innerHTML = `
+      <div style="background:#fff;border-radius:20px;padding:32px;width:100%;max-width:520px;box-shadow:0 24px 64px rgba(0,0,0,0.18);">
+        <h2 style="font-size:1.2rem;font-weight:800;color:#111;margin-bottom:6px;">Submit Work for Approval</h2>
+        <p style="font-size:0.83rem;color:#888;margin-bottom:24px;line-height:1.5;">Describe your work. The client has <strong>14 days</strong> to review — if no action, payment auto-releases.</p>
+        <label style="font-size:0.75rem;font-weight:700;color:#555;display:block;margin-bottom:6px;">Message to Client <span style="color:#e53e3e;">*</span></label>
+        <textarea id="_sw-msg" style="width:100%;padding:12px 14px;border:1.5px solid #e0e0e0;border-radius:10px;font-family:inherit;font-size:0.88rem;resize:vertical;min-height:100px;box-sizing:border-box;outline:none;" placeholder="Hi, I've completed the work as discussed…"></textarea>
+        <label style="font-size:0.75rem;font-weight:700;color:#555;display:block;margin:14px 0 6px;">Attach File <span style="color:#e53e3e;">*</span> <span style="font-weight:400;color:#aaa;">(or provide live link below)</span></label>
+        <div id="_sw-file-zone" style="border:2px dashed #e0e0e0;border-radius:10px;padding:18px;text-align:center;cursor:pointer;position:relative;transition:border-color 0.15s;">
+          <input type="file" id="_sw-file-input" style="position:absolute;inset:0;opacity:0;cursor:pointer;" onchange="(function(inp){if(inp.files&&inp.files[0]){_cSelectedFile=inp.files[0].name;document.getElementById('_sw-fname').textContent='📎 '+_cSelectedFile;document.getElementById('_sw-file-zone').style.borderColor='#1dbf73';}})(this)">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <div style="font-size:0.82rem;color:#aaa;margin-top:6px;">Click to upload — ZIP, PDF, PNG, JPG</div>
+          <div id="_sw-fname" style="font-size:0.82rem;color:#1dbf73;font-weight:600;margin-top:4px;"></div>
+        </div>
+        <label style="font-size:0.75rem;font-weight:700;color:#555;display:block;margin:14px 0 6px;">Live Link <span style="font-weight:400;color:#aaa;">(optional if file attached)</span></label>
+        <input id="_sw-link" type="url" style="width:100%;padding:10px 14px;border:1.5px solid #e0e0e0;border-radius:10px;font-family:inherit;font-size:0.88rem;box-sizing:border-box;outline:none;" placeholder="https://your-project-link.com" oninput="_cSelectedLink=this.value.trim()">
+        <div id="_sw-err" style="display:none;color:#e53e3e;font-size:0.8rem;margin-top:10px;"></div>
+        <div style="display:flex;gap:10px;margin-top:22px;">
+          <button onclick="document.getElementById('_sw-overlay').remove()" style="padding:12px 20px;background:#f5f5f5;color:#555;border:none;border-radius:10px;font-size:0.9rem;font-weight:700;cursor:pointer;font-family:inherit;">Cancel</button>
+          <button onclick="confirmSubmitWork()" style="flex:1;padding:12px;background:#1dbf73;color:#fff;border:none;border-radius:10px;font-size:0.9rem;font-weight:800;cursor:pointer;font-family:inherit;">Submit for Approval</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+  }
+
+  function confirmSubmitWork() {
+    const msg = (document.getElementById('_sw-msg')?.value || '').trim();
+    const errEl = document.getElementById('_sw-err');
+    errEl.style.display = 'none';
+    if (!msg) { errEl.textContent = 'Please write a message to the client.'; errEl.style.display = 'block'; return; }
+    if (!_cSelectedFile && !_cSelectedLink) { errEl.textContent = 'Please attach a file or provide a live link — at least one is required.'; errEl.style.display = 'block'; return; }
+    const now = new Date().toISOString();
+    localStorage.setItem('sb_work_submission_' + _cActiveSubmitId, JSON.stringify({ message: msg, fileName: _cSelectedFile, liveLink: _cSelectedLink, submittedAt: now }));
+    const e = window.EscrowDB.getAll().find(x => x.id === _cActiveSubmitId);
+    window.EscrowDB.updateStatus(_cActiveSubmitId, 'work_submitted', { submittedAt: now });
+    if (e) {
+      const session = window.SessionManager.getActiveUser();
+      window.MessagesDB.send(e.clientId, e.clientName || 'Client', 'Client', '', session.user.id, 'Work Submitted: ' + e.jobTitle,
+        `${session.user.name || 'Your freelancer'} has submitted work for "${e.jobTitle}".\n\nMessage: ${msg}${_cSelectedFile ? '\nFile: ' + _cSelectedFile : ''}${_cSelectedLink ? '\nLink: ' + _cSelectedLink : ''}\n\nPlease review and approve from your dashboard.`);
+    }
+    document.getElementById('_sw-overlay').remove();
+    toast('Work submitted! Client notified. ✓', '#1dbf73');
     loadContracts();
   }
 
-  function markDone(escrowId) {
-    if (!confirm('Mark your work as done? The client will review and release payment.')) return;
-    window.EscrowDB.updateStatus(escrowId, 'work_submitted', { workSubmittedAt: new Date().toISOString() });
-    toast('Work marked as done. Waiting for client to release payment.', '#7c3aed');
+  function requestRevision(escrowId, freelancerName, jobTitle) {
+    const note = prompt(`Request a revision from ${freelancerName}. Describe what needs to change:`);
+    if (!note) return;
+    const session = window.SessionManager.getActiveUser();
+    const e = window.EscrowDB.getAll().find(x => x.id === escrowId);
+    if (e) {
+      window.MessagesDB.send(session.user.id, session.user.name || 'Client', 'Client', '', e.freelancerId,
+        'Revision Requested: ' + jobTitle,
+        `${session.user.name || 'The client'} has requested a revision for "${jobTitle}".\n\nFeedback: ${note}\n\nPlease make the changes and resubmit from your My Contracts tab.`);
+      window.EscrowDB.updateStatus(escrowId, 'funded');
+      localStorage.removeItem('sb_work_submission_' + escrowId);
+    }
+    toast('Revision request sent to freelancer.', '#0d1b2a');
     loadContracts();
+  }
+
+  // ── Rating helpers ──
+  function canRate(escrowId, session) {
+    return session && session.role === 'candidate' && !localStorage.getItem('sb_rated_' + escrowId);
+  }
+
+  function clientRatingFormHtml(escrowId, freelancerId, freelancerName, jobTitle) {
+    return `
+      <div id="crate-wrap-${escrowId}" style="padding:16px;background:#fafafa;border:1.5px solid #e0e0e0;border-radius:12px;">
+        <div style="font-size:0.85rem;font-weight:700;color:#111;margin-bottom:10px;">⭐ Rate your experience with ${escH(freelancerName)}</div>
+        <div style="display:flex;gap:6px;margin-bottom:12px;" id="ccstars-${escrowId}">
+          ${[1,2,3,4,5].map(n => `<span onclick="setCRating('${escrowId}',${n})" style="font-size:1.6rem;cursor:pointer;opacity:0.3;transition:opacity 0.15s;" data-star="${n}">★</span>`).join('')}
+        </div>
+        <textarea id="ccnote-${escrowId}" style="width:100%;padding:10px;border:1.5px solid #e0e0e0;border-radius:8px;font-family:inherit;font-size:0.83rem;resize:none;box-sizing:border-box;" rows="2" placeholder="How was working with this freelancer? (optional)"></textarea>
+        <button data-eid="${escrowId}" data-fid="${escH(freelancerId)}" data-fn="${escH(freelancerName)}" data-jt="${escH(jobTitle)}"
+          onclick="submitCRating(this.dataset.eid,this.dataset.fid,this.dataset.fn,this.dataset.jt)"
+          style="margin-top:10px;padding:9px 20px;background:#0d1b2a;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-family:inherit;font-size:0.85rem;">
+          Submit Rating
+        </button>
+      </div>`;
+  }
+
+  let _cRatings = {};
+  function setCRating(escrowId, n) {
+    _cRatings[escrowId] = n;
+    document.querySelectorAll(`#ccstars-${escrowId} [data-star]`).forEach(s => {
+      s.style.opacity = parseInt(s.dataset.star) <= n ? '1' : '0.25';
+    });
+  }
+
+  function submitCRating(escrowId, freelancerId, freelancerName, jobTitle) {
+    const stars = _cRatings[escrowId];
+    if (!stars) { alert('Please select a star rating.'); return; }
+    const note = (document.getElementById('ccnote-' + escrowId)?.value || '').trim();
+    const session = window.SessionManager.getActiveUser();
+    window.ReviewsDB.add(session.user.id, session.user.name || 'Client', freelancerId, stars, note);
+    localStorage.setItem('sb_client_rated_' + escrowId, '1');
+    const wrap = document.getElementById('crate-wrap-' + escrowId);
+    if (wrap) wrap.innerHTML = `<div style="color:#1dbf73;font-weight:700;">✓ Rating submitted — ${'★'.repeat(stars)} Thank you!</div>`;
+  }
+
+  function ratingFormHtml(escrowId, clientId, clientName, jobTitle) {
+    return `
+      <div id="rate-wrap-${escrowId}" style="margin-top:16px;padding:16px;background:#fafafa;border:1.5px solid #e0e0e0;border-radius:12px;">
+        <div style="font-size:0.85rem;font-weight:700;color:#111;margin-bottom:10px;">⭐ Rate your experience with ${escH(clientName)}</div>
+        <div style="display:flex;gap:6px;margin-bottom:12px;" id="stars-${escrowId}">
+          ${[1,2,3,4,5].map(n => `<span onclick="setRating('${escrowId}',${n})" style="font-size:1.6rem;cursor:pointer;opacity:0.3;transition:opacity 0.15s;" data-star="${n}">★</span>`).join('')}
+        </div>
+        <textarea id="review-note-${escrowId}" style="width:100%;padding:10px;border:1.5px solid #e0e0e0;border-radius:8px;font-family:inherit;font-size:0.83rem;resize:none;box-sizing:border-box;" rows="2" placeholder="Share your experience (optional)"></textarea>
+        <button data-eid="${escH(escrowId)}" data-cid="${escH(clientId)}" data-cn="${escH(clientName)}" data-jt="${escH(jobTitle)}" onclick="submitRating(this.dataset.eid,this.dataset.cid,this.dataset.cn,this.dataset.jt)" style="margin-top:10px;padding:9px 20px;background:#0d1b2a;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-family:inherit;font-size:0.85rem;">Submit Rating</button>
+      </div>`;
+  }
+
+  let _ratingValues = {};
+  function setRating(escrowId, n) {
+    _ratingValues[escrowId] = n;
+    document.querySelectorAll(`#stars-${escrowId} [data-star]`).forEach(s => {
+      s.style.opacity = parseInt(s.dataset.star) <= n ? '1' : '0.25';
+    });
+  }
+
+  function submitRating(escrowId, clientId, clientName, jobTitle) {
+    const stars = _ratingValues[escrowId];
+    if (!stars) { alert('Please select a star rating.'); return; }
+    const note = document.getElementById('review-note-' + escrowId)?.value.trim() || '';
+    const session = window.SessionManager.getActiveUser();
+    const KEY = 'skillbridge_client_ratings';
+    const all = JSON.parse(localStorage.getItem(KEY) || '[]');
+    all.push({ id: 'cr-' + Date.now(), escrowId, reviewerId: session.user.id, reviewerName: session.user.name || 'Freelancer', clientId, clientName, rating: stars, comment: note, jobTitle, createdAt: new Date().toISOString() });
+    localStorage.setItem(KEY, JSON.stringify(all));
+    localStorage.setItem('sb_rated_' + escrowId, '1');
+    const wrap = document.getElementById('rate-wrap-' + escrowId);
+    if (wrap) wrap.innerHTML = `<div style="color:#1dbf73;font-weight:700;">✓ Rating submitted — ${'★'.repeat(stars)}</div>`;
   }
 
   function releaseContract(escrowId) {
-    if (!confirm('Release payment to the freelancer? This cannot be undone.')) return;
+    const e = window.EscrowDB && window.EscrowDB.getAll().find(x => x.id === escrowId);
+    const rawA = e ? String(e.amount).replace(/[₹,\s]/g,'') : '0';
+    const amt = '₹' + rawA;
+    const name = e ? e.freelancerName : 'the freelancer';
+    const existing = document.getElementById('_release-overlay');
+    if (existing) existing.remove();
+    const div = document.createElement('div');
+    div.innerHTML = `
+      <div id="_release-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:3500;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(6px);">
+        <div style="background:#fff;border-radius:20px;max-width:380px;width:100%;padding:28px;box-shadow:0 24px 64px rgba(0,0,0,0.22);text-align:center;">
+          <div style="width:56px;height:56px;border-radius:50%;background:#fff8e6;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#b45309" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div style="font-size:1.05rem;font-weight:800;color:#111;margin-bottom:8px;">Release ${amt} to ${name}?</div>
+          <div style="font-size:0.85rem;color:#666;line-height:1.6;margin-bottom:20px;">These funds are held in escrow. Once released, they transfer to the freelancer. <strong>This cannot be undone.</strong></div>
+          <div style="display:flex;gap:10px;">
+            <button onclick="document.getElementById('_release-overlay').remove()" style="flex:1;padding:10px;border-radius:8px;background:#f5f5f5;color:#555;border:none;font-weight:600;cursor:pointer;font-family:inherit;font-size:0.88rem;">Cancel</button>
+            <button onclick="window._contractConfirmRelease('${escrowId}')" style="flex:1;padding:10px;border-radius:8px;background:#1dbf73;color:#fff;border:none;font-weight:800;cursor:pointer;font-family:inherit;font-size:0.88rem;">Yes, Release</button>
+          </div>
+        </div>
+      </div>`;
+    document.body.appendChild(div.firstElementChild);
+  }
+
+  window._contractConfirmRelease = function(escrowId) {
+    document.getElementById('_release-overlay').remove();
     window.EscrowDB.updateStatus(escrowId, 'released', { releasedAt: new Date().toISOString() });
     toast('Payment released! Thank you for using SkillBridge.', '#1dbf73');
     loadContracts();
-  }
+  };
 
   function disputeContract(escrowId) {
     if (!confirm('Raise a dispute? Our support team will review the case.')) return;

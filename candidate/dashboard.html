@@ -50,7 +50,9 @@
     .stat-card {
       background: #fff; border: 1px solid var(--border-color); border-radius: 16px;
       padding: 20px 22px; display: flex; align-items: center; gap: 14px;
+      transition: border-color 0.15s, box-shadow 0.15s;
     }
+    .stat-card:hover { border-color: #1dbf73; box-shadow: 0 2px 12px rgba(29,191,115,0.12); }
     .stat-icon {
       width: 40px; height: 40px; border-radius: 10px;
       background: rgba(29,191,115,0.1); display: flex; align-items: center; justify-content: center; flex-shrink: 0;
@@ -75,9 +77,28 @@
     .qa-btn.primary svg { stroke: #fff; }
     .qa-btn.primary:hover { background: #18a864; }
 
-    /* ── Main grid ── */
-    .dash-grid { display: grid; grid-template-columns: 1fr 340px; gap: 24px; }
-    @media (max-width: 900px) { .dash-grid { grid-template-columns: 1fr; } }
+    /* ── Activity strip ── */
+    .activity-strip {
+      background: #fff; border: 1px solid var(--border-color); border-radius: 16px;
+      padding: 18px 22px; margin-bottom: 24px;
+    }
+    .activity-strip-title {
+      font-size: 0.78rem; font-weight: 800; color: #888; text-transform: uppercase;
+      letter-spacing: 0.05em; margin-bottom: 14px; display: flex; align-items: center; gap: 7px;
+    }
+    .activity-strip-title svg { stroke: #1dbf73; }
+    .activity-items { display: flex; flex-direction: column; gap: 10px; }
+    .activity-item {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 10px 12px; border-radius: 10px; background: #fafafa;
+      border: 1px solid #f0f0f0;
+    }
+    .activity-dot {
+      width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 5px;
+    }
+    .activity-text { flex: 1; font-size: 0.83rem; font-weight: 600; color: #222; }
+    .activity-sub { font-size: 0.75rem; color: #999; margin-top: 2px; font-weight: 400; }
+    .activity-date { font-size: 0.72rem; color: #bbb; flex-shrink: 0; white-space: nowrap; }
 
     /* ── Panel cards ── */
     .panel-card {
@@ -147,28 +168,71 @@
     .msg-body { font-size: 0.82rem; color: var(--secondary-text); line-height: 1.5; }
     .msg-date { font-size: 0.72rem; color: #bbb; margin-top: 6px; }
 
-    /* ── Profile sidebar card ── */
-    .profile-sidebar-card {
-      background: #fff; border: 1px solid var(--border-color); border-radius: 18px;
-      padding: 24px; text-align: center; margin-bottom: 16px;
+    /* ── Submit Work Modal ── */
+    #submit-work-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 3000;
+      display: flex; align-items: center; justify-content: center; padding: 20px;
+      backdrop-filter: blur(4px);
     }
-    .psc-avatar {
-      width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 14px;
-      background: #1dbf73; color: #fff; font-size: 2rem; font-weight: 800;
-      display: flex; align-items: center; justify-content: center; overflow: hidden;
+    #submit-work-box {
+      background: #fff; border-radius: 20px; padding: 32px; width: 100%; max-width: 520px;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.18);
     }
-    .psc-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-    .psc-name { font-size: 1rem; font-weight: 800; color: #111; margin-bottom: 3px; }
-    .psc-role { font-size: 0.82rem; color: var(--secondary-text); margin-bottom: 14px; }
-    .psc-skills { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-bottom: 16px; }
-    .psc-edit-btn {
-      display: flex; align-items: center; justify-content: center; gap: 7px;
-      width: 100%; padding: 10px; border-radius: 10px; font-size: 0.85rem; font-weight: 700;
-      background: rgba(29,191,115,0.08); color: #16a060; border: 1.5px solid rgba(29,191,115,0.25);
-      cursor: pointer; text-decoration: none; transition: all 0.15s;
+    #submit-work-box h2 { font-size: 1.2rem; font-weight: 800; color: #111; margin-bottom: 6px; }
+    #submit-work-box .sw-sub { font-size: 0.83rem; color: #888; margin-bottom: 24px; line-height: 1.5; }
+    .sw-label { font-size: 0.75rem; font-weight: 700; color: #555; display: block; margin-bottom: 6px; }
+    .sw-textarea {
+      width: 100%; padding: 12px 14px; border: 1.5px solid #e0e0e0; border-radius: 10px;
+      font-family: inherit; font-size: 0.88rem; resize: vertical; min-height: 110px;
+      box-sizing: border-box; outline: none; transition: border-color 0.15s; color: #111;
     }
-    .psc-edit-btn svg { stroke: #1dbf73; }
-    .psc-edit-btn:hover { background: rgba(29,191,115,0.15); }
+    .sw-textarea:focus { border-color: #1dbf73; }
+    .sw-file-zone {
+      border: 2px dashed #e0e0e0; border-radius: 10px; padding: 20px; text-align: center;
+      cursor: pointer; transition: border-color 0.15s; margin-top: 14px; position: relative;
+    }
+    .sw-file-zone:hover { border-color: #1dbf73; }
+    .sw-file-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    .sw-file-name { font-size: 0.82rem; color: #1dbf73; font-weight: 600; margin-top: 6px; }
+    .sw-btns { display: flex; gap: 10px; margin-top: 22px; }
+    .sw-submit-btn {
+      flex: 1; padding: 12px; background: #1dbf73; color: #fff; border: none; border-radius: 10px;
+      font-size: 0.9rem; font-weight: 800; cursor: pointer; font-family: inherit; transition: background 0.15s;
+    }
+    .sw-submit-btn:hover { background: #18a864; }
+    .sw-cancel-btn {
+      padding: 12px 20px; background: #f5f5f5; color: #555; border: none; border-radius: 10px;
+      font-size: 0.9rem; font-weight: 700; cursor: pointer; font-family: inherit;
+    }
+
+    /* ── Delete message button ── */
+    .msg-delete-btn {
+      background: none; border: none; cursor: pointer; color: #ccc; padding: 2px 4px;
+      border-radius: 5px; font-size: 0.9rem; line-height: 1; flex-shrink: 0;
+      transition: color 0.15s;
+    }
+    .msg-delete-btn:hover { color: #e53e3e; }
+
+    /* ── Contract timeline ── */
+    .contract-timeline {
+      display: flex; gap: 0; margin: 12px 0; position: relative;
+    }
+    .contract-timeline::before {
+      content: ''; position: absolute; top: 12px; left: 12px; right: 12px;
+      height: 2px; background: #e8e8e8; z-index: 0;
+    }
+    .ct-step {
+      flex: 1; text-align: center; position: relative; z-index: 1;
+    }
+    .ct-dot {
+      width: 24px; height: 24px; border-radius: 50%; margin: 0 auto 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem; font-weight: 800;
+    }
+    .ct-dot.done { background: #1dbf73; color: #fff; }
+    .ct-dot.active { background: #0d1b2a; color: #fff; box-shadow: 0 0 0 3px rgba(29,191,115,0.25); }
+    .ct-dot.pending { background: #e8e8e8; color: #aaa; }
+    .ct-label { font-size: 0.68rem; font-weight: 600; color: #888; }
 
     .empty-state {
       text-align: center; padding: 32px 16px;
@@ -221,9 +285,9 @@
     </div>
 
     <div class="dash-body">
-      <!-- Stats -->
+      <!-- Stats (clickable → switch tab) -->
       <div class="stats-row">
-        <div class="stat-card">
+        <div class="stat-card" onclick="showPTab('proposals')" style="cursor:pointer;" title="View My Proposals">
           <div class="stat-icon">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
           </div>
@@ -232,7 +296,7 @@
             <div class="stat-label">Proposals Sent</div>
           </div>
         </div>
-        <div class="stat-card">
+        <div class="stat-card" onclick="showPTab('matching')" style="cursor:pointer;" title="View Invites">
           <div class="stat-icon">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           </div>
@@ -241,7 +305,7 @@
             <div class="stat-label">Invites Received</div>
           </div>
         </div>
-        <div class="stat-card">
+        <div class="stat-card" onclick="showPTab('messages')" style="cursor:pointer;" title="View Messages">
           <div class="stat-icon">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
           </div>
@@ -260,55 +324,21 @@
         </a>
       </div>
 
-      <!-- Main Grid -->
-      <div class="dash-grid">
-
-        <!-- LEFT: Tabbed main panel -->
-        <div>
-          <!-- Tab pills -->
-          <div class="panel-tabs" style="background:#fff;border:1px solid var(--border-color);border-radius:14px 14px 0 0;border-bottom:none;padding-bottom:14px;">
-            <button class="ptab active" id="ptab-matching" onclick="showPTab('matching')">Invites</button>
-            <button class="ptab" id="ptab-proposals" onclick="showPTab('proposals')">My Proposals</button>
-            <button class="ptab" id="ptab-messages" onclick="showPTab('messages')">Messages</button>
-            <button class="ptab" id="ptab-escrow" onclick="showPTab('escrow')">Payments</button>
-          </div>
-
-          <div class="panel-card" style="border-radius:0 0 14px 14px;border-top:none;">
-            <!-- Matching Projects -->
-            <div id="panel-matching" class="panel-body"></div>
-            <!-- My Proposals -->
-            <div id="panel-proposals" class="panel-body" style="display:none;"></div>
-            <!-- Messages -->
-            <div id="panel-messages" class="panel-body" style="display:none;"></div>
-            <!-- Payments / Escrow -->
-            <div id="panel-escrow" class="panel-body" style="display:none;"></div>
-          </div>
-        </div>
-
-        <!-- RIGHT: Profile sidebar -->
-        <div>
-          <div class="profile-sidebar-card">
-            <div class="psc-avatar" id="psc-avatar-el">?</div>
-            <div class="psc-name" id="psc-name">—</div>
-            <div class="psc-role" id="psc-role">—</div>
-            <div class="psc-skills" id="psc-skills"></div>
-            <a id="psc-edit-link" href="../edit-profile.html" class="psc-edit-btn">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-              Edit Profile
-            </a>
-          </div>
-
-          <!-- Recent activity stub -->
-          <div class="panel-card">
-            <div class="panel-header">
-              <h3>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-                Activity
-              </h3>
-            </div>
-            <div class="panel-body" id="activity-panel"></div>
-          </div>
-        </div>
+      <!-- Tabbed main panel (full width) -->
+      <div class="panel-tabs" style="background:#fff;border:1px solid var(--border-color);border-radius:14px 14px 0 0;border-bottom:none;padding-bottom:14px;">
+        <button class="ptab active" id="ptab-matching" onclick="showPTab('matching')">Invites <span id="invite-badge" style="display:none;background:#e53e3e;color:#fff;border-radius:100px;font-size:0.65rem;font-weight:800;padding:1px 6px;margin-left:3px;vertical-align:middle;">0</span></button>
+        <button class="ptab" id="ptab-proposals" onclick="showPTab('proposals')">My Proposals</button>
+        <button class="ptab" id="ptab-messages" onclick="showPTab('messages')">Messages <span id="msg-badge" style="display:none;background:#e53e3e;color:#fff;border-radius:100px;font-size:0.65rem;font-weight:800;padding:1px 6px;margin-left:3px;vertical-align:middle;">0</span></button>
+        <a href="../contracts.html" class="ptab" style="text-decoration:none;display:inline-flex;align-items:center;gap:5px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          My Contracts
+        </a>
+      </div>
+      <div class="panel-card" style="border-radius:0 0 14px 14px;border-top:none;">
+        <div id="panel-matching" class="panel-body"></div>
+        <div id="panel-proposals" class="panel-body" style="display:none;"></div>
+        <div id="panel-messages" class="panel-body" style="display:none;"></div>
+        <div id="panel-escrow" class="panel-body" style="display:none;"></div>
       </div>
     </div>
   </main>
@@ -330,11 +360,36 @@
   }
 
   function showPTab(name) {
-    ['matching','proposals','messages','escrow'].forEach(t => {
-      document.getElementById('ptab-' + t).classList.toggle('active', t === name);
-      document.getElementById('panel-' + t).style.display = t === name ? 'block' : 'none';
+    ['matching','proposals','messages'].forEach(t => {
+      const btn = document.getElementById('ptab-' + t);
+      if (btn) btn.classList.toggle('active', t === name);
+      const panel = document.getElementById('panel-' + t);
+      if (panel) panel.style.display = t === name ? 'block' : 'none';
     });
-    if (name === 'escrow') renderFreelancerEscrow();
+    // Clear invite badge and mark as seen when Invites tab is opened
+    if (name === 'matching') {
+      const b = document.getElementById('invite-badge');
+      if (b) b.style.display = 'none';
+      const sess = window.SessionManager && window.SessionManager.getActiveUser();
+      if (sess) {
+        const allInvJs = (window.JobsDB ? window.JobsDB.getAll().filter(j => j.status==='open' && j.invitedFreelancerId === sess.user.id) : []);
+        const seen = JSON.parse(localStorage.getItem('sb_seen_invites_'+sess.user.id)||'[]');
+        allInvJs.forEach(j => { if (!seen.includes(j.id)) seen.push(j.id); });
+        localStorage.setItem('sb_seen_invites_'+sess.user.id, JSON.stringify(seen));
+      }
+    }
+    // Clear message badge and mark as seen when Messages tab is opened
+    if (name === 'messages') {
+      const b = document.getElementById('msg-badge');
+      if (b) b.style.display = 'none';
+      const sess = window.SessionManager && window.SessionManager.getActiveUser();
+      if (sess) {
+        const msgs = window.MessagesDB ? window.MessagesDB.getForCandidate(sess.user.id) : [];
+        const seen = JSON.parse(localStorage.getItem('sb_seen_msgs_'+sess.user.id)||'[]');
+        msgs.forEach(m => { if (!seen.includes(m.id)) seen.push(m.id); });
+        localStorage.setItem('sb_seen_msgs_'+sess.user.id, JSON.stringify(seen));
+      }
+    }
   }
 
   document.addEventListener('DOMContentLoaded', () => {
@@ -355,44 +410,63 @@
 
     document.getElementById('dash-name').textContent = 'Welcome back, ' + name.split(' ')[0] + '!';
     document.getElementById('dash-sub').textContent = candidate.role || 'Freelancer';
-    document.getElementById('view-profile-btn').href = '../profile.html?id=' + encodeURIComponent(session.user.id);
+    const viewProfileBtn = document.getElementById('view-profile-btn');
+    if (viewProfileBtn) viewProfileBtn.href = '../profile.html?id=' + encodeURIComponent(session.user.id);
 
-    // Sidebar profile card
-    const pscAv = document.getElementById('psc-avatar-el');
-    if (candidate.avatar && candidate.avatar.startsWith('data:')) {
-      pscAv.innerHTML = `<img src="${candidate.avatar}" alt="">`;
-    } else {
-      pscAv.textContent = initial;
-    }
-    document.getElementById('psc-name').textContent = name;
-    document.getElementById('psc-role').textContent = candidate.role || 'Freelancer';
-    document.getElementById('psc-edit-link').href = '../profile.html?id=' + encodeURIComponent(session.user.id);
-
-    const skills = candidate.skills || [];
-    document.getElementById('psc-skills').innerHTML = skills.slice(0, 5).map(s =>
-      `<span class="skill-pill match">${escH(s)}</span>`
-    ).join('') + (skills.length > 5 ? `<span class="skill-pill">+${skills.length - 5}</span>` : '');
 
     // My Proposals
     const myProposals = window.ProposalsDB ? window.ProposalsDB.getByFreelancer(session.user.id) : [];
     document.getElementById('stat-proposals').textContent = myProposals.length;
 
-    // Messages
+    // Messages (exclude deleted)
     const messages = window.MessagesDB ? window.MessagesDB.getForCandidate(session.user.id) : [];
-    document.getElementById('stat-messages').textContent = messages.length;
+    const deletedMsgs = JSON.parse(localStorage.getItem('deleted_msgs_' + session.user.id) || '[]');
+    document.getElementById('stat-messages').textContent = messages.filter(m => !deletedMsgs.includes(m.id)).length;
 
     // Direct invite jobs only (for "Invites" tab)
+    // Also match jobs where invitedFreelancerId was not saved (pre-fix data) but
+    // a "Project Invite:" message was sent from that job's client to this freelancer.
     const allJobs = window.JobsDB ? window.JobsDB.getAll().filter(j => j.status === 'open') : [];
-    const inviteJobs = allJobs.filter(j => j.invitedFreelancerId === session.user.id);
+    const inviteMessages = messages.filter(m => m.subject && m.subject.startsWith('Project Invite:'));
+    const inviteJobs = allJobs.filter(j =>
+      j.invitedFreelancerId === session.user.id ||
+      // Fallback: job is directHire by clientId + title match from messages
+      (j.directHire && inviteMessages.some(m => m.recruiterId === j.clientId && m.subject === 'Project Invite: ' + j.title))
+    );
     // Exclude invites that have already been declined (stored in localStorage)
     const declinedInvites = JSON.parse(localStorage.getItem('declined_invites_' + session.user.id) || '[]');
     const pendingInvites = inviteJobs.filter(j => !declinedInvites.includes(j.id));
     document.getElementById('stat-matching').textContent = pendingInvites.length;
 
-    renderInvites(pendingInvites, session);
-    renderProposals(myProposals);
-    renderMessages(messages);
-    renderActivity(myProposals, messages);
+    // ── Invite badge: count unseen invites ──
+    const seenInvites = JSON.parse(localStorage.getItem('sb_seen_invites_' + session.user.id) || '[]');
+    const newInvites = pendingInvites.filter(j => !seenInvites.includes(j.id));
+    const invBadge = document.getElementById('invite-badge');
+    if (invBadge && newInvites.length) { invBadge.textContent = newInvites.length; invBadge.style.display = 'inline'; }
+
+    // ── Messages badge: count unread messages ──
+    const seenMsgs = JSON.parse(localStorage.getItem('sb_seen_msgs_' + session.user.id) || '[]');
+    const unreadMsgs = messages.filter(m => !deletedMsgs.includes(m.id) && !seenMsgs.includes(m.id));
+    const msgBadge = document.getElementById('msg-badge');
+    if (msgBadge && unreadMsgs.length) { msgBadge.textContent = unreadMsgs.length; msgBadge.style.display = 'inline'; }
+
+    // Listen for cross-tab events (client sends a new invite → badge appears)
+    window.addEventListener('storage', () => {
+      const freshInvites2 = (window.JobsDB ? window.JobsDB.getAll().filter(j => j.status==='open' && j.invitedFreelancerId === session.user.id) : [])
+        .filter(j => !JSON.parse(localStorage.getItem('declined_invites_'+session.user.id)||'[]').includes(j.id));
+      const seen2 = JSON.parse(localStorage.getItem('sb_seen_invites_'+session.user.id)||'[]');
+      const fresh2 = freshInvites2.filter(j => !seen2.includes(j.id));
+      if (invBadge) { invBadge.textContent = fresh2.length; invBadge.style.display = fresh2.length ? 'inline' : 'none'; }
+    });
+
+    // Sort newest-first before rendering
+    const sortedProposals = [...myProposals].sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
+    const sortedMessages  = [...messages].sort((a, b) => new Date(b.sentAt || b.createdAt || 0) - new Date(a.sentAt || a.createdAt || 0));
+    const sortedInvites   = [...pendingInvites].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+
+    renderInvites(sortedInvites, session);
+    renderProposals(sortedProposals);
+    renderMessages(sortedMessages);
   });
 
   function renderInvites(jobs, session) {
@@ -421,7 +495,7 @@
 
         ${alreadyBid ? `
           <div style="padding:8px 14px;background:rgba(29,191,115,0.08);border:1px solid rgba(29,191,115,0.2);border-radius:8px;font-size:0.82rem;font-weight:700;color:#16a060;">
-            ✓ You have already submitted a bid for this project.
+            ✓ Response sent — awaiting client review.
           </div>
         ` : `
         <!-- Action buttons -->
@@ -429,39 +503,42 @@
           <button onclick="toggleInviteDesc('${j.id}')" style="padding:8px 14px;border-radius:8px;background:#f5f5f5;color:#555;border:1.5px solid #e0e0e0;font-weight:600;cursor:pointer;font-family:inherit;font-size:0.82rem;">
             View Details
           </button>
-          <button onclick="openBidForm('${j.id}')" style="padding:8px 18px;border-radius:8px;background:#1dbf73;color:#fff;border:none;font-weight:700;cursor:pointer;font-family:inherit;font-size:0.82rem;">
-            Bid
+          <button onclick="acceptInvite('${j.id}')" style="padding:8px 18px;border-radius:8px;background:#1dbf73;color:#fff;border:none;font-weight:700;cursor:pointer;font-family:inherit;font-size:0.82rem;">
+            Accept
           </button>
-          <button onclick="declineInvite('${j.id}')" style="padding:8px 14px;border-radius:8px;background:#fff;color:#c53030;border:1.5px solid #fed7d7;font-weight:600;cursor:pointer;font-family:inherit;font-size:0.82rem;">
-            Decline
+          <button onclick="openCounterForm('${j.id}')" style="padding:8px 14px;border-radius:8px;background:#fff;color:#0d1b2a;border:1.5px solid #cbd5e0;font-weight:600;cursor:pointer;font-family:inherit;font-size:0.82rem;">
+            Counter
+          </button>
+          <button onclick="rejectInvite('${j.id}','${j.title.replace(/'/g,"\\'")}','${j.clientId}')" style="padding:8px 14px;border-radius:8px;background:#fff;color:#c53030;border:1.5px solid #fed7d7;font-weight:600;cursor:pointer;font-family:inherit;font-size:0.82rem;">
+            Reject
           </button>
         </div>
 
-        <!-- Bid form (hidden by default) -->
-        <div id="bid-form-${j.id}" style="display:none;margin-top:12px;padding:14px;background:#fafafa;border:1.5px solid #e0e0e0;border-radius:10px;">
-          <div style="font-size:0.82rem;font-weight:700;color:#111;margin-bottom:10px;">Submit Your Bid</div>
+        <!-- Counter form (hidden by default) -->
+        <div id="counter-form-${j.id}" style="display:none;margin-top:12px;padding:14px;background:#fafafa;border:1.5px solid #e0e0e0;border-radius:10px;">
+          <div style="font-size:0.82rem;font-weight:700;color:#111;margin-bottom:10px;">Counter Offer</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
             <div>
-              <label style="font-size:0.72rem;color:#888;font-weight:600;display:block;margin-bottom:3px;">Your Bid Amount (₹) *</label>
-              <input id="bid-budget-${j.id}" type="number" min="0" placeholder="e.g. 12000"
+              <label style="font-size:0.72rem;color:#888;font-weight:600;display:block;margin-bottom:3px;">Your Price (₹) *</label>
+              <input id="counter-budget-${j.id}" type="number" min="0" placeholder="e.g. 18000"
                 style="width:100%;padding:8px 10px;border:1.5px solid #e0e0e0;border-radius:7px;font-family:inherit;font-size:0.85rem;box-sizing:border-box;">
             </div>
             <div>
               <label style="font-size:0.72rem;color:#888;font-weight:600;display:block;margin-bottom:3px;">Timeline *</label>
-              <input id="bid-timeline-${j.id}" type="text" placeholder="e.g. 2 weeks"
+              <input id="counter-timeline-${j.id}" type="text" placeholder="e.g. 3 weeks"
                 style="width:100%;padding:8px 10px;border:1.5px solid #e0e0e0;border-radius:7px;font-family:inherit;font-size:0.85rem;box-sizing:border-box;">
             </div>
           </div>
           <div style="margin-bottom:10px;">
-            <label style="font-size:0.72rem;color:#888;font-weight:600;display:block;margin-bottom:3px;">Cover Message *</label>
-            <textarea id="bid-msg-${j.id}" rows="3" placeholder="Why are you the right fit? What's your approach?"
+            <label style="font-size:0.72rem;color:#888;font-weight:600;display:block;margin-bottom:3px;">Note to client</label>
+            <textarea id="counter-note-${j.id}" rows="2" placeholder="Explain why you're adjusting the price or timeline…"
               style="width:100%;padding:8px 10px;border:1.5px solid #e0e0e0;border-radius:7px;font-family:inherit;font-size:0.85rem;box-sizing:border-box;resize:vertical;"></textarea>
           </div>
           <div style="display:flex;gap:8px;">
-            <button onclick="submitBid('${j.id}')" style="flex:1;padding:9px;background:#1dbf73;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-family:inherit;font-size:0.85rem;">
-              Send Bid to Client
+            <button onclick="submitCounter('${j.id}','${j.clientId}','${j.title.replace(/'/g,"\\'")}','${j.budget||''}')" style="flex:1;padding:9px;background:#0d1b2a;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-family:inherit;font-size:0.85rem;">
+              Send Counter Offer
             </button>
-            <button onclick="closeBidForm('${j.id}')" style="padding:9px 14px;background:#fff;color:#888;border:1.5px solid #e0e0e0;border-radius:8px;font-weight:600;cursor:pointer;font-family:inherit;font-size:0.85rem;">
+            <button onclick="closeCounterForm('${j.id}')" style="padding:9px 14px;background:#fff;color:#888;border:1.5px solid #e0e0e0;border-radius:8px;font-weight:600;cursor:pointer;font-family:inherit;font-size:0.85rem;">
               Cancel
             </button>
           </div>
@@ -476,81 +553,135 @@
     if (d) d.style.display = d.style.display === 'none' ? 'block' : 'none';
   }
 
-  function openBidForm(jobId) {
-    document.getElementById('bid-form-' + jobId).style.display = 'block';
+  function openCounterForm(jobId) {
+    document.getElementById('counter-form-' + jobId).style.display = 'block';
     document.getElementById('invite-actions-' + jobId).style.display = 'none';
   }
 
-  function closeBidForm(jobId) {
-    document.getElementById('bid-form-' + jobId).style.display = 'none';
+  function closeCounterForm(jobId) {
+    document.getElementById('counter-form-' + jobId).style.display = 'none';
     document.getElementById('invite-actions-' + jobId).style.display = 'flex';
   }
 
-  function declineInvite(jobId) {
-    if (!confirm('Decline this invitation? The client will not be notified.')) return;
-    const session = window.SessionManager.getActiveUser();
-    const key = 'declined_invites_' + session.user.id;
-    const declined = JSON.parse(localStorage.getItem(key) || '[]');
-    declined.push(jobId);
-    localStorage.setItem(key, JSON.stringify(declined));
-    const card = document.getElementById('invite-card-' + jobId);
-    if (card) {
-      card.style.opacity = '0.4';
-      card.style.pointerEvents = 'none';
-      setTimeout(() => card.remove(), 400);
-    }
-    const stat = document.getElementById('stat-matching');
-    if (stat) stat.textContent = Math.max(0, parseInt(stat.textContent) - 1);
-    showFreeToast('Invitation declined.', '#888');
+  function _notifyClient(session, candidate, job, subject, body) {
+    // Store with recruiterId=clientId so getForRecruiter(clientId) surfaces it in client dashboard
+    const clientRec = window.RecruitersDB && window.RecruitersDB.getById(job.clientId);
+    window.MessagesDB.send(
+      job.clientId, (clientRec && clientRec.name) || 'Client', 'Client', '',
+      session.user.id, subject, body
+    );
   }
 
-  function submitBid(jobId) {
-    const budget = document.getElementById('bid-budget-' + jobId).value.trim();
-    const timeline = document.getElementById('bid-timeline-' + jobId).value.trim();
-    const msg = document.getElementById('bid-msg-' + jobId).value.trim();
-    if (!budget || !timeline || !msg) { alert('Please fill in all fields before submitting your bid.'); return; }
+  function _replaceCardWithConfirmation(jobId, html) {
+    const card = document.getElementById('invite-card-' + jobId);
+    if (!card) return;
+    const actions = card.querySelector('#invite-actions-' + jobId);
+    const form    = card.querySelector('#counter-form-' + jobId);
+    const target  = form || actions;
+    if (target) target.outerHTML = html;
+    const stat = document.getElementById('stat-matching');
+    if (stat) stat.textContent = Math.max(0, parseInt(stat.textContent || '0') - 1);
+  }
+
+  function acceptInvite(jobId) {
+    const session = window.SessionManager.getActiveUser();
+    const candidate = window.CandidatesDB.getById(session.user.id) || session.user;
+    const job = window.JobsDB.getById(jobId);
+    if (!job) { showFreeToast('Project not found.', '#e53e3e'); return; }
+
+    try {
+      window.ProposalsDB.submit(jobId, session, {
+        proposedBudget: job.budget || 'As quoted',
+        proposedTimeline: job.deadline || 'As agreed',
+        coverLetter: `${candidate.name} has accepted your project invite at the listed terms.`,
+        proposalType: 'accept'
+      });
+    } catch (err) {
+      showFreeToast(err.message || 'Could not accept.', '#e53e3e');
+      return;
+    }
+
+    _notifyClient(session, candidate, job,
+      `Invite Accepted: ${job.title}`,
+      `Great news!\n\n${candidate.name} has accepted your project invite for "${job.title}" at the listed budget.\n\nHead to your dashboard to review the proposal and fund escrow to kick off the project.`
+    );
+
+    showFreeToast('Accepted! Client notified. ✓', '#1dbf73');
+    _replaceCardWithConfirmation(jobId, `
+      <div style="padding:10px 14px;background:rgba(29,191,115,0.08);border:1px solid rgba(29,191,115,0.2);border-radius:8px;font-size:0.82rem;font-weight:700;color:#16a060;margin-top:8px;">
+        ✓ You accepted this project. Waiting for client to fund escrow.
+      </div>`);
+    const stat = document.getElementById('stat-proposals');
+    if (stat) stat.textContent = parseInt(stat.textContent || '0') + 1;
+  }
+
+  function submitCounter(jobId, clientId, jobTitle, listedBudget) {
+    const budget   = document.getElementById('counter-budget-' + jobId).value.trim();
+    const timeline = document.getElementById('counter-timeline-' + jobId).value.trim();
+    const note     = document.getElementById('counter-note-' + jobId).value.trim();
+    if (!budget || !timeline) { alert('Please enter your price and timeline.'); return; }
 
     const session = window.SessionManager.getActiveUser();
     const candidate = window.CandidatesDB.getById(session.user.id) || session.user;
     const job = window.JobsDB.getById(jobId);
-    if (!job) { alert('Job not found.'); return; }
+    if (!job) { showFreeToast('Project not found.', '#e53e3e'); return; }
 
     try {
       window.ProposalsDB.submit(jobId, session, {
         proposedBudget: budget,
         proposedTimeline: timeline,
-        coverLetter: msg
+        coverLetter: note || `Counter offer from ${candidate.name}.`,
+        proposalType: 'counter'
       });
     } catch (err) {
-      showFreeToast(err.message || 'Could not submit bid.', '#e53e3e');
-      closeBidForm(jobId);
+      showFreeToast(err.message || 'Could not submit counter.', '#e53e3e');
+      closeCounterForm(jobId);
       return;
     }
 
-    // Notify client via message
-    const clientRecruiter = window.RecruitersDB && window.RecruitersDB.getById(job.clientId);
-    const clientEmail = clientRecruiter ? clientRecruiter.email : '';
-    window.MessagesDB.send(
-      session.user.id, candidate.name, candidate.role || 'Freelancer', candidate.contact?.email || '',
-      job.clientId, `New Bid: ${job.title}`,
-      `Hi,\n\n${candidate.name} has submitted a bid for your project "${job.title}".\n\nBid: ₹${budget}\nTimeline: ${timeline}\n\nMessage:\n${msg}\n\nLog in to your dashboard to review and respond.`
+    _notifyClient(session, candidate, job,
+      `Counter Offer: ${jobTitle}`,
+      `${candidate.name} has sent a counter offer for your project "${jobTitle}".\n\nTheir price: ₹${budget}\nTimeline: ${timeline}${note ? '\n\nNote: ' + note : ''}\n\nYour listed budget was ${listedBudget}.\n\nReview the proposal in your dashboard to accept or decline.`
     );
 
-    showFreeToast('Bid sent to client! ✓', '#1dbf73');
-
-    // Replace card actions with confirmation
-    const card = document.getElementById('invite-card-' + jobId);
-    if (card) {
-      const actionsOrForm = card.querySelector(`#bid-form-${jobId}, #invite-actions-${jobId}`);
-      if (actionsOrForm) {
-        actionsOrForm.outerHTML = `
-          <div style="padding:10px 14px;background:rgba(29,191,115,0.08);border:1px solid rgba(29,191,115,0.2);border-radius:8px;font-size:0.82rem;font-weight:700;color:#16a060;margin-top:8px;">
-            ✓ Bid sent — ₹${escH(budget)} · ${escH(timeline)}. Client will review soon.
-          </div>`;
-      }
-    }
+    showFreeToast('Counter offer sent! ✓', '#0d1b2a');
+    _replaceCardWithConfirmation(jobId, `
+      <div style="padding:10px 14px;background:#f0f4ff;border:1px solid #c7d4f0;border-radius:8px;font-size:0.82rem;font-weight:700;color:#2d4a8a;margin-top:8px;">
+        Counter sent — ₹${escH(budget)} · ${escH(timeline)}. Client is reviewing.
+      </div>`);
     const stat = document.getElementById('stat-proposals');
     if (stat) stat.textContent = parseInt(stat.textContent || '0') + 1;
+  }
+
+  function rejectInvite(jobId, jobTitle, clientId) {
+    if (!confirm('Reject this invitation? The client will be notified.')) return;
+    const session = window.SessionManager.getActiveUser();
+    const candidate = window.CandidatesDB.getById(session.user.id) || session.user;
+    const job = window.JobsDB.getById(jobId);
+
+    // Store rejection locally
+    const key = 'declined_invites_' + session.user.id;
+    const declined = JSON.parse(localStorage.getItem(key) || '[]');
+    declined.push(jobId);
+    localStorage.setItem(key, JSON.stringify(declined));
+
+    // Notify client
+    if (job) {
+      _notifyClient(session, candidate, job,
+        `Invite Declined: ${jobTitle}`,
+        `${candidate.name} has declined your project invite for "${jobTitle}".\n\nYou may want to reach out to other freelancers or adjust the project terms.`
+      );
+    }
+
+    const card = document.getElementById('invite-card-' + jobId);
+    if (card) {
+      card.style.transition = 'opacity 0.3s';
+      card.style.opacity = '0';
+      setTimeout(() => card.remove(), 300);
+    }
+    const stat = document.getElementById('stat-matching');
+    if (stat) stat.textContent = Math.max(0, parseInt(stat.textContent || '0') - 1);
+    showFreeToast('Invitation rejected. Client notified.', '#888');
   }
 
   function showFreeToast(msg, bg) {
@@ -588,20 +719,34 @@
     }).join('');
   }
 
+  function deleteMessage(msgId, userId) {
+    const key = 'deleted_msgs_' + userId;
+    const del = JSON.parse(localStorage.getItem(key) || '[]');
+    if (!del.includes(msgId)) { del.push(msgId); localStorage.setItem(key, JSON.stringify(del)); }
+    const card = document.getElementById('msg-' + msgId);
+    if (card) { card.style.transition = 'opacity 0.25s'; card.style.opacity = '0'; setTimeout(() => card.remove(), 250); }
+    const stat = document.getElementById('stat-messages');
+    if (stat) stat.textContent = Math.max(0, parseInt(stat.textContent || '0') - 1);
+  }
+
   function renderMessages(msgs) {
+    const session = window.SessionManager && window.SessionManager.getActiveUser();
+    const deletedKey = session ? 'deleted_msgs_' + session.user.id : null;
+    const deleted = JSON.parse(localStorage.getItem(deletedKey) || '[]');
+    const visible = msgs.filter(m => !deleted.includes(m.id));
     const el = document.getElementById('panel-messages');
-    if (!msgs.length) {
+    if (!visible.length) {
       el.innerHTML = `<div class="empty-state">
         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
         <p>No messages yet. Complete your profile to attract clients.</p>
       </div>`;
       return;
     }
-    el.innerHTML = msgs.map(m => {
+    el.innerHTML = visible.map(m => {
       const date = new Date(m.sentAt || m.createdAt || m.timestamp).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
       const isInvite = m.subject && m.subject.startsWith('Project Invite:');
       const isCounter = m.subject && m.subject.startsWith('Counter Offer:');
-      // Find the related job if this is a direct hire invite
+      const isEscrow = m.subject && m.subject.startsWith('Escrow Funded:');
       let relatedJob = null;
       if (isInvite && window.JobsDB) {
         const titleMatch = m.subject.replace('Project Invite: ', '').trim();
@@ -612,17 +757,24 @@
         const titleMatch = m.subject.replace('Counter Offer: ', '').trim();
         counterJob = window.JobsDB.getAll().find(j => j.title === titleMatch && j.clientId === m.recruiterId);
       }
-      const borderColor = isInvite ? '#1dbf73' : isCounter ? '#7c3aed' : 'transparent';
-      return `<div class="msg-card" style="${(isInvite || isCounter) ? `border-left:3px solid ${borderColor};` : ''}">
+      const borderColor = isInvite ? '#1dbf73' : isCounter ? '#7c3aed' : isEscrow ? '#1dbf73' : 'transparent';
+      const userId = session ? session.user.id : '';
+      return `<div class="msg-card" id="msg-${escH(m.id)}" style="${(isInvite || isCounter || isEscrow) ? `border-left:3px solid ${borderColor};` : ''}">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
           <div style="flex:1;">
-            ${isInvite ? `<div style="font-size:0.7rem;font-weight:800;color:#1dbf73;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">★ Project Invite</div>` : ''}
-            ${isCounter ? `<div style="font-size:0.7rem;font-weight:800;color:#7c3aed;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">⟺ Counter Offer Received</div>` : ''}
+            ${isInvite  ? `<div style="font-size:0.7rem;font-weight:800;color:#1dbf73;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">★ Project Invite</div>` : ''}
+            ${isCounter ? `<div style="font-size:0.7rem;font-weight:800;color:#7c3aed;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">⟺ Counter Offer</div>` : ''}
+            ${isEscrow  ? `<div style="font-size:0.7rem;font-weight:800;color:#1dbf73;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">💰 Escrow Funded</div>` : ''}
             <div class="msg-from">${escH(m.recruiterName || m.from || 'Client')}</div>
             <div class="msg-subject">${escH(m.subject || 'New message')}</div>
-            <div class="msg-body">${escH((m.body || m.message || '').slice(0, 140))}${(m.body || '').length > 140 ? '…' : ''}</div>
+            <div class="msg-body">${escH((m.body || m.message || '').slice(0, 160))}${(m.body || '').length > 160 ? '…' : ''}</div>
           </div>
-          <div class="msg-date" style="flex-shrink:0;">${date}</div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;">
+            <span class="msg-date">${date}</span>
+            <button class="msg-delete-btn" onclick="deleteMessage('${escH(m.id)}','${escH(userId)}')" title="Delete message">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+            </button>
+          </div>
         </div>
         ${relatedJob ? `
           <a href="../browse-projects.html?job=${encodeURIComponent(relatedJob.id)}"
@@ -638,6 +790,12 @@
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
           </a>
         ` : ''}
+        ${isEscrow ? `
+          <a href="../contracts.html"
+             style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:7px 14px;background:#0d1b2a;color:#fff;border-radius:8px;font-weight:700;font-size:0.82rem;text-decoration:none;">
+            View My Contracts →
+          </a>
+        ` : ''}
       </div>`;
     }).join('');
   }
@@ -650,65 +808,279 @@
     if (!escrows.length) {
       el.innerHTML = `<div class="empty-state">
         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        <p>No escrow payments yet. Get hired to see your payments here.</p>
+        <p>No contracts yet. Once a client funds escrow for your work, it will appear here.</p>
       </div>`;
       return;
     }
-    const statusLabels = { awaiting_payment: 'Awaiting Client Payment', funded: 'Payment in Escrow', work_submitted: 'Work Submitted', released: 'Payment Released ✓', disputed: 'Dispute in Progress' };
     const statusColors = { awaiting_payment: '#b45309', funded: '#1dbf73', work_submitted: '#3b82f6', released: '#16a060', disputed: '#e53e3e' };
-    el.innerHTML = escrows.map(e => `
-      <div style="border:1px solid #e8e8e8;border-radius:14px;padding:18px;margin-bottom:14px;background:#fff;">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px;">
+    const statusLabels = { awaiting_payment: 'Awaiting Payment', funded: 'Escrow Funded — Work In Progress', work_submitted: 'Work Submitted — Awaiting Release', released: 'Payment Released ✓', disputed: 'Dispute In Progress' };
+
+    el.innerHTML = escrows.map(e => {
+      const rawAmt = String(e.amount).replace(/[₹,\s]/g, '');
+      const dispAmt = '₹' + rawAmt;
+      const steps = ['Payment', 'Work', 'Review', 'Released'];
+      const stepIdx = { awaiting_payment: 0, funded: 1, work_submitted: 2, released: 3 }[e.status] ?? 0;
+      const fundedDate = e.fundedAt ? new Date(e.fundedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : null;
+      const createdDate = new Date(e.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+
+      const timeline = steps.map((s, i) => {
+        const cls = i < stepIdx ? 'done' : i === stepIdx ? 'active' : 'pending';
+        const icon = i < stepIdx ? '✓' : (i + 1).toString();
+        return `<div class="ct-step">
+          <div class="ct-dot ${cls}">${icon}</div>
+          <div class="ct-label">${s}</div>
+        </div>`;
+      }).join('');
+
+      return `
+      <div style="border:1.5px solid ${e.status==='funded'?'rgba(29,191,115,0.4)':e.status==='released'?'rgba(29,191,115,0.2)':'#e8e8e8'};border-radius:16px;padding:20px;margin-bottom:16px;background:#fff;">
+        <!-- Header -->
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:14px;">
           <div>
-            <div style="font-weight:800;font-size:0.92rem;color:#1a1a2e;">${escH(e.jobTitle)}</div>
-            <div style="font-size:0.8rem;color:#888;margin-top:2px;">Client: ${escH(e.clientName)}</div>
+            <div style="font-weight:800;font-size:1rem;color:#111;">${escH(e.jobTitle)}</div>
+            <div style="font-size:0.8rem;color:#888;margin-top:3px;">Client: <strong>${escH(e.clientName)}</strong></div>
           </div>
-          <span style="padding:3px 10px;border-radius:100px;font-size:0.72rem;font-weight:700;color:${statusColors[e.status]||'#888'};background:rgba(29,191,115,0.08);white-space:nowrap;">${statusLabels[e.status]||e.status}</span>
+          <span style="padding:4px 12px;border-radius:100px;font-size:0.72rem;font-weight:700;color:${statusColors[e.status]||'#888'};background:${e.status==='funded'?'rgba(29,191,115,0.1)':e.status==='released'?'rgba(22,160,96,0.1)':e.status==='work_submitted'?'rgba(59,130,246,0.1)':'#fff8e6'};border:1px solid ${statusColors[e.status]||'#ddd'};white-space:nowrap;">${statusLabels[e.status]||e.status}</span>
         </div>
-        <div style="font-size:0.88rem;color:#555;margin-bottom:12px;">
-          Amount: <strong style="font-size:1.1rem;color:#1dbf73;">₹${escH(e.amount)}</strong>
+
+        <!-- Timeline -->
+        <div class="contract-timeline">${timeline}</div>
+
+        <!-- Details row -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0;padding:14px;background:#f8f9fa;border-radius:10px;">
+          <div>
+            <div style="font-size:0.7rem;color:#999;font-weight:700;text-transform:uppercase;margin-bottom:3px;">Amount</div>
+            <div style="font-size:1.15rem;font-weight:800;color:#1dbf73;">${dispAmt}</div>
+          </div>
+          <div>
+            <div style="font-size:0.7rem;color:#999;font-weight:700;text-transform:uppercase;margin-bottom:3px;">Hired On</div>
+            <div style="font-size:0.88rem;font-weight:700;color:#333;">${createdDate}</div>
+          </div>
+          <div>
+            <div style="font-size:0.7rem;color:#999;font-weight:700;text-transform:uppercase;margin-bottom:3px;">${fundedDate ? 'Payment Received' : 'Payment Status'}</div>
+            <div style="font-size:0.88rem;font-weight:700;color:${fundedDate?'#16a060':'#b45309'};">${fundedDate || 'Pending'}</div>
+          </div>
         </div>
-        ${e.status === 'funded' || e.status === 'work_submitted' ? `
-          <button onclick="submitWork('${e.id}')" id="work-btn-${e.id}" style="padding:8px 16px;background:#1dbf73;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:0.83rem;">
-            ${e.status === 'work_submitted' ? '✓ Work Submitted' : 'Mark Work as Done'}
+
+        ${e.status === 'funded' ? `
+          <div style="padding:12px 14px;background:rgba(29,191,115,0.06);border:1px solid rgba(29,191,115,0.2);border-radius:10px;margin-bottom:14px;font-size:0.83rem;color:#16a060;">
+            💰 ${dispAmt} is secured in escrow. Complete your work then submit it below for client approval.
+          </div>
+          <button onclick="openSubmitWorkModal('${e.id}')" style="padding:11px 22px;background:#1dbf73;color:#fff;border:none;border-radius:10px;font-weight:800;cursor:pointer;font-size:0.9rem;font-family:inherit;display:inline-flex;align-items:center;gap:8px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            Submit Work for Approval
           </button>
-          ${e.status === 'work_submitted' ? '' : ''}
-        ` : e.status === 'released' ? `<div style="color:#16a060;font-weight:700;font-size:0.9rem;">✓ Payment Released to You</div>` : ''}
-      </div>
-    `).join('');
+        ` : (() => {
+          if (e.status !== 'work_submitted') return '';
+          const sub = JSON.parse(localStorage.getItem('sb_work_submission_' + e.id) || '{}');
+          const subDate = sub.submittedAt ? new Date(sub.submittedAt) : new Date();
+          const deadline = new Date(subDate.getTime() + 14 * 86400000);
+          const daysLeft = Math.max(0, Math.ceil((deadline - new Date()) / 86400000));
+          const subDateStr = subDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+          return `
+          <div style="border:1.5px solid rgba(59,130,246,0.25);border-radius:12px;padding:16px;background:rgba(59,130,246,0.04);">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <span style="font-size:0.88rem;font-weight:800;color:#2563eb;">Work Submitted — Awaiting Client Approval</span>
+            </div>
+            ${sub.message ? `<div style="font-size:0.82rem;color:#555;line-height:1.5;margin-bottom:10px;padding:10px 12px;background:#fff;border-radius:8px;border:1px solid #e8e8e8;">"${escH(sub.message.slice(0, 200))}${sub.message.length > 200 ? '…' : ''}"</div>` : ''}
+            ${sub.fileName ? `<div style="font-size:0.78rem;color:#1dbf73;font-weight:600;margin-bottom:10px;">📎 ${escH(sub.fileName)}</div>` : ''}
+            <div style="display:flex;gap:16px;font-size:0.78rem;color:#888;">
+              <span>Submitted: <strong style="color:#333;">${subDateStr}</strong></span>
+              <span>Review deadline: <strong style="color:${daysLeft <= 3 ? '#e53e3e' : '#333'};">${daysLeft} day${daysLeft !== 1 ? 's' : ''} left</strong></span>
+            </div>
+            <div style="margin-top:10px;font-size:0.75rem;color:#aaa;">If the client takes no action within 14 days, payment is automatically released to you.</div>
+          </div>`;
+        })()}
+        ${e.status === 'awaiting_payment' ? `
+          <div style="padding:12px 14px;background:#fff8e6;border:1px solid #fde68a;border-radius:10px;font-size:0.83rem;color:#b45309;">
+            ⏳ <strong>Waiting</strong> for ${escH(e.clientName)} to fund escrow. You'll be notified when payment is secured.
+          </div>
+        ` : e.status === 'disputed' ? `
+          <div style="padding:12px 14px;background:rgba(229,62,62,0.06);border:1px solid rgba(229,62,62,0.2);border-radius:10px;font-size:0.83rem;color:#c53030;">
+            ⚠️ <strong>Dispute in progress.</strong> Our support team will review and contact both parties within 24–48 hours. The escrow amount is held safely.
+          </div>
+        ` : ''}
+        ${e.status === 'released' ? `
+          <div style="padding:12px 14px;background:rgba(22,160,96,0.08);border:1px solid rgba(22,160,96,0.2);border-radius:10px;font-size:0.88rem;font-weight:700;color:#16a060;margin-bottom:12px;">
+            🎉 ${dispAmt} has been released to you. Well done!
+          </div>
+          ${!localStorage.getItem('sb_rated_' + e.id) ? `
+          <div id="frate-wrap-${e.id}" style="padding:16px;background:#fafafa;border:1.5px solid #e0e0e0;border-radius:12px;">
+            <div style="font-size:0.85rem;font-weight:700;color:#111;margin-bottom:10px;">⭐ Rate your experience with ${escH(e.clientName)}</div>
+            <div style="display:flex;gap:6px;margin-bottom:12px;" id="fstars-${e.id}">
+              ${[1,2,3,4,5].map(n => `<span onclick="setFreeRating('${e.id}',${n})" style="font-size:1.6rem;cursor:pointer;opacity:0.3;transition:opacity 0.15s;" data-star="${n}">★</span>`).join('')}
+            </div>
+            <textarea id="frnote-${e.id}" style="width:100%;padding:10px;border:1.5px solid #e0e0e0;border-radius:8px;font-family:inherit;font-size:0.83rem;resize:none;box-sizing:border-box;" rows="2" placeholder="Share your experience working with this client (optional)"></textarea>
+            <button data-eid="${e.id}" data-cid="${escH(e.clientId)}" data-cn="${escH(e.clientName)}" data-jt="${escH(e.jobTitle)}" onclick="submitFreeRating(this.dataset.eid,this.dataset.cid,this.dataset.cn,this.dataset.jt)" style="margin-top:10px;padding:9px 20px;background:#0d1b2a;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-family:inherit;font-size:0.85rem;">Submit Rating</button>
+          </div>` : `<div style="font-size:0.8rem;color:#1dbf73;font-weight:600;">✓ You've rated this project.</div>`}
+        ` : ''}
+      </div>`;
+    }).join('');
   }
 
-  function submitWork(escrowId) {
-    window.EscrowDB.updateStatus(escrowId, 'work_submitted');
-    const btn = document.getElementById('work-btn-' + escrowId);
-    if (btn) { btn.textContent = '✓ Work Submitted'; btn.disabled = true; btn.style.opacity = '0.6'; }
-    const toast = document.createElement('div');
-    toast.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#1dbf73;color:#fff;padding:10px 20px;border-radius:10px;font-weight:700;font-size:0.88rem;z-index:3000;box-shadow:0 4px 16px rgba(0,0,0,0.15);';
-    toast.textContent = 'Work submitted! Waiting for client to release payment.';
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 2800);
+  let _activeSubmitEscrowId = null;
+  let _selectedFileName = '';
+
+  function openSubmitWorkModal(escrowId) {
+    _activeSubmitEscrowId = escrowId;
+    _selectedFileName = '';
+
+    const overlay = document.createElement('div');
+    overlay.id = 'submit-work-overlay';
+    overlay.innerHTML = `
+      <div id="submit-work-box">
+        <h2>Submit Work for Approval</h2>
+        <p class="sw-sub">Describe what you've completed. The client has <strong>14 days</strong> to review — if no action is taken, payment is automatically released.</p>
+
+        <label class="sw-label" for="sw-msg">Message to Client <span style="color:#e53e3e;">*</span></label>
+        <textarea id="sw-msg" class="sw-textarea" placeholder="Hi, I've completed the project as discussed. Here's a summary of what was done…"></textarea>
+
+        <label class="sw-label" style="margin-top:16px;">Attach File <span style="color:#e53e3e;">*</span> <span style="font-weight:400;color:#aaa;">or provide live link below — at least one required</span></label>
+        <div class="sw-file-zone" id="sw-file-zone">
+          <input type="file" id="sw-file-input" onchange="handleFileSelect(this)">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <div style="font-size:0.83rem;color:#aaa;margin-top:8px;">Click to upload or drag & drop</div>
+          <div style="font-size:0.75rem;color:#ccc;">ZIP, PDF, PNG, JPG — up to 50 MB</div>
+          <div class="sw-file-name" id="sw-file-name"></div>
+        </div>
+
+        <label class="sw-label" style="margin-top:14px;">Live Link <span style="font-weight:400;color:#aaa;">(optional if file attached)</span></label>
+        <input type="url" id="sw-link" style="width:100%;padding:10px 14px;border:1.5px solid #e0e0e0;border-radius:10px;font-family:inherit;font-size:0.88rem;box-sizing:border-box;outline:none;" placeholder="https://your-project.com">
+        <div id="sw-err" style="display:none;color:#e53e3e;font-size:0.8rem;margin-top:8px;"></div>
+
+        <div class="sw-btns">
+          <button class="sw-cancel-btn" onclick="closeSubmitWorkModal()">Cancel</button>
+          <button class="sw-submit-btn" onclick="confirmSubmitWork()">Submit for Approval</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+    document.getElementById('sw-msg').focus();
+  }
+
+  function handleFileSelect(input) {
+    if (input.files && input.files[0]) {
+      _selectedFileName = input.files[0].name;
+      const label = document.getElementById('sw-file-name');
+      if (label) label.textContent = '📎 ' + _selectedFileName;
+      document.getElementById('sw-file-zone').style.borderColor = '#1dbf73';
+    }
+  }
+
+  function closeSubmitWorkModal() {
+    const el = document.getElementById('submit-work-overlay');
+    if (el) el.remove();
+    _activeSubmitEscrowId = null;
+  }
+
+  function confirmSubmitWork() {
+    const msg = (document.getElementById('sw-msg')?.value || '').trim();
+    const liveLink = (document.getElementById('sw-link')?.value || '').trim();
+    const errEl = document.getElementById('sw-err');
+    if (errEl) errEl.style.display = 'none';
+    if (!msg) {
+      document.getElementById('sw-msg').style.borderColor = '#e53e3e';
+      document.getElementById('sw-msg').focus();
+      return;
+    }
+    if (!_selectedFileName && !liveLink) {
+      if (errEl) { errEl.textContent = 'Please attach a file or provide a live link — at least one is required.'; errEl.style.display = 'block'; }
+      return;
+    }
+
+    const now = new Date().toISOString();
+    const submission = { message: msg, fileName: _selectedFileName, liveLink, submittedAt: now };
+    localStorage.setItem('sb_work_submission_' + _activeSubmitEscrowId, JSON.stringify(submission));
+
+    const e = window.EscrowDB.getAll().find(x => x.id === _activeSubmitEscrowId);
+    window.EscrowDB.updateStatus(_activeSubmitEscrowId, 'work_submitted', { submittedAt: now });
+
+    // Notify client
+    if (e) {
+      const session = window.SessionManager && window.SessionManager.getActiveUser();
+      const candidate = session && (window.CandidatesDB.getById(session.user.id) || session.user);
+      window.MessagesDB.send(
+        e.clientId, e.clientName || 'Client', 'Client', '',
+        session.user.id,
+        'Work Submitted: ' + e.jobTitle,
+        `${candidate ? candidate.name : 'Your freelancer'} has submitted work for "${e.jobTitle}".\n\nMessage: ${msg}${_selectedFileName ? '\nAttachment: ' + _selectedFileName : ''}${liveLink ? '\nLive Link: ' + liveLink : ''}\n\nPlease review and approve or request revisions from your Contracts tab. You have 14 days — after that, payment is automatically released.`
+      );
+    }
+
+    closeSubmitWorkModal();
+    showFreeToast('Work submitted! Client has been notified.', '#1dbf73');
+    renderFreelancerEscrow();
+  }
+
+  // ── Freelancer rates client ──
+  let _freeRatings = {};
+  function setFreeRating(escrowId, n) {
+    _freeRatings[escrowId] = n;
+    document.querySelectorAll(`#fstars-${escrowId} [data-star]`).forEach(s => {
+      s.style.opacity = parseInt(s.dataset.star) <= n ? '1' : '0.25';
+    });
+  }
+
+  function submitFreeRating(escrowId, clientId, clientName, jobTitle) {
+    const stars = _freeRatings[escrowId];
+    if (!stars) { alert('Please select a star rating first.'); return; }
+    const note = (document.getElementById('frnote-' + escrowId)?.value || '').trim();
+    const session = window.SessionManager && window.SessionManager.getActiveUser();
+    // Store in separate client-ratings bucket
+    const KEY = 'skillbridge_client_ratings';
+    const all = JSON.parse(localStorage.getItem(KEY) || '[]');
+    all.push({ id: 'cr-' + Date.now(), escrowId, reviewerId: session.user.id, reviewerName: session.user.name || 'Freelancer', clientId, clientName, rating: stars, comment: note, jobTitle, createdAt: new Date().toISOString() });
+    localStorage.setItem(KEY, JSON.stringify(all));
+    localStorage.setItem('sb_rated_' + escrowId, '1');
+    const wrap = document.getElementById('frate-wrap-' + escrowId);
+    if (wrap) wrap.innerHTML = `<div style="color:#1dbf73;font-weight:700;font-size:0.9rem;">✓ Rating submitted — ${'★'.repeat(stars)}</div>`;
   }
 
   function renderActivity(proposals, messages) {
+    const session = window.SessionManager && window.SessionManager.getActiveUser();
     const el = document.getElementById('activity-panel');
+    const escrows = window.EscrowDB && session ? window.EscrowDB.getByFreelancer(session.user.id) : [];
+
     const items = [
-      ...proposals.map(p => ({ type: 'proposal', label: 'Sent proposal', time: p.submittedAt, status: p.status })),
-      ...messages.map(m => ({ type: 'message', label: 'Message from ' + (m.recruiterName || 'client'), time: m.sentAt || m.createdAt }))
-    ].sort((a, b) => new Date(b.time) - new Date(a.time)).slice(0, 5);
+      ...proposals.map(p => {
+        const job = window.JobsDB && window.JobsDB.getById(p.jobId);
+        const typeLabel = p.proposalType === 'accept' ? 'Accepted invite' : p.proposalType === 'counter' ? 'Sent counter offer' : 'Sent proposal';
+        return { type: 'proposal', label: typeLabel + (job ? ' · ' + job.title : ''), sub: 'Budget: ' + (p.proposedBudget || '—') + ' · ' + (p.status === 'accepted' ? 'Accepted ✓' : p.status === 'declined' ? 'Declined' : 'Pending review'), time: p.submittedAt, dotColor: p.status === 'accepted' ? '#1dbf73' : p.status === 'declined' ? '#e53e3e' : '#0d1b2a' };
+      }),
+      ...messages.map(m => ({
+        type: 'message',
+        label: m.subject || 'New message',
+        sub: 'From ' + (m.recruiterName || 'Client'),
+        time: m.sentAt || m.createdAt,
+        dotColor: m.subject && m.subject.startsWith('Escrow Funded') ? '#1dbf73' : '#60a5fa'
+      })),
+      ...escrows.filter(e => e.status !== 'awaiting_payment').map(e => ({
+        type: 'escrow',
+        label: e.status === 'funded' ? 'Escrow funded · ' + e.jobTitle : e.status === 'released' ? 'Payment released · ' + e.jobTitle : 'Contract update · ' + e.jobTitle,
+        sub: '₹' + String(e.amount).replace(/[₹,\s]/g,'') + ' · ' + (e.clientName || 'Client'),
+        time: e.fundedAt || e.createdAt,
+        dotColor: '#1dbf73'
+      }))
+    ].sort((a, b) => new Date(b.time) - new Date(a.time)).slice(0, 6);
 
     if (!items.length) {
-      el.innerHTML = `<p style="font-size:0.82rem;color:#bbb;text-align:center;padding:12px 0;">No recent activity</p>`;
+      el.innerHTML = `<p style="font-size:0.82rem;color:#bbb;text-align:center;padding:4px 0;">No recent activity yet — send a proposal or wait for invites.</p>`;
       return;
     }
     el.innerHTML = items.map(it => {
-      const date = new Date(it.time).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
-      const dotColor = it.type === 'message' ? '#60a5fa' : '#1dbf73';
-      return `<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:12px;">
-        <span style="width:8px;height:8px;border-radius:50%;background:${dotColor};margin-top:5px;flex-shrink:0;"></span>
-        <div>
-          <div style="font-size:0.83rem;font-weight:600;color:#111;">${escH(it.label)}</div>
-          <div style="font-size:0.72rem;color:#bbb;">${date}</div>
+      const d = new Date(it.time);
+      const now = new Date();
+      const diffMs = now - d;
+      const diffH = Math.floor(diffMs / 3600000);
+      const diffD = Math.floor(diffMs / 86400000);
+      const timeStr = diffH < 1 ? 'Just now' : diffH < 24 ? diffH + 'h ago' : diffD < 7 ? diffD + 'd ago' : d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+      return `<div class="activity-item">
+        <span class="activity-dot" style="background:${it.dotColor};"></span>
+        <div style="flex:1;">
+          <div class="activity-text">${escH(it.label)}</div>
+          <div class="activity-sub">${escH(it.sub || '')}</div>
         </div>
+        <span class="activity-date">${timeStr}</span>
       </div>`;
     }).join('');
   }
