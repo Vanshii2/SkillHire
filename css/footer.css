@@ -1,11 +1,19 @@
 /* ==========================================================================
-   Exhibily — Dribbble-Style Footer
+   SkillBridge — Shared Footer
    ========================================================================== */
 
 footer {
   background-color: var(--surface-color);
   border-top: 3px solid #1dbf73;
   margin-top: auto;
+}
+
+.footer-nav-groups {
+  display: flex;
+  gap: 48px;
+  margin-left: 48px;
+  flex-wrap: wrap;
+  flex: 1;
 }
 
 /* ── TOP ROW ───────────────────────────────────────────────────────────── */
@@ -171,12 +179,15 @@ footer {
 
 /* Responsive */
 @media (max-width: 900px) {
-  .footer-nav {
-    display: none;
-  }
-  .footer-top-inner {
-    justify-content: space-between;
-  }
+  .footer-nav { display: none; }
+  .footer-top-inner { flex-wrap: wrap; }
+  .footer-nav-groups { margin-left: 0; gap: 28px; }
+}
+
+@media (max-width: 640px) {
+  .footer-nav-groups { flex-direction: column; gap: 20px; }
+  .footer-top-inner { gap: 24px; }
+  .footer-socials { margin-left: 0 !important; }
 }
 
 @media (max-width: 600px) {

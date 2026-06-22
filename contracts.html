@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Contracts — SkillBridge</title>
   <link rel="stylesheet" href="css/base.css">
@@ -79,7 +80,7 @@
     .timeline-bar { height: 100%; border-radius: 100px; background: #1dbf73; transition: width 0.5s; }
     .timeline-label { font-size: 0.75rem; color: #888; margin-bottom: 14px; }
 
-    .contract-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .contract-actions { display: block; }
     .btn-fund {
       padding: 9px 20px; background: #1dbf73; color: #fff; border: none;
       border-radius: 9px; font-weight: 700; cursor: pointer; font-family: inherit; font-size: 0.85rem;
@@ -138,6 +139,95 @@
 
     .toast-ctr { position: fixed; bottom: 24px; right: 24px; z-index: 3000; }
 
+    /* ── Two-column card layout ── */
+    .cc-layout {
+      display: grid;
+      grid-template-columns: 1fr 256px;
+      gap: 28px;
+      align-items: start;
+    }
+
+    /* ── Activity timeline rail (right column) ── */
+    .cc-timeline {
+      background: #f8f9fa;
+      border-radius: 14px;
+      padding: 18px 20px;
+      border: 1px solid #ececec;
+    }
+    .cc-timeline-heading {
+      font-size: 0.7rem;
+      font-weight: 800;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: 16px;
+    }
+    .cc-tl-item {
+      display: flex;
+      gap: 12px;
+      position: relative;
+      padding-bottom: 16px;
+    }
+    .cc-tl-item:last-child { padding-bottom: 0; }
+    .cc-tl-left {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .cc-tl-dot {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .cc-tl-line {
+      width: 2px;
+      flex: 1;
+      background: #e0e0e0;
+      margin-top: 4px;
+      min-height: 12px;
+    }
+    .cc-tl-body { flex: 1; min-width: 0; padding-top: 3px; }
+    .cc-tl-label {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #1a1a1a;
+      line-height: 1.3;
+      margin-bottom: 2px;
+    }
+    .cc-tl-sub {
+      font-size: 0.72rem;
+      color: #aaa;
+      line-height: 1.4;
+    }
+    .cc-tl-msg {
+      font-size: 0.77rem;
+      color: #666;
+      margin-top: 4px;
+      line-height: 1.45;
+      background: #fff;
+      border-radius: 7px;
+      padding: 6px 9px;
+      border: 1px solid #ebebeb;
+      word-break: break-word;
+    }
+    .cc-tl-pending .cc-tl-dot {
+      background: #f4f4f4;
+      border: 1.5px dashed #ddd;
+      opacity: 0.45;
+    }
+    .cc-tl-pending .cc-tl-label { color: #bbb; }
+    .cc-tl-pending .cc-tl-sub { color: #ccc; }
+    .cc-tl-pending .cc-tl-line { background: #ebebeb; }
+
+    @media (max-width: 800px) {
+      .cc-layout { grid-template-columns: 1fr; }
+      .cc-timeline { margin-top: 0; }
+    }
     @media (max-width: 600px) {
       .contracts-body { padding: 20px 16px 60px; }
       .contract-card { padding: 18px 16px; }
@@ -242,6 +332,146 @@
     }[status] || '';
   }
 
+  function fmtDate(iso) {
+    if (!iso) return '';
+    return new Date(iso).toLocaleString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  }
+  function fmtDateShort(iso) {
+    if (!iso) return '';
+    return new Date(iso).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+  }
+
+  // SVG icons for the activity timeline — all stroked in theme green
+  const TL_ICONS = {
+    created:  `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>`,
+    funded:   `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>`,
+    update:   `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`,
+    submit:   `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>`,
+    released: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
+    disputed: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e53e3e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
+  };
+
+  function buildActivityTimeline(e) {
+    const events = [];
+
+    // 1. Contract created
+    events.push({
+      svg: TL_ICONS.created,
+      label: 'Contract Created',
+      sub: fmtDate(e.createdAt),
+      done: true
+    });
+
+    // 2. Escrow funded
+    if (e.fundedAt) {
+      const rawAmt = String(e.amount).replace(/[₹,\s]/g, '');
+      events.push({
+        svg: TL_ICONS.funded,
+        label: 'Escrow Funded',
+        sub: fmtDate(e.fundedAt),
+        msg: '₹' + rawAmt + ' secured in escrow',
+        done: true
+      });
+    } else {
+      events.push({
+        svg: TL_ICONS.funded,
+        label: 'Escrow Funding',
+        sub: 'Waiting for client',
+        done: false
+      });
+    }
+
+    // 3. Progress updates (sorted oldest → newest)
+    const updates = JSON.parse(localStorage.getItem('sb_work_updates_' + e.id) || '[]');
+    const sortedUpdates = [...updates].sort((a, b) => new Date(a.sentAt) - new Date(b.sentAt));
+    sortedUpdates.forEach((u, i) => {
+      events.push({
+        svg: TL_ICONS.update,
+        label: 'Progress Update' + (sortedUpdates.length > 1 ? ' #' + (i + 1) : ''),
+        sub: fmtDateShort(u.sentAt),
+        msg: u.message ? u.message.slice(0, 80) + (u.message.length > 80 ? '…' : '') : '',
+        done: true
+      });
+    });
+
+    // 4. Final work submitted
+    const sub = JSON.parse(localStorage.getItem('sb_work_submission_' + e.id) || '{}');
+    if (sub.submittedAt) {
+      events.push({
+        svg: TL_ICONS.submit,
+        label: 'Final Work Submitted',
+        sub: fmtDate(sub.submittedAt),
+        msg: sub.message ? sub.message.slice(0, 80) + (sub.message.length > 80 ? '…' : '') : '',
+        done: true
+      });
+    } else if (e.fundedAt && e.status !== 'released' && e.status !== 'disputed') {
+      events.push({
+        svg: TL_ICONS.submit,
+        label: 'Final Submission',
+        sub: 'Pending',
+        done: false
+      });
+    }
+
+    // 5. Released / Disputed / Pending
+    if (e.status === 'released') {
+      events.push({
+        svg: TL_ICONS.released,
+        label: 'Payment Released',
+        sub: e.releasedAt ? fmtDate(e.releasedAt) : 'Completed',
+        done: true
+      });
+    } else if (e.status === 'disputed') {
+      events.push({
+        svg: TL_ICONS.disputed,
+        label: 'Dispute Raised',
+        sub: 'Under review',
+        done: true,
+        red: true
+      });
+    } else {
+      events.push({
+        svg: TL_ICONS.released,
+        label: 'Approval & Release',
+        sub: 'Pending',
+        done: false
+      });
+    }
+
+    const items = events.map((ev, i) => {
+      const isLast = i === events.length - 1;
+      if (!ev.done) {
+        return `<div class="cc-tl-item cc-tl-pending">
+          <div class="cc-tl-left">
+            <div class="cc-tl-dot">${ev.svg}</div>
+            ${!isLast ? '<div class="cc-tl-line"></div>' : ''}
+          </div>
+          <div class="cc-tl-body">
+            <div class="cc-tl-label">${ev.label}</div>
+            <div class="cc-tl-sub">${ev.sub}</div>
+          </div>
+        </div>`;
+      }
+      const dotBg = ev.red ? 'rgba(229,62,62,0.08)' : 'rgba(29,191,115,0.1)';
+      return `<div class="cc-tl-item">
+        <div class="cc-tl-left">
+          <div class="cc-tl-dot" style="background:${dotBg};">${ev.svg}</div>
+          ${!isLast ? '<div class="cc-tl-line"></div>' : ''}
+        </div>
+        <div class="cc-tl-body">
+          <div class="cc-tl-label">${ev.label}</div>
+          <div class="cc-tl-sub">${ev.sub}</div>
+          ${ev.msg ? `<div class="cc-tl-msg">${escH(ev.msg)}</div>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+
+    return `<div class="cc-timeline">
+      <div class="cc-timeline-heading">Activity Timeline</div>
+      ${items}
+    </div>`;
+  }
+
   function renderContractCard(e, session, job) {
     // Role-gated: a user acting as freelancer (candidate) must never see client-only buttons,
     // even if their ID happens to match clientId (dual-role accounts).
@@ -271,37 +501,75 @@
         </div>`;
     } else if (e.status === 'funded' && isFreelancer) {
       actionsHtml = `
-        <div style="padding:10px 14px;background:rgba(29,191,115,0.06);border:1px solid rgba(29,191,115,0.2);border-radius:8px;font-size:0.82rem;color:#16a060;margin-bottom:12px;">
-          💰 ${dispAmt} is secured in escrow. Complete your work then submit it below for client review.
+        <div style="padding:10px 14px;background:rgba(29,191,115,0.06);border:1px solid rgba(29,191,115,0.2);border-radius:8px;font-size:0.82rem;color:#16a060;margin-bottom:14px;">
+          ${dispAmt} is secured in escrow. Complete your work, send updates, or submit for final review.
         </div>
-        <button class="btn-done" onclick="openSubmitWorkModal('${e.id}')">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-          Submit Work for Approval
-        </button>`;
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button onclick="openAddUpdateModal('${e.id}')" style="padding:10px 18px;background:#f0fdf7;color:#16a060;border:1.5px solid rgba(29,191,115,0.35);border-radius:10px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            Add Update
+          </button>
+          <button class="btn-done" onclick="openSubmitWorkModal('${e.id}')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            Submit Final Project
+          </button>
+        </div>`;
     } else if (e.status === 'funded' && isClient) {
+      const updates = JSON.parse(localStorage.getItem('sb_work_updates_' + e.id) || '[]');
+      const updatesHtml = updates.length ? `
+        <div style="margin-bottom:16px;">
+          <div style="font-size:0.72rem;font-weight:800;color:#555;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:10px;display:flex;align-items:center;gap:5px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Freelancer Updates (${updates.length})</div>
+          ${updates.map(u => `
+            <div style="padding:14px 16px;background:#fff;border:1.5px solid #e8e8e8;border-left:4px solid #1dbf73;border-radius:10px;margin-bottom:10px;">
+              <div style="font-size:0.93rem;font-weight:600;color:#111;line-height:1.55;margin-bottom:8px;">${escH(u.message)}</div>
+              <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px;">
+                ${u.liveLink ? `<a href="${escH(u.liveLink)}" target="_blank" style="display:inline-flex;align-items:center;gap:5px;padding:5px 11px;background:#e8f5f0;border-radius:6px;color:#1dbf73;font-weight:700;font-size:0.79rem;text-decoration:none;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> Live Link</a>` : ''}
+                ${u.codeLink ? `<a href="${escH(u.codeLink)}" target="_blank" style="display:inline-flex;align-items:center;gap:5px;padding:5px 11px;background:#e8f5f0;border-radius:6px;color:#1dbf73;font-weight:700;font-size:0.79rem;text-decoration:none;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> Code Repo</a>` : ''}
+              </div>
+              <div style="font-size:0.73rem;color:#bbb;">${u.sentAt ? new Date(u.sentAt).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : ''}</div>
+            </div>`).join('')}
+        </div>` : '';
       actionsHtml = `
-        <div style="padding:10px 14px;background:#fff8e6;border:1px solid #fde68a;border-radius:8px;font-size:0.81rem;color:#92400e;margin-bottom:12px;">
-          ⚠️ Only release payment after reviewing and approving the freelancer's delivered work.
+        <div style="padding:7px 12px;background:#fff8e6;border:1px solid #fde68a;border-radius:7px;font-size:0.78rem;color:#92400e;margin-bottom:14px;display:flex;align-items:center;gap:6px;">
+          Only release payment after reviewing the freelancer's delivered work.
         </div>
+        ${updatesHtml}
         <div style="display:flex;gap:8px;">
           <button class="btn-release" onclick="releaseContract('${e.id}')">Release Payment</button>
           <button class="btn-dispute" onclick="disputeContract('${e.id}')">Raise Dispute</button>
         </div>`;
     } else if (e.status === 'work_submitted' && isClient) {
+      const updates2 = JSON.parse(localStorage.getItem('sb_work_updates_' + e.id) || '[]');
+      const updatesHtml2 = updates2.length ? `
+        <div style="margin-bottom:16px;">
+          <div style="font-size:0.72rem;font-weight:800;color:#555;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:10px;display:flex;align-items:center;gap:5px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Progress Updates (${updates2.length})</div>
+          ${updates2.map(u => `
+            <div style="padding:14px 16px;background:#fff;border:1.5px solid #e8e8e8;border-left:4px solid #1dbf73;border-radius:10px;margin-bottom:10px;">
+              <div style="font-size:0.93rem;font-weight:600;color:#111;line-height:1.55;margin-bottom:8px;">${escH(u.message)}</div>
+              <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px;">
+                ${u.liveLink ? `<a href="${escH(u.liveLink)}" target="_blank" style="display:inline-flex;align-items:center;gap:5px;padding:5px 11px;background:#e8f5f0;border-radius:6px;color:#1dbf73;font-weight:700;font-size:0.79rem;text-decoration:none;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> Live Link</a>` : ''}
+                ${u.codeLink ? `<a href="${escH(u.codeLink)}" target="_blank" style="display:inline-flex;align-items:center;gap:5px;padding:5px 11px;background:#e8f5f0;border-radius:6px;color:#1dbf73;font-weight:700;font-size:0.79rem;text-decoration:none;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> Code Repo</a>` : ''}
+              </div>
+              <div style="font-size:0.73rem;color:#bbb;">${u.sentAt ? new Date(u.sentAt).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : ''}</div>
+            </div>`).join('')}
+        </div>` : '';
       actionsHtml = `
-        ${sub.submittedAt ? `
-        <div style="padding:14px;background:rgba(59,130,246,0.06);border:1.5px solid rgba(59,130,246,0.25);border-radius:10px;margin-bottom:14px;">
-          <div style="font-size:0.78rem;font-weight:800;color:#2563eb;text-transform:uppercase;margin-bottom:8px;">🔔 Work Submitted — ${new Date(sub.submittedAt).toLocaleDateString('en-IN',{day:'numeric',month:'short'})}</div>
-          ${sub.message ? `<div style="font-size:0.83rem;color:#444;line-height:1.5;margin-bottom:8px;font-style:italic;">"${escH(sub.message.slice(0,200))}${sub.message.length>200?'…':''}"</div>` : ''}
-          ${sub.fileName ? `<div style="font-size:0.78rem;color:#1dbf73;font-weight:600;margin-bottom:4px;">📎 ${escH(sub.fileName)}</div>` : ''}
-          ${sub.liveLink ? `<div style="font-size:0.78rem;margin-bottom:4px;"><a href="${escH(sub.liveLink)}" target="_blank" style="color:#2563eb;font-weight:600;">🔗 View Live Demo</a></div>` : ''}
-          ${sub.codeLink ? `<div style="font-size:0.78rem;margin-bottom:4px;"><a href="${escH(sub.codeLink)}" target="_blank" style="color:#555;font-weight:600;">💻 View Code Repository</a></div>` : ''}
-        </div>` : ''}
-        <div style="padding:10px 14px;background:#fff8e6;border:1px solid #fde68a;border-radius:8px;font-size:0.81rem;color:#92400e;margin-bottom:12px;">
-          ⚠️ Review the work above carefully. Only approve once you are satisfied.
+        <div style="padding:7px 12px;background:#fff8e6;border:1px solid #fde68a;border-radius:7px;font-size:0.78rem;color:#92400e;margin-bottom:14px;display:flex;align-items:center;gap:6px;">
+          ⚠️ Review the work carefully. Only approve once you are satisfied.
         </div>
+        ${updatesHtml2}
+        ${sub.submittedAt ? `
+        <div style="padding:16px;background:rgba(59,130,246,0.05);border:1.5px solid rgba(59,130,246,0.22);border-left:4px solid #2563eb;border-radius:10px;margin-bottom:16px;">
+          <div style="font-size:0.72rem;font-weight:800;color:#2563eb;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:10px;display:flex;align-items:center;gap:5px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Final Work Submitted — ${new Date(sub.submittedAt).toLocaleDateString('en-IN',{day:'numeric',month:'short'})}</div>
+          ${sub.message ? `<div style="font-size:0.93rem;color:#222;line-height:1.65;margin-bottom:12px;">${escH(sub.message)}</div>` : ''}
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            ${sub.liveLink ? `<a href="${escH(sub.liveLink)}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#e8f5f0;border-radius:8px;color:#1dbf73;font-weight:700;font-size:0.83rem;text-decoration:none;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> View Live Demo</a>` : ''}
+            ${sub.codeLink ? `<a href="${escH(sub.codeLink)}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#e8f5f0;border-radius:8px;color:#1dbf73;font-weight:700;font-size:0.83rem;text-decoration:none;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> View Code Repository</a>` : ''}
+            ${sub.fileName ? `<div style="font-size:0.82rem;color:#1dbf73;font-weight:600;padding:7px 0;display:flex;align-items:center;gap:5px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg> ${escH(sub.fileName)}</div>` : ''}
+          </div>
+        </div>` : ''}
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <button class="btn-release" onclick="releaseContract('${e.id}')">✓ Approve & Release Payment</button>
+          <button class="btn-release" onclick="releaseContract('${e.id}')">✓ Approve &amp; Release Payment</button>
           <button data-eid="${e.id}" data-fn="${escH(e.freelancerName)}" data-jt="${escH(e.jobTitle)}" onclick="requestRevision(this.dataset.eid,this.dataset.fn,this.dataset.jt)" style="padding:8px 16px;background:#fff;color:#0d1b2a;border:1.5px solid #cbd5e0;border-radius:8px;font-weight:700;cursor:pointer;font-family:inherit;font-size:0.85rem;">Request Revision</button>
           <button class="btn-dispute" onclick="disputeContract('${e.id}')">Raise Dispute</button>
         </div>`;
@@ -330,8 +598,11 @@
       ? `<button class="btn-complaint" onclick="toggleComplaintForm('${e.id}')">📋 File a Complaint</button>`
       : `<span style="font-size:0.8rem;color:#888;">Complaint filed (${existingComplaints[0].status})</span>`;
 
+    const activityTimeline = buildActivityTimeline(e);
+
     return `
     <div class="contract-card" id="contract-${e.id}">
+      <!-- Title + status pill always full-width at top -->
       <div class="contract-header">
         <div>
           <div class="contract-title">${escH(e.jobTitle)}</div>
@@ -342,51 +613,60 @@
         <div class="status-pill ${statusClass(e.status)}">${statusLabel(e.status)}</div>
       </div>
 
-      <div class="contract-meta">
-        <span>
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-          Escrow: <strong>${dispAmt}</strong>
-        </span>
-        <span>
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          ${job ? escH(job.deadline) : '—'}
-        </span>
-        <span>Started ${new Date(e.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
-      </div>
+      <!-- Two-column: left = content, right = activity timeline -->
+      <div class="cc-layout">
+        <!-- LEFT COLUMN -->
+        <div>
+          <div class="contract-meta">
+            <span>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+              Escrow: <strong>${dispAmt}</strong>
+            </span>
+            <span>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              ${job ? escH(job.deadline) : '—'}
+            </span>
+            <span>Started ${new Date(e.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+          </div>
 
-      ${timelineHtml}
+          ${timelineHtml}
 
-      <div class="contract-actions" style="margin-bottom:${(e.status !== 'released' && e.status !== 'disputed') ? '10px' : '0'};">
-        ${actionsHtml}
-        ${complaintBtn}
-      </div>
+          <div class="contract-actions" style="margin-bottom:${(e.status !== 'released' && e.status !== 'disputed') ? '10px' : '0'};">
+            ${actionsHtml}
+            ${complaintBtn}
+          </div>
 
-      <!-- Complaint Form -->
-      <div class="complaint-form" id="cf-${e.id}">
-        <h4>📋 File a Complaint</h4>
-        <div class="cf-field">
-          <label>Subject *</label>
-          <input id="cf-subject-${e.id}" type="text" placeholder="Brief summary of the issue">
+          <!-- Complaint Form -->
+          <div class="complaint-form" id="cf-${e.id}">
+            <h4>📋 File a Complaint</h4>
+            <div class="cf-field">
+              <label>Subject *</label>
+              <input id="cf-subject-${e.id}" type="text" placeholder="Brief summary of the issue">
+            </div>
+            <div class="cf-field">
+              <label>Category</label>
+              <select id="cf-category-${e.id}">
+                <option value="payment">Payment Issue</option>
+                <option value="quality">Work Quality</option>
+                <option value="communication">Communication</option>
+                <option value="deadline">Missed Deadline</option>
+                <option value="fraud">Fraud / Scam</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="cf-field">
+              <label>Detailed Description *</label>
+              <textarea id="cf-desc-${e.id}" rows="4" placeholder="Describe what happened in detail. Include dates, amounts, and any relevant context."></textarea>
+            </div>
+            <div class="cf-actions">
+              <button class="btn-submit-complaint" onclick="submitComplaint('${e.id}')">Submit Complaint</button>
+              <button class="btn-cancel-complaint" onclick="toggleComplaintForm('${e.id}')">Cancel</button>
+            </div>
+          </div>
         </div>
-        <div class="cf-field">
-          <label>Category</label>
-          <select id="cf-category-${e.id}">
-            <option value="payment">Payment Issue</option>
-            <option value="quality">Work Quality</option>
-            <option value="communication">Communication</option>
-            <option value="deadline">Missed Deadline</option>
-            <option value="fraud">Fraud / Scam</option>
-            <option value="other">Other</option>
-          </select>
-        </div>
-        <div class="cf-field">
-          <label>Detailed Description *</label>
-          <textarea id="cf-desc-${e.id}" rows="4" placeholder="Describe what happened in detail. Include dates, amounts, and any relevant context."></textarea>
-        </div>
-        <div class="cf-actions">
-          <button class="btn-submit-complaint" onclick="submitComplaint('${e.id}')">Submit Complaint</button>
-          <button class="btn-cancel-complaint" onclick="toggleComplaintForm('${e.id}')">Cancel</button>
-        </div>
+
+        <!-- RIGHT COLUMN: Activity Timeline (same for client + freelancer) -->
+        ${activityTimeline}
       </div>
     </div>`;
   }
@@ -422,19 +702,21 @@
         <label style="font-size:0.75rem;font-weight:700;color:#555;display:block;margin-bottom:6px;">Description / Message to Client <span style="color:#e53e3e;">*</span></label>
         <textarea id="_sw-msg" style="width:100%;padding:12px 14px;border:1.5px solid #e0e0e0;border-radius:10px;font-family:inherit;font-size:0.88rem;resize:vertical;min-height:110px;box-sizing:border-box;outline:none;transition:border-color 0.15s;" placeholder="Hi, I've completed the work as discussed. Here's a summary of what I built…" onfocus="this.style.borderColor='#1dbf73'" onblur="this.style.borderColor='#e0e0e0'"></textarea>
 
-        <label style="font-size:0.75rem;font-weight:700;color:#555;display:block;margin:16px 0 6px;">
-          🔗 Live Demo URL <span style="font-weight:400;color:#aaa;">(Netlify, Vercel, etc.)</span>
+        <label style="font-size:0.75rem;font-weight:700;color:#555;display:flex;align-items:center;gap:5px;margin:16px 0 6px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          Live Demo URL <span style="font-weight:400;color:#aaa;">(Netlify, Vercel, etc.)</span>
         </label>
         <input id="_sw-link" type="url" style="width:100%;padding:10px 14px;border:1.5px solid #e0e0e0;border-radius:10px;font-family:inherit;font-size:0.88rem;box-sizing:border-box;outline:none;transition:border-color 0.15s;" placeholder="https://my-project.vercel.app" oninput="_cSelectedLink=this.value.trim()" onfocus="this.style.borderColor='#1dbf73'" onblur="this.style.borderColor='#e0e0e0'">
 
-        <label style="font-size:0.75rem;font-weight:700;color:#555;display:block;margin:16px 0 6px;">
-          💻 Code Repository URL <span style="font-weight:400;color:#aaa;">(GitHub, GitLab, etc.)</span>
+        <label style="font-size:0.75rem;font-weight:700;color:#555;display:flex;align-items:center;gap:5px;margin:16px 0 6px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          Code Repository URL <span style="font-weight:400;color:#aaa;">(GitHub, GitLab, etc.)</span>
         </label>
         <input id="_sw-code" type="url" style="width:100%;padding:10px 14px;border:1.5px solid #e0e0e0;border-radius:10px;font-family:inherit;font-size:0.88rem;box-sizing:border-box;outline:none;transition:border-color 0.15s;" placeholder="https://github.com/yourname/project" oninput="_cSelectedCode=this.value.trim()" onfocus="this.style.borderColor='#1dbf73'" onblur="this.style.borderColor='#e0e0e0'">
 
-        <label style="font-size:0.75rem;font-weight:700;color:#555;display:block;margin:16px 0 6px;">📎 Attach File <span style="font-weight:400;color:#aaa;">(ZIP, PDF, PNG, JPG — optional)</span></label>
+        <label style="font-size:0.75rem;font-weight:700;color:#555;display:flex;align-items:center;gap:5px;margin:16px 0 6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg> Attach File <span style="font-weight:400;color:#aaa;">(ZIP, PDF, PNG, JPG — optional)</span></label>
         <div id="_sw-file-zone" style="border:2px dashed #e0e0e0;border-radius:10px;padding:16px;text-align:center;cursor:pointer;position:relative;transition:border-color 0.15s;">
-          <input type="file" id="_sw-file-input" style="position:absolute;inset:0;opacity:0;cursor:pointer;" onchange="(function(inp){if(inp.files&&inp.files[0]){_cSelectedFile=inp.files[0].name;document.getElementById('_sw-fname').textContent='📎 '+_cSelectedFile;document.getElementById('_sw-file-zone').style.borderColor='#1dbf73';}})(this)">
+          <input type="file" id="_sw-file-input" style="position:absolute;inset:0;opacity:0;cursor:pointer;" onchange="(function(inp){if(inp.files&&inp.files[0]){_cSelectedFile=inp.files[0].name;document.getElementById('_sw-fname').textContent=_cSelectedFile;document.getElementById('_sw-file-zone').style.borderColor='#1dbf73';}})(this)">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
           <div style="font-size:0.81rem;color:#aaa;margin-top:5px;">Click to upload</div>
           <div id="_sw-fname" style="font-size:0.82rem;color:#1dbf73;font-weight:600;margin-top:4px;"></div>
@@ -444,7 +726,7 @@
 
         <div style="display:flex;gap:10px;margin-top:22px;">
           <button onclick="document.getElementById('_sw-overlay').remove()" style="padding:12px 20px;background:#f5f5f5;color:#555;border:none;border-radius:10px;font-size:0.9rem;font-weight:700;cursor:pointer;font-family:inherit;">Cancel</button>
-          <button onclick="sendUpdateOnly()" style="padding:12px 18px;background:#f0fdf7;color:#16a060;border:1.5px solid rgba(29,191,115,0.35);border-radius:10px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;" title="Send a progress update without marking work as complete">
+          <button onclick="sendUpdateOnly_UNUSED()" style="display:none;" title="Send a progress update without marking work as complete">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
             Add Update
           </button>
@@ -487,29 +769,70 @@
   }
 
   function sendUpdateOnly() {
-    const msg = (document.getElementById('_sw-msg')?.value || '').trim();
-    const errEl = document.getElementById('_sw-err');
+    const msg = (document.getElementById('_sw-upd-msg')?.value || '').trim();
+    const liveLink = (document.getElementById('_sw-upd-link')?.value || '').trim();
+    const codeLink = (document.getElementById('_sw-upd-code')?.value || '').trim();
+    const errEl = document.getElementById('_sw-upd-err');
     errEl.style.display = 'none';
-    if (!msg) { errEl.textContent = 'Please write a progress update message.'; errEl.style.display = 'block'; return; }
+    if (!msg) { errEl.textContent = 'Please write an update message.'; errEl.style.display = 'block'; return; }
     const e = window.EscrowDB.getAll().find(x => x.id === _cActiveSubmitId);
     if (e) {
       const session = window.SessionManager.getActiveUser();
-      const liveLink = (document.getElementById('_sw-link')?.value || '').trim();
-      const codeLink = (document.getElementById('_sw-code')?.value || '').trim();
+      const now = new Date().toISOString();
+      // Store update in localStorage so client can see it in contracts view
+      const key = 'sb_work_updates_' + _cActiveSubmitId;
+      const updates = JSON.parse(localStorage.getItem(key) || '[]');
+      updates.push({ message: msg, liveLink, codeLink, sentAt: now });
+      localStorage.setItem(key, JSON.stringify(updates));
       const extras = [
         liveLink ? `🔗 Live link: ${liveLink}` : '',
-        codeLink ? `💻 Code: ${codeLink}` : '',
-        _cSelectedFile ? `📎 File: ${_cSelectedFile}` : ''
+        codeLink ? `💻 Code: ${codeLink}` : ''
       ].filter(Boolean).join('\n');
       window.MessagesDB.send(
         session.user.id, session.user.name || 'Freelancer', 'Freelancer', '',
         e.clientId,
         '📢 Project Update — ' + e.jobTitle,
-        `${session.user.name || 'Your freelancer'} sent a progress update for "${e.jobTitle}".\n\n${msg}${extras ? '\n\n' + extras : ''}\n\nSent: ${new Date().toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}`
+        `${session.user.name || 'Your freelancer'} sent a progress update for "${e.jobTitle}".\n\n${msg}${extras ? '\n\n' + extras : ''}\n\nSent: ${new Date(now).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}`
       );
     }
-    document.getElementById('_sw-overlay').remove();
+    document.getElementById('_sw-upd-overlay').remove();
     toast('Update sent to client. ✓', '#0d1b2a');
+    loadContracts();
+  }
+
+  function openAddUpdateModal(escrowId) {
+    _cActiveSubmitId = escrowId;
+    const overlay = document.createElement('div');
+    overlay.id = '_sw-upd-overlay';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:3000;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);';
+    overlay.innerHTML = `
+      <div style="background:#fff;border-radius:20px;padding:32px;width:100%;max-width:520px;max-height:88vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,0.18);">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <h2 style="font-size:1.15rem;font-weight:800;color:#111;margin:0;">Add Progress Update</h2>
+        </div>
+        <p style="font-size:0.83rem;color:#888;margin-bottom:20px;line-height:1.5;">Let your client know how the work is going. This does NOT submit the final project.</p>
+
+        <label style="font-size:0.75rem;font-weight:700;color:#555;display:block;margin-bottom:6px;">Update Message <span style="color:#e53e3e;">*</span></label>
+        <textarea id="_sw-upd-msg" style="width:100%;padding:12px 14px;border:1.5px solid #e0e0e0;border-radius:10px;font-family:inherit;font-size:0.88rem;resize:vertical;min-height:100px;box-sizing:border-box;outline:none;transition:border-color 0.15s;" placeholder="Here's a quick progress update — I've completed the layout and am now working on…" onfocus="this.style.borderColor='#1dbf73'" onblur="this.style.borderColor='#e0e0e0'"></textarea>
+
+        <label style="font-size:0.75rem;font-weight:700;color:#555;display:flex;align-items:center;gap:5px;margin:14px 0 6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> Preview / Live Link <span style="font-weight:400;color:#aaa;">(optional)</span></label>
+        <input id="_sw-upd-link" type="url" style="width:100%;padding:10px 14px;border:1.5px solid #e0e0e0;border-radius:10px;font-family:inherit;font-size:0.88rem;box-sizing:border-box;outline:none;transition:border-color 0.15s;" placeholder="https://staging.my-project.app" onfocus="this.style.borderColor='#1dbf73'" onblur="this.style.borderColor='#e0e0e0'">
+
+        <label style="font-size:0.75rem;font-weight:700;color:#555;display:flex;align-items:center;gap:5px;margin:14px 0 6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> Code Repo URL <span style="font-weight:400;color:#aaa;">(optional)</span></label>
+        <input id="_sw-upd-code" type="url" style="width:100%;padding:10px 14px;border:1.5px solid #e0e0e0;border-radius:10px;font-family:inherit;font-size:0.88rem;box-sizing:border-box;outline:none;transition:border-color 0.15s;" placeholder="https://github.com/yourname/project" onfocus="this.style.borderColor='#1dbf73'" onblur="this.style.borderColor='#e0e0e0'">
+
+        <div id="_sw-upd-err" style="display:none;color:#e53e3e;font-size:0.8rem;margin-top:10px;padding:8px 12px;background:#fff5f5;border-radius:8px;border:1px solid #fed7d7;"></div>
+
+        <div style="display:flex;gap:10px;margin-top:22px;">
+          <button onclick="document.getElementById('_sw-upd-overlay').remove()" style="padding:12px 20px;background:#f5f5f5;color:#555;border:none;border-radius:10px;font-size:0.9rem;font-weight:700;cursor:pointer;font-family:inherit;">Cancel</button>
+          <button onclick="sendUpdateOnly()" style="flex:1;padding:12px;background:#0d1b2a;color:#fff;border:none;border-radius:10px;font-size:0.9rem;font-weight:800;cursor:pointer;font-family:inherit;">
+            Send Update to Client
+          </button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
   }
 
   function requestRevision(escrowId, freelancerName, jobTitle) {
@@ -629,8 +952,23 @@
 
   window._contractConfirmRelease = function(escrowId) {
     document.getElementById('_release-overlay').remove();
-    window.EscrowDB.updateStatus(escrowId, 'released', { releasedAt: new Date().toISOString() });
-    toast('Payment released! Thank you for using SkillBridge.', '#1dbf73');
+    const now = new Date().toISOString();
+    const e = window.EscrowDB && window.EscrowDB.getAll().find(x => x.id === escrowId);
+    window.EscrowDB.updateStatus(escrowId, 'released', { releasedAt: now });
+
+    // Notify freelancer
+    if (e) {
+      const session = window.SessionManager && window.SessionManager.getActiveUser();
+      const rawAmt = String(e.amount).replace(/[₹,\s]/g, '');
+      window.MessagesDB.send(
+        e.clientId, e.clientName || 'Client', 'Client', '',
+        e.freelancerId,
+        'Payment Successful — ' + e.jobTitle,
+        `Great news! ${e.clientName || 'Your client'} has approved your work on "${e.jobTitle}" and released the payment.\n\nAmount received: ₹${rawAmt}\n\nThank you for your great work on SkillBridge!`
+      );
+    }
+
+    toast('Payment released! The freelancer has been notified.', '#1dbf73');
     loadContracts();
   };
 
@@ -735,5 +1073,6 @@
 
   document.addEventListener('DOMContentLoaded', loadContracts);
   </script>
+  <script src="js/footer.js"></script>
 </body>
 </html>

@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SkillBridge — Find Skilled Talent. Discover Meaningful Opportunities.</title>
   <meta name="description" content="SkillBridge is a two-sided freelance marketplace. Hire top freelancers for your projects or get hired by great clients — all in one platform.">
@@ -18,15 +19,8 @@
   <header id="site-header">
     <div class="nav-container">
       <a href="index.html" class="logo" id="nav-logo">SkillBridge</a>
-      <ul class="nav-menu" id="nav-menu-list">
-        <li><a href="index.html" class="nav-link active">Home</a></li>
-        <li><a href="hire-talent.html" class="nav-link">Hire Talent</a></li>
-        <li><a href="browse-projects.html" class="nav-link">Get Hired</a></li>
-      </ul>
-      <div class="nav-cta">
-        <button class="btn btn-secondary" id="nav-btn-login" style="margin-right:8px;">Log In</button>
-        <button class="btn btn-primary" id="nav-btn-register">Register</button>
-      </div>
+      <ul class="nav-menu" id="nav-menu-list"></ul>
+      <div class="nav-cta"></div>
       <button class="mobile-toggle" id="mobile-hamburger" aria-label="Toggle Menu">
         <span class="hamburger-line"></span>
         <span class="hamburger-line"></span>
@@ -36,15 +30,8 @@
 
   <div class="mobile-drawer-overlay" id="mobile-overlay"></div>
   <div class="mobile-drawer" id="mobile-drawer-menu">
-    <ul class="mobile-nav-list">
-      <li><a href="index.html" class="mobile-nav-link active">Home</a></li>
-      <li><a href="hire-talent.html" class="mobile-nav-link">Hire Talent</a></li>
-      <li><a href="browse-projects.html" class="mobile-nav-link">Get Hired</a></li>
-    </ul>
-    <div class="mobile-nav-cta">
-      <button class="btn btn-secondary btn-block" id="mob-btn-login">Log In</button>
-      <button class="btn btn-primary btn-block" id="mob-btn-register" style="margin-top:10px;">Register</button>
-    </div>
+    <ul class="mobile-nav-list"></ul>
+    <div class="mobile-nav-cta"></div>
   </div>
 
   <main>
@@ -393,5 +380,6 @@
       }
     }
   </script>
+  <script src="js/footer.js"></script>
 </body>
 </html>

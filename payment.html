@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Secure Payment — SkillBridge</title>
   <link rel="stylesheet" href="css/base.css">
@@ -278,10 +279,7 @@
     <div class="nav-container">
       <a href="index.html" class="logo">SkillBridge</a>
       <ul class="nav-menu" id="nav-menu-list"></ul>
-      <div class="nav-cta" id="nav-cta-area">
-        <button class="btn btn-secondary" id="nav-btn-login" style="margin-right:8px;">Log In</button>
-        <button class="btn btn-primary" id="nav-btn-register">Register</button>
-      </div>
+      <div class="nav-cta" id="nav-cta-area"></div>
       <button class="mobile-toggle" id="mobile-hamburger" aria-label="Toggle Menu">
         <span class="hamburger-line"></span>
         <span class="hamburger-line"></span>
@@ -291,10 +289,7 @@
   <div class="mobile-drawer-overlay" id="mobile-overlay"></div>
   <div class="mobile-drawer" id="mobile-drawer-menu">
     <ul class="mobile-nav-list" id="mob-nav-list"></ul>
-    <div class="mobile-nav-cta" id="mob-cta-area">
-      <button class="btn btn-secondary btn-block" id="mob-btn-login">Log In</button>
-      <button class="btn btn-primary btn-block" id="mob-btn-register" style="margin-top:10px;">Register</button>
-    </div>
+    <div class="mobile-nav-cta" id="mob-cta-area"></div>
   </div>
 
   <div class="payment-page">
@@ -654,11 +649,12 @@
           }
           document.getElementById('pay-form-wrap').style.display = 'none';
           document.getElementById('pay-success').style.display = 'block';
-          document.getElementById('success-heading').textContent = 'Escrow Funded!';
-          document.getElementById('success-body').innerHTML = '<strong>' + displayAmt + '</strong> is now held securely in escrow for <strong>' + (escrowLbl || 'this project') + '</strong>. Funds will be released to the freelancer once you approve the work.';
+          document.getElementById('success-heading').textContent = 'Payment Successful!';
+          document.getElementById('success-body').innerHTML = '<strong>' + displayAmt + '</strong> is now held securely in escrow for <strong>' + (escrowLbl || 'this project') + '</strong>. You\'ll be redirected to My Contracts in a moment…';
           const backBtn = document.getElementById('btn-back-post');
-          backBtn.textContent = 'Back to Dashboard';
-          backBtn.href = returnUrl;
+          backBtn.textContent = 'Go to My Contracts';
+          backBtn.href = 'contracts.html';
+          setTimeout(() => { window.location.href = 'contracts.html'; }, 2500);
         } else {
           const planKey = params.get('plan') || 'pro';
           const plan = PLANS[planKey] || PLANS.pro;
@@ -675,5 +671,6 @@
       }, 1800);
     });
   </script>
+  <script src="js/footer.js"></script>
 </body>
 </html>

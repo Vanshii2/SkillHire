@@ -249,10 +249,7 @@
     <div class="nav-container">
       <a href="../index.html" class="logo">SkillBridge</a>
       <ul class="nav-menu" id="nav-menu-list"></ul>
-      <div class="nav-cta" id="nav-cta-area">
-        <button class="btn btn-secondary" id="nav-btn-login" style="margin-right:8px;">Log In</button>
-        <button class="btn btn-primary" id="nav-btn-register">Register</button>
-      </div>
+      <div class="nav-cta" id="nav-cta-area"></div>
       <button class="mobile-toggle" id="mobile-hamburger" aria-label="Toggle Menu">
         <span class="hamburger-line"></span><span class="hamburger-line"></span>
       </button>
@@ -333,17 +330,18 @@
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
           Saved Projects
         </button>
-        <a href="../contracts.html" class="ptab" style="text-decoration:none;display:inline-flex;align-items:center;gap:5px;">
+        <button class="ptab" id="ptab-escrow" onclick="showPTab('escrow')" style="display:inline-flex;align-items:center;gap:5px;">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
           My Contracts
-        </a>
+          <span id="contracts-badge" style="display:none;background:#e53e3e;color:#fff;border-radius:100px;font-size:0.65rem;font-weight:800;padding:1px 6px;vertical-align:middle;">0</span>
+        </button>
       </div>
       <div class="panel-card" style="border-radius:0 0 14px 14px;border-top:none;">
         <div id="panel-matching" class="panel-body"></div>
         <div id="panel-proposals" class="panel-body" style="display:none;"></div>
         <div id="panel-messages" class="panel-body" style="display:none;"></div>
-        <div id="panel-escrow" class="panel-body" style="display:none;"></div>
         <div id="panel-saved" class="panel-body" style="display:none;"></div>
+        <div id="panel-escrow" class="panel-body" style="display:none;"></div>
       </div>
     </div>
   </main>
@@ -365,13 +363,18 @@
   }
 
   function showPTab(name) {
-    ['matching','proposals','messages','saved'].forEach(t => {
+    ['matching','proposals','messages','saved','escrow'].forEach(t => {
       const btn = document.getElementById('ptab-' + t);
       if (btn) btn.classList.toggle('active', t === name);
       const panel = document.getElementById('panel-' + t);
       if (panel) panel.style.display = t === name ? 'block' : 'none';
     });
     if (name === 'saved') renderSavedProjects();
+    if (name === 'escrow') {
+      renderFreelancerEscrow();
+      const cb = document.getElementById('contracts-badge');
+      if (cb) cb.style.display = 'none';
+    }
     // Clear invite badge and mark as seen when Invites tab is opened
     if (name === 'matching') {
       const b = document.getElementById('invite-badge');
@@ -456,6 +459,12 @@
     const msgBadge = document.getElementById('msg-badge');
     if (msgBadge && unreadMsgs.length) { msgBadge.textContent = unreadMsgs.length; msgBadge.style.display = 'inline'; }
 
+    // ── Contracts badge: funded escrows = freelancer needs to submit work ──
+    const myEscrows = window.EscrowDB ? window.EscrowDB.getByFreelancer(session.user.id) : [];
+    const pendingAction = myEscrows.filter(e => e.status === 'funded').length;
+    const contractsBadge = document.getElementById('contracts-badge');
+    if (contractsBadge && pendingAction > 0) { contractsBadge.textContent = pendingAction; contractsBadge.style.display = 'inline'; }
+
     // Listen for cross-tab events (client sends a new invite → badge appears)
     window.addEventListener('storage', () => {
       const freshInvites2 = (window.JobsDB ? window.JobsDB.getAll().filter(j => j.status==='open' && j.invitedFreelancerId === session.user.id) : [])
@@ -488,6 +497,11 @@
     }
     el.innerHTML = jobs.map(j => {
       const alreadyBid = window.ProposalsDB && window.ProposalsDB.hasApplied(j.id, session.user.id);
+      let bidType = null;
+      if (alreadyBid && window.ProposalsDB) {
+        const myProp = window.ProposalsDB.getByFreelancer(session.user.id).find(p => p.jobId === j.id);
+        bidType = myProp && myProp.proposalType;
+      }
       const skillPills = (j.skills || []).slice(0, 5).map(s =>
         `<span class="skill-pill match">${escH(s)}</span>`
       ).join('');
@@ -500,8 +514,17 @@
         <div class="skills-row" style="margin-bottom:12px;">${skillPills}</div>
 
         ${alreadyBid ? `
-          <div style="padding:8px 14px;background:rgba(29,191,115,0.08);border:1px solid rgba(29,191,115,0.2);border-radius:8px;font-size:0.82rem;font-weight:700;color:#16a060;">
-            ✓ Response sent — awaiting client review.
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            ${bidType === 'accept' ? `
+              <button disabled style="padding:8px 18px;border-radius:8px;background:#1dbf73;color:#fff;border:none;font-weight:700;font-size:0.82rem;opacity:0.85;cursor:default;">✓ Accepted</button>
+              <span style="font-size:0.79rem;color:#888;">Waiting for client to fund escrow</span>
+            ` : bidType === 'counter' ? `
+              <button disabled style="padding:8px 18px;border-radius:8px;background:#0d1b2a;color:#fff;border:none;font-weight:700;font-size:0.82rem;opacity:0.85;cursor:default;">↩ Counter Sent</button>
+              <span style="font-size:0.79rem;color:#888;">Client is reviewing your offer</span>
+            ` : `
+              <button disabled style="padding:8px 18px;border-radius:8px;background:#f0f0f0;color:#555;border:none;font-weight:700;font-size:0.82rem;cursor:default;">✓ Response Sent</button>
+              <span style="font-size:0.79rem;color:#888;">Awaiting client review</span>
+            `}
           </div>
         ` : `
         <!-- Action buttons -->
@@ -583,8 +606,9 @@
     if (!card) return;
     const actions = card.querySelector('#invite-actions-' + jobId);
     const form    = card.querySelector('#counter-form-' + jobId);
-    const target  = form || actions;
-    if (target) target.outerHTML = html;
+    // Always replace the actions row; separately remove the counter form
+    if (actions) actions.outerHTML = html;
+    if (form) form.remove();
     const stat = document.getElementById('stat-matching');
     if (stat) stat.textContent = Math.max(0, parseInt(stat.textContent || '0') - 1);
   }
@@ -753,6 +777,7 @@
       const isInvite = m.subject && m.subject.startsWith('Project Invite:');
       const isCounter = m.subject && m.subject.startsWith('Counter Offer:');
       const isEscrow = m.subject && m.subject.startsWith('Escrow Funded:');
+      const isPayment = m.subject && m.subject.startsWith('Payment Successful');
       let relatedJob = null;
       if (isInvite && window.JobsDB) {
         const titleMatch = m.subject.replace('Project Invite: ', '').trim();
@@ -763,14 +788,15 @@
         const titleMatch = m.subject.replace('Counter Offer: ', '').trim();
         counterJob = window.JobsDB.getAll().find(j => j.title === titleMatch && j.clientId === m.recruiterId);
       }
-      const borderColor = isInvite ? '#1dbf73' : isCounter ? '#7c3aed' : isEscrow ? '#1dbf73' : 'transparent';
+      const borderColor = isPayment ? '#16a060' : isInvite ? '#1dbf73' : isCounter ? '#7c3aed' : isEscrow ? '#1dbf73' : 'transparent';
       const userId = session ? session.user.id : '';
-      return `<div class="msg-card" id="msg-${escH(m.id)}" style="${(isInvite || isCounter || isEscrow) ? `border-left:3px solid ${borderColor};` : ''}">
+      return `<div class="msg-card" id="msg-${escH(m.id)}" style="${(isInvite || isCounter || isEscrow || isPayment) ? `border-left:3px solid ${borderColor};` : ''}${isPayment ? 'background:linear-gradient(135deg,#f0fdf7 0%,#fff 60%);' : ''}">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
           <div style="flex:1;">
+            ${isPayment ? `<div style="display:inline-flex;align-items:center;gap:5px;font-size:0.7rem;font-weight:800;color:#15803d;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;padding:3px 8px;background:rgba(22,160,96,0.1);border-radius:100px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Payment Received</div>` : ''}
             ${isInvite  ? `<div style="font-size:0.7rem;font-weight:800;color:#1dbf73;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">★ Project Invite</div>` : ''}
             ${isCounter ? `<div style="font-size:0.7rem;font-weight:800;color:#7c3aed;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">⟺ Counter Offer</div>` : ''}
-            ${isEscrow  ? `<div style="font-size:0.7rem;font-weight:800;color:#1dbf73;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">💰 Escrow Funded</div>` : ''}
+            ${isEscrow  ? `<div style="font-size:0.7rem;font-weight:800;color:#1dbf73;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">Escrow Funded</div>` : ''}
             <div class="msg-from">${escH(m.recruiterName || m.from || 'Client')}</div>
             <div class="msg-subject">${escH(m.subject || 'New message')}</div>
             <div class="msg-body">${escH((m.body || m.message || '').slice(0, 160))}${(m.body || '').length > 160 ? '…' : ''}</div>
@@ -782,13 +808,13 @@
             </button>
           </div>
         </div>
-        ${relatedJob ? `
-          <a href="../browse-projects.html?job=${encodeURIComponent(relatedJob.id)}"
-             style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:7px 14px;background:#1dbf73;color:#fff;border-radius:8px;font-weight:700;font-size:0.82rem;text-decoration:none;">
-            View Project &amp; Submit Bid
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-          </a>
-        ` : ''}
+        ${relatedJob ? (() => {
+            const alreadyBidMsg = window.ProposalsDB && window.ProposalsDB.hasApplied(relatedJob.id, (session && session.user.id) || userId);
+            if (alreadyBidMsg) {
+              return `<a href="../browse-projects.html?job=${encodeURIComponent(relatedJob.id)}" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:7px 14px;background:#f0f0f0;color:#555;border-radius:8px;font-weight:600;font-size:0.82rem;text-decoration:none;">View Project Details</a>`;
+            }
+            return `<a href="../browse-projects.html?job=${encodeURIComponent(relatedJob.id)}" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:7px 14px;background:#1dbf73;color:#fff;border-radius:8px;font-weight:700;font-size:0.82rem;text-decoration:none;">View Project &amp; Submit Bid <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></a>`;
+          })() : ''}
         ${counterJob ? `
           <a href="../browse-projects.html?job=${encodeURIComponent(counterJob.id)}"
              style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:7px 14px;background:#7c3aed;color:#fff;border-radius:8px;font-weight:700;font-size:0.82rem;text-decoration:none;">
@@ -800,6 +826,13 @@
           <a href="../contracts.html"
              style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:7px 14px;background:#0d1b2a;color:#fff;border-radius:8px;font-weight:700;font-size:0.82rem;text-decoration:none;">
             View My Contracts →
+          </a>
+        ` : ''}
+        ${isPayment ? `
+          <a href="../contracts.html"
+             style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:8px 16px;background:#1dbf73;color:#fff;border-radius:8px;font-weight:700;font-size:0.82rem;text-decoration:none;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            View Completed Contract
           </a>
         ` : ''}
       </div>`;
@@ -868,15 +901,44 @@
           </div>
         </div>
 
-        ${e.status === 'funded' ? `
-          <div style="padding:12px 14px;background:rgba(29,191,115,0.06);border:1px solid rgba(29,191,115,0.2);border-radius:10px;margin-bottom:14px;font-size:0.83rem;color:#16a060;">
-            💰 ${dispAmt} is secured in escrow. Complete your work then submit it below for client approval.
+        ${e.status === 'funded' ? (() => {
+          const job = window.JobsDB && e.jobId ? window.JobsDB.getById(e.jobId) : null;
+          const deadlineStr = job ? job.deadline : null;
+          // Parse deadline to days
+          let daysTotal = 30, daysElapsed = 0, daysRem = 30;
+          if (e.fundedAt && deadlineStr) {
+            const map = { '1 week': 7, '2 weeks': 14, '3 weeks': 21, '1 month': 30, '2 months': 60, '3 months': 90 };
+            daysTotal = map[deadlineStr] || parseInt(deadlineStr) || 30;
+            daysElapsed = (Date.now() - new Date(e.fundedAt).getTime()) / 86400000;
+            daysRem = Math.max(0, Math.ceil(daysTotal - daysElapsed));
+          }
+          const pct = Math.min(100, (daysElapsed / daysTotal) * 100);
+          const barColor = pct > 80 ? '#f59e0b' : '#1dbf73';
+          const urgency = daysRem <= 3 ? 'color:#e53e3e;font-weight:800;' : 'color:#555;';
+          return `
+          <div style="background:#f8fffe;border:1.5px solid rgba(29,191,115,0.2);border-radius:12px;padding:14px 16px;margin-bottom:14px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+              <span style="font-size:0.78rem;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:0.05em;">⏱ Deadline</span>
+              <span style="font-size:0.82rem;${urgency}">${daysRem} day${daysRem !== 1 ? 's' : ''} remaining of ${daysTotal}</span>
+            </div>
+            <div style="background:#e8f5ee;border-radius:100px;height:8px;overflow:hidden;">
+              <div style="width:${pct}%;height:100%;border-radius:100px;background:${barColor};transition:width 0.4s;"></div>
+            </div>
           </div>
-          <button onclick="openSubmitWorkModal('${e.id}')" style="padding:11px 22px;background:#1dbf73;color:#fff;border:none;border-radius:10px;font-weight:800;cursor:pointer;font-size:0.9rem;font-family:inherit;display:inline-flex;align-items:center;gap:8px;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-            Submit Work for Approval
-          </button>
-        ` : (() => {
+          <div style="padding:10px 14px;background:rgba(29,191,115,0.06);border:1px solid rgba(29,191,115,0.2);border-radius:10px;margin-bottom:14px;font-size:0.82rem;color:#16a060;">
+            💰 ${dispAmt} is secured in escrow. Send updates or submit your final work for client approval.
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button onclick="openAddUpdateModal('${e.id}')" style="padding:10px 18px;background:#f0fdf7;color:#16a060;border:1.5px solid rgba(29,191,115,0.35);border-radius:10px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              Add Update
+            </button>
+            <button onclick="openSubmitWorkModal('${e.id}')" style="padding:10px 20px;background:#1dbf73;color:#fff;border:none;border-radius:10px;font-weight:800;cursor:pointer;font-size:0.85rem;font-family:inherit;display:inline-flex;align-items:center;gap:7px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              Submit Final Project
+            </button>
+          </div>`;
+        })() : (() => {
           if (e.status !== 'work_submitted') return '';
           const sub = JSON.parse(localStorage.getItem('sb_work_submission_' + e.id) || '{}');
           const subDate = sub.submittedAt ? new Date(sub.submittedAt) : new Date();
@@ -962,6 +1024,61 @@
       </div>`;
     document.body.appendChild(overlay);
     document.getElementById('sw-msg').focus();
+  }
+
+  function openAddUpdateModal(escrowId) {
+    _activeSubmitEscrowId = escrowId;
+    const overlay = document.createElement('div');
+    overlay.id = '_dash-upd-overlay';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:3000;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);';
+    overlay.innerHTML = `
+      <div style="background:#fff;border-radius:20px;padding:32px;width:100%;max-width:520px;max-height:88vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,0.18);">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <h2 style="font-size:1.15rem;font-weight:800;color:#111;margin:0;">Add Progress Update</h2>
+        </div>
+        <p style="font-size:0.83rem;color:#888;margin-bottom:20px;line-height:1.5;">Let your client know how the work is going. This does <strong>not</strong> submit the final project.</p>
+        <label style="font-size:0.75rem;font-weight:700;color:#555;display:block;margin-bottom:6px;">Update Message <span style="color:#e53e3e;">*</span></label>
+        <textarea id="_dash-upd-msg" style="width:100%;padding:12px 14px;border:1.5px solid #e0e0e0;border-radius:10px;font-family:inherit;font-size:0.88rem;resize:vertical;min-height:100px;box-sizing:border-box;outline:none;" placeholder="Quick progress update — I've completed the UI and am now working on…"></textarea>
+        <label style="font-size:0.75rem;font-weight:700;color:#555;display:block;margin:14px 0 6px;">🔗 Preview / Live Link <span style="font-weight:400;color:#aaa;">(optional)</span></label>
+        <input id="_dash-upd-link" type="url" style="width:100%;padding:10px 14px;border:1.5px solid #e0e0e0;border-radius:10px;font-family:inherit;font-size:0.88rem;box-sizing:border-box;outline:none;" placeholder="https://staging.example.app">
+        <label style="font-size:0.75rem;font-weight:700;color:#555;display:block;margin:14px 0 6px;">💻 Code Repo <span style="font-weight:400;color:#aaa;">(optional)</span></label>
+        <input id="_dash-upd-code" type="url" style="width:100%;padding:10px 14px;border:1.5px solid #e0e0e0;border-radius:10px;font-family:inherit;font-size:0.88rem;box-sizing:border-box;outline:none;" placeholder="https://github.com/yourname/project">
+        <div id="_dash-upd-err" style="display:none;color:#e53e3e;font-size:0.8rem;margin-top:10px;padding:8px 12px;background:#fff5f5;border-radius:8px;"></div>
+        <div style="display:flex;gap:10px;margin-top:22px;">
+          <button onclick="document.getElementById('_dash-upd-overlay').remove()" style="padding:12px 20px;background:#f5f5f5;color:#555;border:none;border-radius:10px;font-size:0.9rem;font-weight:700;cursor:pointer;font-family:inherit;">Cancel</button>
+          <button onclick="sendDashUpdate()" style="flex:1;padding:12px;background:#0d1b2a;color:#fff;border:none;border-radius:10px;font-size:0.9rem;font-weight:800;cursor:pointer;font-family:inherit;">Send Update to Client</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+    overlay.addEventListener('click', ev => { if (ev.target === overlay) overlay.remove(); });
+  }
+
+  function sendDashUpdate() {
+    const msg = (document.getElementById('_dash-upd-msg')?.value || '').trim();
+    const liveLink = (document.getElementById('_dash-upd-link')?.value || '').trim();
+    const codeLink = (document.getElementById('_dash-upd-code')?.value || '').trim();
+    const errEl = document.getElementById('_dash-upd-err');
+    errEl.style.display = 'none';
+    if (!msg) { errEl.textContent = 'Please write an update message.'; errEl.style.display = 'block'; return; }
+    const e = window.EscrowDB && window.EscrowDB.getAll().find(x => x.id === _activeSubmitEscrowId);
+    if (e) {
+      const session = window.SessionManager && window.SessionManager.getActiveUser();
+      const now = new Date().toISOString();
+      const key = 'sb_work_updates_' + _activeSubmitEscrowId;
+      const updates = JSON.parse(localStorage.getItem(key) || '[]');
+      updates.push({ message: msg, liveLink, codeLink, sentAt: now });
+      localStorage.setItem(key, JSON.stringify(updates));
+      const extras = [liveLink ? `🔗 ${liveLink}` : '', codeLink ? `💻 ${codeLink}` : ''].filter(Boolean).join('\n');
+      window.MessagesDB.send(
+        session.user.id, session.user.name || 'Freelancer', 'Freelancer', '',
+        e.clientId, '📢 Project Update — ' + e.jobTitle,
+        `${session.user.name} sent a progress update for "${e.jobTitle}".\n\n${msg}${extras ? '\n\n' + extras : ''}`
+      );
+    }
+    document.getElementById('_dash-upd-overlay').remove();
+    showFreeToast('Update sent to client ✓', '#0d1b2a');
+    renderFreelancerEscrow();
   }
 
   function handleFileSelect(input) {

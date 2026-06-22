@@ -635,7 +635,7 @@ function initProposalModal() {
 /* --------------------------------------------------------------------------
    updateNavbarState — renders nav based on session + active mode
    Mode: 'freelancer' shows Browse Projects + My Proposals
-         'client'     shows Browse Freelancers + Post Project
+         'client'     shows Browse Freelancers + Create Project Brief
    Same account can switch modes via the mode toggle button.
    -------------------------------------------------------------------------- */
 function getActiveMode(session) {
@@ -669,13 +669,13 @@ function updateNavbarState() {
       ? `${prefix}client-profile.html?id=${session.user.id}`
       : `${prefix}profile.html?id=${session.user.id}`;
 
-    // Role-specific link order — client: Home | Browse Freelancers | Post Project | Dashboard
+    // Role-specific link order — client: Home | Browse Freelancers | Create Project Brief | Dashboard
     //                             freelancer: Home | Find Work | Dashboard
     desktopMenu.innerHTML = isClient ? `
       <li><a href="${prefix}index.html" class="nav-link">Home</a></li>
       <li><a href="${prefix}candidates.html" class="nav-link">Browse Freelancers</a></li>
       <li><a href="${prefix}projects.html" class="nav-link">Browse Projects</a></li>
-      <li><a href="${prefix}post-project.html" class="nav-link">Post Project</a></li>
+      <li><a href="${prefix}post-project.html" class="nav-link">Create Project Brief</a></li>
       <li><a href="${dashUrl}" class="nav-link">Dashboard</a></li>
     ` : `
       <li><a href="${prefix}index.html" class="nav-link">Home</a></li>
@@ -717,7 +717,7 @@ function updateNavbarState() {
         <li><a href="${prefix}index.html" class="mobile-nav-link">Home</a></li>
         <li><a href="${prefix}candidates.html" class="mobile-nav-link">Browse Freelancers</a></li>
         <li><a href="${prefix}projects.html" class="mobile-nav-link">Browse Projects</a></li>
-        <li><a href="${prefix}post-project.html" class="mobile-nav-link">Post Project</a></li>
+        <li><a href="${prefix}post-project.html" class="mobile-nav-link">Create Project Brief</a></li>
         <li><a href="${dashUrl}" class="mobile-nav-link">Dashboard</a></li>
         <li><a href="${profileUrl}" class="mobile-nav-link">My Profile</a></li>
       ` : `
