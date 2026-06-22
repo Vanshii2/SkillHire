@@ -113,13 +113,21 @@
       border-radius: 10px; cursor: pointer; transition: all 0.15s;
     }
     .btn-next:hover { background: #16a060; transform: translateY(-1px); }
-    .btn-skip {
-      padding: 13px 20px; font-size: 0.88rem; font-weight: 600;
-      background: #f5f5f5; color: #888; border: none;
+    .btn-back {
+      padding: 13px 20px; font-size: 0.95rem; font-weight: 700;
+      background: transparent; color: #888; border: 1px solid #e0e0e0;
       border-radius: 10px; cursor: pointer; transition: all 0.15s;
-      white-space: nowrap;
     }
-    .btn-skip:hover { background: #ebebeb; color: #555; }
+    .btn-back:hover { border-color: #bbb; color: #555; }
+    .btn-skip {
+      display: none; width: 100%; text-align: center; margin-top: 10px;
+      font-size: 0.84rem; color: #aaa; background: none; border: none;
+      cursor: pointer;
+    }
+    .btn-skip:hover { color: #888; text-decoration: underline; }
+    .step-error {
+      color: #e53e3e; font-size: 0.82rem; margin-top: 8px; display: none;
+    }
 
     /* Step dots */
     .step-dots {
@@ -192,9 +200,11 @@
         </div>
         <div id="step-content"></div>
         <div class="setup-actions">
+          <button class="btn-back" id="btn-back" onclick="prevStep()" style="display:none;">← Back</button>
           <button class="btn-next" id="btn-next" onclick="nextStep()">Continue</button>
-          <button class="btn-skip" id="btn-skip" onclick="skipStep()">Skip</button>
         </div>
+        <button class="btn-skip" id="btn-skip" onclick="skipStep()">I don't have a company — skip this step</button>
+        <div class="step-error" id="step-error"></div>
       </div>
 
       <!-- Step dots -->
@@ -221,13 +231,13 @@
       id: 'about',
       title: 'About You',
       desc: 'Write a short bio to help clients understand who you are.',
-      required: false,
+      required: true,
       render: () => `
         <h2>About You</h2>
         <p>Write a short bio to help clients understand who you are.</p>
         <div class="form-group">
-          <label for="s-about">Bio / About</label>
-          <textarea id="s-about" placeholder="I'm a frontend developer with 3+ years of experience building React apps..."></textarea>
+          <label for="s-about">Bio / About <span style="color:#e53e3e;">*</span></label>
+          <textarea id="s-about" placeholder="I'm a frontend developer with 3+ years of experience building React apps...">${currentData().about || ''}</textarea>
         </div>
       `,
       save: () => ({ about: document.getElementById('s-about').value.trim() })
@@ -236,14 +246,14 @@
       id: 'skills',
       title: 'Your Skills',
       desc: 'Add skills to help clients find you.',
-      required: false,
+      required: true,
       render: () => {
-        stepSkills = [];
+        stepSkills = [...(currentData().skills || [])];
         return `
           <h2>Your Skills</h2>
-          <p>Add skills to help clients find the right freelancer.</p>
+          <p>Add at least one skill so clients can find you.</p>
           <div class="form-group">
-            <label>Skills <span style="color:#aaa;font-weight:400;font-size:0.82rem;">(press Enter or comma to add)</span></label>
+            <label>Skills <span style="color:#e53e3e;">*</span> <span style="color:#aaa;font-weight:400;font-size:0.82rem;">(press Enter or comma to add)</span></label>
             <div class="skills-input-wrap" id="setup-skills-wrap">
               ${stepSkills.map(s => `<div class="skill-chip">${s}<button type="button" onclick="removeSetupSkill('${s}',this)">&times;</button></div>`).join('')}
               <input type="text" id="setup-skills-input" placeholder="e.g. React, Node.js, Python...">
@@ -272,13 +282,13 @@
       id: 'rate',
       title: 'Hourly Rate',
       desc: 'Set your starting hourly rate.',
-      required: false,
+      required: true,
       render: () => `
         <h2>Your Hourly Rate</h2>
         <p>Set a starting rate. You can negotiate project-by-project.</p>
         <div class="form-group">
-          <label for="s-rate">Hourly Rate (₹/hr)</label>
-          <input type="number" id="s-rate" placeholder="e.g. 800" min="100" max="10000" value="${currentData().hourlyRate || ''}">
+          <label for="s-rate">Hourly Rate (₹/hr) <span style="color:#e53e3e;">*</span></label>
+          <input type="number" id="s-rate" placeholder="e.g. 800" min="1" value="${currentData().hourlyRate || ''}">
         </div>
       `,
       save: () => {
@@ -290,12 +300,12 @@
       id: 'contact',
       title: 'Your Links',
       desc: 'Add LinkedIn or GitHub so clients can learn more about you.',
-      required: false,
+      required: true,
       render: () => {
         const contact = currentData().contact || {};
         return `
           <h2>Professional Links</h2>
-          <p>Optional — add LinkedIn or GitHub for credibility.</p>
+          <p>Add at least one — LinkedIn or GitHub — so clients can verify your work. <span style="color:#e53e3e;">*</span></p>
           <div class="form-group">
             <label for="s-linkedin">LinkedIn URL</label>
             <input type="url" id="s-linkedin" placeholder="https://linkedin.com/in/yourname" value="${contact.linkedin || ''}">
@@ -321,42 +331,82 @@
       render: () => `
         <h2>Upload Your Profile Photo</h2>
         <p>A real photo builds trust. This is required to complete your profile.</p>
-        <div style="display:flex;flex-direction:column;align-items:center;gap:20px;padding:12px 0;">
-          <div id="photo-preview-wrap" style="width:110px;height:110px;border-radius:50%;background:#f0f0f0;overflow:hidden;display:flex;align-items:center;justify-content:center;border:3px dashed #d0d0d0;position:relative;">
-            <svg id="photo-placeholder-icon" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            <img id="photo-preview-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:50%;">
-          </div>
-          <label for="s-photo-input" style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:10px;background:rgba(29,191,115,0.08);color:#16a060;border:1.5px solid rgba(29,191,115,0.25);font-weight:700;font-size:0.88rem;cursor:pointer;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:18px;padding:12px 0;">
+          <label for="s-photo-input" id="photo-drop-zone" style="width:160px;height:160px;border-radius:50%;background:#f8f8f8;border:3px dashed #d0d0d0;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative;overflow:hidden;transition:border-color 0.2s,background 0.2s;">
+            <svg id="photo-placeholder-icon" width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span id="photo-upload-text" style="font-size:0.72rem;color:#bbb;margin-top:8px;text-align:center;line-height:1.4;padding:0 14px;">Click or drag<br>photo here</span>
+            <img id="photo-preview-img" src="" alt="" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+          </label>
+          <input type="file" id="s-photo-input" accept="image/jpeg,image/png,image/webp" style="display:none;">
+          <button type="button" onclick="document.getElementById('s-photo-input').click()" style="display:inline-flex;align-items:center;gap:8px;padding:10px 22px;border-radius:10px;background:rgba(29,191,115,0.08);color:#16a060;border:1.5px solid rgba(29,191,115,0.25);font-weight:700;font-size:0.88rem;cursor:pointer;font-family:inherit;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
             Choose Photo
-          </label>
-          <input type="file" id="s-photo-input" accept="image/*" style="display:none;">
+          </button>
           <p id="photo-hint" style="font-size:0.78rem;color:#aaa;text-align:center;margin:0;">JPG, PNG or WEBP · Max 4MB</p>
-          <p id="photo-name" style="font-size:0.82rem;color:#1dbf73;font-weight:600;display:none;"></p>
+          <p id="photo-name" style="font-size:0.82rem;color:#1dbf73;font-weight:600;margin:0;display:none;"></p>
         </div>
       `,
       afterRender: () => {
         const input = document.getElementById('s-photo-input');
-        input.addEventListener('change', () => {
-          const file = input.files[0];
+        const dropZone = document.getElementById('photo-drop-zone');
+        if (!input) return;
+
+        const existing = currentData().avatar;
+        if (existing && existing.startsWith('data:')) {
+          document.getElementById('photo-preview-img').src = existing;
+          document.getElementById('photo-preview-img').style.display = 'block';
+          document.getElementById('photo-placeholder-icon').style.display = 'none';
+          document.getElementById('photo-upload-text').style.display = 'none';
+          dropZone.style.borderColor = '#1dbf73';
+          dropZone.style.background = '#f0fdf4';
+        }
+
+        function compressAndShow(file) {
           if (!file) return;
+          if (!file.type.match(/^image\/(jpeg|jpg|png|webp)$/i)) {
+            const h = document.getElementById('photo-hint');
+            h.textContent = 'Please choose a JPG, PNG or WEBP image.'; h.style.color = '#e53e3e'; return;
+          }
           if (file.size > 4 * 1024 * 1024) {
-            document.getElementById('photo-hint').textContent = 'File too large. Please choose an image under 4MB.';
-            document.getElementById('photo-hint').style.color = '#e53e3e';
-            return;
+            const h = document.getElementById('photo-hint');
+            h.textContent = 'File too large. Please choose an image under 4MB.'; h.style.color = '#e53e3e'; return;
           }
           const reader = new FileReader();
-          reader.onload = e => {
-            const src = e.target.result;
-            document.getElementById('photo-preview-img').src = src;
-            document.getElementById('photo-preview-img').style.display = 'block';
-            document.getElementById('photo-placeholder-icon').style.display = 'none';
-            document.getElementById('photo-preview-wrap').style.borderColor = '#1dbf73';
-            document.getElementById('photo-name').textContent = file.name;
-            document.getElementById('photo-name').style.display = 'block';
+          reader.onload = ev => {
+            const img = new Image();
+            img.onload = () => {
+              const MAX = 400;
+              const scale = Math.min(1, MAX / Math.max(img.width, img.height));
+              const canvas = document.createElement('canvas');
+              canvas.width = Math.round(img.width * scale);
+              canvas.height = Math.round(img.height * scale);
+              canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+              const compressed = canvas.toDataURL('image/jpeg', 0.82);
+
+              document.getElementById('photo-preview-img').src = compressed;
+              document.getElementById('photo-preview-img').style.display = 'block';
+              document.getElementById('photo-placeholder-icon').style.display = 'none';
+              document.getElementById('photo-upload-text').style.display = 'none';
+              dropZone.style.borderColor = '#1dbf73';
+              dropZone.style.background = '#f0fdf4';
+
+              const nameEl = document.getElementById('photo-name');
+              nameEl.textContent = '✓ ' + file.name;
+              nameEl.style.display = 'block';
+
+              const h = document.getElementById('photo-hint');
+              h.textContent = 'JPG, PNG or WEBP · Max 4MB'; h.style.color = '#aaa';
+            };
+            img.src = ev.target.result;
           };
           reader.readAsDataURL(file);
-        });
+        }
+
+        input.addEventListener('change', () => compressAndShow(input.files[0]));
+
+        dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.style.borderColor = '#1dbf73'; dropZone.style.background = '#f0fdf4'; });
+        dropZone.addEventListener('dragleave', () => { if (!document.getElementById('photo-preview-img').src.startsWith('data:')) { dropZone.style.borderColor = '#d0d0d0'; dropZone.style.background = '#f8f8f8'; } });
+        dropZone.addEventListener('drop', e => { e.preventDefault(); compressAndShow(e.dataTransfer.files[0]); });
       },
       save: () => {
         const img = document.getElementById('photo-preview-img');
@@ -374,9 +424,10 @@
       title: 'Your Company',
       desc: 'Tell freelancers a bit about your company.',
       required: false,
+      skippable: true,
       render: () => `
         <h2>Your Company</h2>
-        <p>Help freelancers understand who they'd be working with.</p>
+        <p>Help freelancers understand who they'd be working with. You can skip this if you're hiring as an individual.</p>
         <div class="form-group">
           <label for="s-company">Company Name</label>
           <input type="text" id="s-company" placeholder="e.g. Acme Corp" value="${currentData().company || ''}">
@@ -388,13 +439,13 @@
       id: 'about-client',
       title: 'About Your Work',
       desc: 'What kind of projects do you typically hire for?',
-      required: false,
+      required: true,
       render: () => `
         <h2>What Do You Build?</h2>
-        <p>Help freelancers understand the type of work you bring.</p>
+        <p>Help freelancers understand the type of work you bring. <span style="color:#e53e3e;">*</span></p>
         <div class="form-group">
           <label for="s-about">About / Description</label>
-          <textarea id="s-about" placeholder="We build SaaS products and need freelancers for design, frontend, and backend work..."></textarea>
+          <textarea id="s-about" placeholder="We build SaaS products and need freelancers for design, frontend, and backend work...">${currentData().about || ''}</textarea>
         </div>
       `,
       save: () => ({ about: document.getElementById('s-about').value.trim() })
@@ -407,42 +458,82 @@
       render: () => `
         <h2>Upload Your Profile Photo</h2>
         <p>Help freelancers put a face to your name. This is required.</p>
-        <div style="display:flex;flex-direction:column;align-items:center;gap:20px;padding:12px 0;">
-          <div id="photo-preview-wrap" style="width:110px;height:110px;border-radius:50%;background:#f0f0f0;overflow:hidden;display:flex;align-items:center;justify-content:center;border:3px dashed #d0d0d0;position:relative;">
-            <svg id="photo-placeholder-icon" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            <img id="photo-preview-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:50%;">
-          </div>
-          <label for="s-photo-input" style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:10px;background:rgba(29,191,115,0.08);color:#16a060;border:1.5px solid rgba(29,191,115,0.25);font-weight:700;font-size:0.88rem;cursor:pointer;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:18px;padding:12px 0;">
+          <label for="s-photo-input" id="photo-drop-zone" style="width:160px;height:160px;border-radius:50%;background:#f8f8f8;border:3px dashed #d0d0d0;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative;overflow:hidden;transition:border-color 0.2s,background 0.2s;">
+            <svg id="photo-placeholder-icon" width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span id="photo-upload-text" style="font-size:0.72rem;color:#bbb;margin-top:8px;text-align:center;line-height:1.4;padding:0 14px;">Click or drag<br>photo here</span>
+            <img id="photo-preview-img" src="" alt="" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+          </label>
+          <input type="file" id="s-photo-input" accept="image/jpeg,image/png,image/webp" style="display:none;">
+          <button type="button" onclick="document.getElementById('s-photo-input').click()" style="display:inline-flex;align-items:center;gap:8px;padding:10px 22px;border-radius:10px;background:rgba(29,191,115,0.08);color:#16a060;border:1.5px solid rgba(29,191,115,0.25);font-weight:700;font-size:0.88rem;cursor:pointer;font-family:inherit;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
             Choose Photo
-          </label>
-          <input type="file" id="s-photo-input" accept="image/*" style="display:none;">
+          </button>
           <p id="photo-hint" style="font-size:0.78rem;color:#aaa;text-align:center;margin:0;">JPG, PNG or WEBP · Max 4MB</p>
-          <p id="photo-name" style="font-size:0.82rem;color:#1dbf73;font-weight:600;display:none;"></p>
+          <p id="photo-name" style="font-size:0.82rem;color:#1dbf73;font-weight:600;margin:0;display:none;"></p>
         </div>
       `,
       afterRender: () => {
         const input = document.getElementById('s-photo-input');
-        input.addEventListener('change', () => {
-          const file = input.files[0];
+        const dropZone = document.getElementById('photo-drop-zone');
+        if (!input) return;
+
+        const existing = currentData().avatar;
+        if (existing && existing.startsWith('data:')) {
+          document.getElementById('photo-preview-img').src = existing;
+          document.getElementById('photo-preview-img').style.display = 'block';
+          document.getElementById('photo-placeholder-icon').style.display = 'none';
+          document.getElementById('photo-upload-text').style.display = 'none';
+          dropZone.style.borderColor = '#1dbf73';
+          dropZone.style.background = '#f0fdf4';
+        }
+
+        function compressAndShow(file) {
           if (!file) return;
+          if (!file.type.match(/^image\/(jpeg|jpg|png|webp)$/i)) {
+            const h = document.getElementById('photo-hint');
+            h.textContent = 'Please choose a JPG, PNG or WEBP image.'; h.style.color = '#e53e3e'; return;
+          }
           if (file.size > 4 * 1024 * 1024) {
-            document.getElementById('photo-hint').textContent = 'File too large. Please choose an image under 4MB.';
-            document.getElementById('photo-hint').style.color = '#e53e3e';
-            return;
+            const h = document.getElementById('photo-hint');
+            h.textContent = 'File too large. Please choose an image under 4MB.'; h.style.color = '#e53e3e'; return;
           }
           const reader = new FileReader();
-          reader.onload = e => {
-            const src = e.target.result;
-            document.getElementById('photo-preview-img').src = src;
-            document.getElementById('photo-preview-img').style.display = 'block';
-            document.getElementById('photo-placeholder-icon').style.display = 'none';
-            document.getElementById('photo-preview-wrap').style.borderColor = '#1dbf73';
-            document.getElementById('photo-name').textContent = file.name;
-            document.getElementById('photo-name').style.display = 'block';
+          reader.onload = ev => {
+            const img = new Image();
+            img.onload = () => {
+              const MAX = 400;
+              const scale = Math.min(1, MAX / Math.max(img.width, img.height));
+              const canvas = document.createElement('canvas');
+              canvas.width = Math.round(img.width * scale);
+              canvas.height = Math.round(img.height * scale);
+              canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+              const compressed = canvas.toDataURL('image/jpeg', 0.82);
+
+              document.getElementById('photo-preview-img').src = compressed;
+              document.getElementById('photo-preview-img').style.display = 'block';
+              document.getElementById('photo-placeholder-icon').style.display = 'none';
+              document.getElementById('photo-upload-text').style.display = 'none';
+              dropZone.style.borderColor = '#1dbf73';
+              dropZone.style.background = '#f0fdf4';
+
+              const nameEl = document.getElementById('photo-name');
+              nameEl.textContent = '✓ ' + file.name;
+              nameEl.style.display = 'block';
+
+              const h = document.getElementById('photo-hint');
+              h.textContent = 'JPG, PNG or WEBP · Max 4MB'; h.style.color = '#aaa';
+            };
+            img.src = ev.target.result;
           };
           reader.readAsDataURL(file);
-        });
+        }
+
+        input.addEventListener('change', () => compressAndShow(input.files[0]));
+
+        dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.style.borderColor = '#1dbf73'; dropZone.style.background = '#f0fdf4'; });
+        dropZone.addEventListener('dragleave', () => { if (!document.getElementById('photo-preview-img').src.startsWith('data:')) { dropZone.style.borderColor = '#d0d0d0'; dropZone.style.background = '#f8f8f8'; } });
+        dropZone.addEventListener('drop', e => { e.preventDefault(); compressAndShow(e.dataTransfer.files[0]); });
       },
       save: () => {
         const img = document.getElementById('photo-preview-img');
@@ -504,9 +595,17 @@
     document.getElementById('step-content').innerHTML = step.render();
     if (step.afterRender) step.afterRender();
 
-    // Hide Skip on required steps (photo)
+    // Show/hide back button
+    const backBtn = document.getElementById('btn-back');
+    if (backBtn) backBtn.style.display = currentStep > 0 ? '' : 'none';
+
+    // Show/hide skip button
     const skipBtn = document.getElementById('btn-skip');
-    if (skipBtn) skipBtn.style.display = step.required ? 'none' : '';
+    if (skipBtn) skipBtn.style.display = step.skippable ? 'block' : 'none';
+
+    // Clear any previous error
+    const errEl = document.getElementById('step-error');
+    if (errEl) { errEl.textContent = ''; errEl.style.display = 'none'; }
 
     // dots
     const dots = document.getElementById('step-dots');
@@ -520,6 +619,23 @@
     updateProgress();
   }
 
+  function prevStep() {
+    if (currentStep <= 0) return;
+    currentStep--;
+    renderStep();
+  }
+
+  function skipStep() {
+    completedSteps = Math.max(completedSteps, currentStep + 1);
+    currentStep++;
+    renderStep();
+  }
+
+  function showStepError(msg) {
+    const errEl = document.getElementById('step-error');
+    if (errEl) { errEl.textContent = msg; errEl.style.display = 'block'; }
+  }
+
   function saveCurrentStep() {
     const steps = getSteps();
     const step = steps[currentStep];
@@ -529,18 +645,66 @@
 
     const current = currentData();
     const merged = { ...current, ...data };
-    if (session.role === 'candidate') {
-      window.CandidatesDB.save(merged);
-    } else {
-      window.RecruitersDB.update(merged);
+    try {
+      if (session.role === 'candidate') {
+        window.CandidatesDB.save(merged);
+      } else {
+        window.RecruitersDB.update(merged);
+      }
+    } catch (err) {
+      if (err.name === 'QuotaExceededError' || (err.message && err.message.toLowerCase().includes('quota'))) {
+        const hint = document.getElementById('photo-hint');
+        if (hint) { hint.textContent = 'Storage full — try a smaller image.'; hint.style.color = '#e53e3e'; }
+        throw err;
+      }
     }
   }
 
   function nextStep() {
     const steps = getSteps();
     const step = steps[currentStep];
-    // Enforce photo upload on the photo step
-    if (step && step.id === 'photo') {
+    if (!step) return;
+
+    // Clear previous error
+    const errEl = document.getElementById('step-error');
+    if (errEl) { errEl.textContent = ''; errEl.style.display = 'none'; }
+
+    // Per-step validation
+    if (step.id === 'about' || step.id === 'about-client') {
+      const val = (document.getElementById('s-about') || {}).value || '';
+      if (!val.trim()) { showStepError('Please write a short bio before continuing.'); return; }
+    }
+
+    if (step.id === 'skills') {
+      if (stepSkills.length === 0) {
+        const pending = (document.getElementById('setup-skills-input') || {}).value || '';
+        if (pending.trim()) {
+          addSetupSkill(pending.trim());
+          document.getElementById('setup-skills-input').value = '';
+        }
+        if (stepSkills.length === 0) {
+          showStepError('Please add at least one skill before continuing.'); return;
+        }
+      }
+    }
+
+    if (step.id === 'rate') {
+      const rawVal = (document.getElementById('s-rate') || {}).value || '';
+      const numVal = parseInt(rawVal);
+      if (!rawVal.trim() || isNaN(numVal) || numVal < 1) {
+        showStepError('Please enter your hourly rate (₹/hr) before continuing.'); return;
+      }
+    }
+
+    if (step.id === 'contact') {
+      const linkedin = ((document.getElementById('s-linkedin') || {}).value || '').trim();
+      const github   = ((document.getElementById('s-github')   || {}).value || '').trim();
+      if (!linkedin && !github) {
+        showStepError('Please add at least one link — LinkedIn or GitHub — to continue.'); return;
+      }
+    }
+
+    if (step.id === 'photo') {
       const img = document.getElementById('photo-preview-img');
       if (!img || !img.src || !img.src.startsWith('data:')) {
         const hint = document.getElementById('photo-hint');
@@ -548,20 +712,26 @@
         return;
       }
     }
-    saveCurrentStep();
+
+    try { saveCurrentStep(); } catch (e) { return; }
     completedSteps = Math.max(completedSteps, currentStep + 1);
     currentStep++;
     renderStep();
   }
 
-  function skipStep() {
-    completedSteps = Math.max(completedSteps, currentStep);
-    currentStep++;
-    renderStep();
-  }
 
   function showComplete() {
     updateProgress();
+
+    // Mark profile as active and available now that setup is done
+    const current = currentData();
+    current.lastLoginAt = Date.now();
+    if (session.role === 'candidate') {
+      current.availability = 'Available';
+      try { window.CandidatesDB.save(current); } catch(e) {}
+    } else {
+      try { window.RecruitersDB.update(current); } catch(e) {}
+    }
 
     const dashUrl = session.role === 'recruiter' ? 'recruiter/dashboard.html' : 'candidate/dashboard.html';
     const browseUrl = session.role === 'recruiter' ? 'candidates.html' : 'browse-projects.html';

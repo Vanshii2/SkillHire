@@ -177,8 +177,15 @@ a {
 }
 
 .badge-fulltime {
-  background-color: var(--badge-green-bg);
-  color: var(--badge-green-text);
+  background-color: #e6f4ea;
+  color: #16a060;
+  font-weight: 700;
+}
+
+.badge-inactive {
+  background-color: #f3f4f6;
+  color: #9ca3af;
+  font-weight: 700;
 }
 
 /* Skill Tags */
@@ -629,8 +636,8 @@ main {
 
 .req-star { color: #e53e3e; font-size: 0.85em; margin-left: 2px; }
 
-.pw-wrap { position: relative; }
-.pw-wrap input { padding-right: 44px; }
+.pw-wrap { position: relative; width: 100%; display: block; }
+.pw-wrap input { padding-right: 44px; width: 100%; box-sizing: border-box; }
 .pw-toggle {
   position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
   background: none; border: none; cursor: pointer; color: #aaa;

@@ -13,19 +13,40 @@
 
     .bp-hero {
       background: linear-gradient(135deg, #0d1b2a 0%, #0a2617 100%);
-      padding: 56px 0 44px;
+      padding: 28px 0 24px;
       color: white;
     }
-    .bp-hero h1 { font-size: clamp(1.8rem,4vw,2.6rem); font-weight:800; letter-spacing:-0.03em; color:#fff; margin-bottom:8px; }
-    .bp-hero p { color:rgba(255,255,255,0.85); font-size:1rem; max-width:500px; }
+    .bp-hero-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .bp-hero h1 { font-size: clamp(1.5rem,3vw,2rem); font-weight:800; letter-spacing:-0.03em; color:#fff; margin-bottom:6px; }
+    .bp-hero p { color:rgba(255,255,255,0.85); font-size:0.95rem; max-width:480px; margin:0; }
+    .bp-hero-btn {
+      display: inline-block;
+      background: #1dbf73;
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 12px 28px;
+      border-radius: 99px;
+      text-decoration: none;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: background 0.15s;
+    }
+    .bp-hero-btn:hover { background: #16a060; }
 
     .bp-body {
-      max-width: 1100px;
+      max-width: 1280px;
       margin: 0 auto;
       padding: 40px 24px 80px;
       display: grid;
-      grid-template-columns: 260px 1fr;
-      gap: 32px;
+      grid-template-columns: 320px 1fr;
+      gap: 36px;
       align-items: start;
     }
 
@@ -237,9 +258,12 @@
 
   <main>
     <div class="bp-hero">
-      <div class="container">
-        <h1>Browse Projects</h1>
-        <p>Discover live projects posted by clients. Submit your proposal and start earning.</p>
+      <div class="container bp-hero-inner">
+        <div>
+          <h1>Browse Projects</h1>
+          <p>Discover live projects posted by clients. Submit your proposal and start earning.</p>
+        </div>
+        <a href="#" id="bp-hero-action-btn" class="bp-hero-btn" style="display:none;">Create Your Profile</a>
       </div>
     </div>
 
@@ -313,28 +337,27 @@
   document.addEventListener('DOMContentLoaded', () => {
     if (window.initProposalModal) window.initProposalModal();
 
-    // Hide "Post a Project" CTA for freelancers — it's only relevant for clients
-    const ctaBanner = document.getElementById('post-project-cta');
-    const ctaSession = window.SessionManager.getActiveUser();
-    if (ctaBanner && ctaSession && ctaSession.role === 'candidate') {
-      ctaBanner.style.display = 'none';
+    // Hero action button: "Create Your Profile" (logged out) or "Add Projects" (freelancer)
+    const heroBtn = document.getElementById('bp-hero-action-btn');
+    const _bpSession = window.SessionManager.getActiveUser();
+    if (heroBtn) {
+      if (!_bpSession) {
+        heroBtn.textContent = 'Create Your Profile';
+        heroBtn.style.display = 'inline-block';
+        heroBtn.addEventListener('click', e => { e.preventDefault(); if (window.openAuthModal) window.openAuthModal('login'); });
+      } else if (_bpSession.role === 'candidate') {
+        heroBtn.textContent = 'Add Projects';
+        heroBtn.style.display = 'inline-block';
+        heroBtn.href = 'edit-profile.html#add-project-form';
+      }
+      // recruiters/clients: button stays hidden
     }
 
-    // Gate: freelancers must have at least 1 project to browse/apply
-    const gateSession = window.SessionManager.getActiveUser();
-    if (gateSession && gateSession.role === 'candidate') {
-      const me = window.CandidatesDB.getById(gateSession.user.id);
-      if (!me || !me.projects || me.projects.length === 0) {
-        document.querySelector('.bp-body').innerHTML = `
-          <div style="grid-column:1/-1;text-align:center;padding:80px 20px;">
-            <div style="font-size:3rem;margin-bottom:16px;">📁</div>
-            <h2 style="font-size:1.5rem;font-weight:800;margin-bottom:10px;">Add a Project First</h2>
-            <p style="color:#888;max-width:420px;margin:0 auto 24px;">You need at least one project in your profile before you can browse and apply for jobs. This helps clients see your work.</p>
-            <a href="edit-profile.html" class="btn btn-primary" style="padding:12px 28px;font-size:0.95rem;">Add Your First Project</a>
-          </div>
-        `;
-        return;
-      }
+    // Hide "Post a Project" CTA for guests and freelancers — only relevant for logged-in clients
+    const ctaBanner = document.getElementById('post-project-cta');
+    const ctaSession = window.SessionManager.getActiveUser();
+    if (ctaBanner && (!ctaSession || ctaSession.role === 'candidate')) {
+      ctaBanner.style.display = 'none';
     }
 
     renderJobs();
@@ -380,8 +403,28 @@
   function renderJobs() {
     const search = document.getElementById('proj-search').value;
     const cat = document.querySelector('.category-btn.active')?.getAttribute('data-cat') || '';
-    const jobs = window.JobsDB.query({ search, category: cat }).filter(j => !j.directHire);
     const session = window.SessionManager.getActiveUser();
+
+    // Get the freelancer's saved skills (lowercase for comparison)
+    let mySkills = [];
+    if (session && session.role === 'candidate') {
+      const me = window.CandidatesDB.getById(session.user.id);
+      if (me && Array.isArray(me.skills) && me.skills.length > 0) {
+        mySkills = me.skills.map(s => s.toLowerCase());
+      }
+    }
+
+    let jobs = window.JobsDB.query({ search, category: cat }).filter(j => !j.directHire);
+
+    // Sort by skill match — jobs sharing skills with the freelancer come first
+    if (mySkills.length > 0) {
+      jobs = jobs.slice().sort((a, b) => {
+        const scoreA = (a.skills || []).filter(s => mySkills.includes(s.toLowerCase())).length;
+        const scoreB = (b.skills || []).filter(s => mySkills.includes(s.toLowerCase())).length;
+        return scoreB - scoreA;
+      });
+    }
+
     const list = document.getElementById('jobs-list');
     const countLabel = document.getElementById('job-count-label');
 

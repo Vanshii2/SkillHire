@@ -93,11 +93,15 @@ function filterAndRender() {
   const sortVal = sortSelect ? sortSelect.value : '';
 
   // Query LocalStorage database
-  const matches = window.CandidatesDB.query({
+  const session = window.SessionManager && window.SessionManager.getActiveUser();
+  const rawMatches = window.CandidatesDB.query({
     search: searchVal,
     skills: selectedSkills,
     sortBy: sortVal
   });
+
+  // Never show the logged-in user their own profile — can't hire yourself
+  const matches = session ? rawMatches.filter(c => c.id !== session.user.id) : rawMatches;
 
   // Update counter
   if (countDisplay) {
@@ -118,7 +122,6 @@ function filterAndRender() {
     return;
   }
 
-  const session = window.SessionManager && window.SessionManager.getActiveUser();
   const activeMode = localStorage.getItem('skillbridge_mode') || 'freelancer';
   const isRecruiter = session && (session.role === 'recruiter' || (session.user && session.user.bothRoles && activeMode === 'client'));
 

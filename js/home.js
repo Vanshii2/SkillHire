@@ -46,10 +46,10 @@ function initHeroToggle() {
   btnHire.addEventListener('click', () => {
     btnHire.classList.add('active');
     btnWork.classList.remove('active');
-    
-    heading.innerHTML = 'Grow at the speed<br>of your ambition';
-    subtext.innerHTML = 'Hire experts who use AI to amplify their skills<br>and impact — turning complex work into results';
-    
+
+    heading.innerHTML = 'Grow at the speed <br>of your ambition.';
+    subtext.innerHTML = 'Browse freelancers and hire the right person.';
+
     ctaHire.style.display = 'flex';
     ctaWork.style.display = 'none';
   });
@@ -176,7 +176,7 @@ function renderProjectsShowcase(activeFilter) {
   const filtered = (activeFilter === 'all'
     ? allProjects
     : allProjects.filter(p => p.tags.some(t => t.toLowerCase() === activeFilter.toLowerCase()))
-  ).slice(0, 3);
+  ).sort((a, b) => (b.likes || 0) - (a.likes || 0)).slice(0, 3);
 
   if (filtered.length === 0) {
     container.innerHTML = '<p style="text-align:center;color:var(--secondary-text);padding:40px 0;">No projects found for this category.</p>';
@@ -186,10 +186,17 @@ function renderProjectsShowcase(activeFilter) {
   // Retrieve liked state from localStorage
   const likedProjects = getLikedProjects();
 
+  const session = window.SessionManager && window.SessionManager.getActiveUser();
+  const pendingSaves = JSON.parse(localStorage.getItem('skillbridge_pending_saves') || '[]');
+  const savedProjects = (session && session.role === 'candidate')
+    ? ((window.CandidatesDB.getById(session.user.id) || {}).savedProjects || [])
+    : pendingSaves;
+
   container.innerHTML = filtered.map((project, idx) => {
     const isLiked = likedProjects.includes(project.id);
     const heartFill = isLiked ? '#1dbf73' : 'none';
     const heartStroke = isLiked ? '#1dbf73' : 'currentColor';
+    const isSaved = savedProjects.includes(project.id);
 
     return `
       <a href="project.html?id=${encodeURIComponent(project.id)}"
@@ -197,7 +204,7 @@ function renderProjectsShowcase(activeFilter) {
          id="project-card-${idx}"
          data-project-id="${escapeHTML(project.id)}">
 
-        <!-- Thumbnail + Hover Overlay -->
+        <!-- Thumbnail + Hover Overlay (Save only — Like is in footer) -->
         <div class="project-shot-thumb">
           <img
             src="${escapeHTML(project.thumbnail)}"
@@ -209,25 +216,14 @@ function renderProjectsShowcase(activeFilter) {
             <div class="project-shot-overlay-title">${escapeHTML(project.title)}</div>
             <div class="project-shot-actions">
               <button
-                class="project-shot-action-btn${isLiked ? ' liked' : ''}"
-                id="like-btn-${idx}"
-                data-project-id="${escapeHTML(project.id)}"
-                aria-label="Like project"
-                onclick="event.preventDefault(); toggleProjectLike(this, '${escapeHTML(project.id)}', ${idx})"
-              >
-                <svg viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                </svg>
-                Like
-              </button>
-              <button
-                class="project-shot-action-btn"
+                class="project-shot-action-btn${isSaved ? ' saved' : ''}"
                 id="save-btn-${idx}"
+                data-saved="${isSaved}"
                 data-project-id="${escapeHTML(project.id)}"
                 aria-label="Save project"
-                onclick="event.preventDefault(); toggleProjectSave(this, '${escapeHTML(project.id)}', ${idx})"
+                onclick="event.preventDefault(); event.stopPropagation(); toggleProjectSave(this, '${escapeHTML(project.id)}', ${idx})"
               >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg viewBox="0 0 24 24" fill="${isSaved ? '#111111' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
                 </svg>
                 Save
@@ -247,12 +243,18 @@ function renderProjectsShowcase(activeFilter) {
             <span class="project-shot-author-name">${escapeHTML(project.authorName)}</span>
           </div>
           <div class="project-shot-stats">
-            <span class="project-shot-stat">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <button
+              class="project-shot-stat like-footer-btn${isLiked ? ' liked' : ''}"
+              id="like-btn-${idx}"
+              onclick="event.preventDefault(); event.stopPropagation(); toggleProjectLike(this, '${escapeHTML(project.id)}', ${idx})"
+              style="background:none;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:4px;padding:0;font-size:inherit;color:inherit;"
+              aria-label="Like"
+            >
+              <svg viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
               </svg>
-              <span id="likes-count-${idx}">${formatCount(project.likes)}</span>
-            </span>
+              <span id="likes-count-${idx}" data-raw="${project.likes}">${formatCount(project.likes)}</span>
+            </button>
             <span class="project-shot-stat">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
@@ -317,14 +319,14 @@ function setupShowcaseTabs() {
       const view = btn.getAttribute('data-view');
 
       if (view === 'shots') {
-        heading.textContent  = 'Projects';
-        subtext.textContent  = 'Browse real work from talented creators — hover to interact.';
+        heading.textContent  = 'Featured Work';
+        subtext.textContent  = 'Explore real work from top freelancers on SkillBridge.';
         panelShots.style.display     = '';
         panelDesigners.style.display = 'none';
         if (browseAll) { browseAll.textContent = 'Browse All Talent →'; browseAll.href = 'candidates.html'; }
       } else {
         heading.textContent  = 'Freelancers';
-        subtext.textContent  = 'Discover skilled designers and developers ready to work with you.';
+        subtext.textContent  = 'Discover skilled freelancers and developers ready to work with you.';
         panelShots.style.display     = 'none';
         panelDesigners.style.display = '';
         renderDesigners();
@@ -341,7 +343,7 @@ function renderDesigners() {
   const container = document.getElementById('designers-grid');
   if (!container || container.dataset.rendered) return;
 
-  const candidates = window.CandidatesDB.getAll().slice(0, 3);
+  const candidates = window.CandidatesDB.getAll().sort((a, b) => (b.rating || 0) - (a.rating || 0)).slice(0, 3);
   if (!candidates || candidates.length === 0) {
     container.innerHTML = '<p style="text-align:center;color:var(--secondary-text);padding:40px 0;">No freelancers found.</p>';
     return;
@@ -427,34 +429,49 @@ function toggleProjectLike(btn, projectId, idx) {
     btn.querySelector('svg').setAttribute('stroke', '#1dbf73');
   }
 
-  // Update footer like count display (optimistic)
+  // Update footer like count display using data-raw to avoid stale DB reads
   const countEl = document.getElementById(`likes-count-${idx}`);
   if (countEl) {
-    const project = window.ProjectsDB.getById(projectId);
-    if (project) {
-      const delta = isLiked ? -1 : +1;
-      const newCount = project.likes + delta;
-      countEl.textContent = formatCount(newCount);
-    }
+    const delta = isLiked ? -1 : +1;
+    const rawCount = (parseInt(countEl.dataset.raw, 10) || 0) + delta;
+    countEl.dataset.raw = rawCount;
+    countEl.textContent = formatCount(rawCount);
   }
 }
 
 /**
- * Toggle save state (visual feedback only — would be tied to auth in prod)
+ * Toggle save. Works without login (stored in localStorage) and persists
+ * to the candidate's profile when logged in. Pending saves are merged on login.
  */
-function toggleProjectSave(btn, projectId) {
-  const isSaved = btn.dataset.saved === 'true';
-  if (isSaved) {
-    btn.dataset.saved = 'false';
-    btn.querySelector('svg').setAttribute('fill', 'none');
-    btn.style.background = '';
-    btn.style.color = '';
-  } else {
-    btn.dataset.saved = 'true';
-    btn.querySelector('svg').setAttribute('fill', '#111111');
-    btn.style.background = '#f4f4f5';
-    btn.style.color = '#111111';
+function toggleProjectSave(btn, projectId, idx) {
+  const session = window.SessionManager && window.SessionManager.getActiveUser();
+
+  if (!session) {
+    // Not logged in — use localStorage pending saves
+    const pending = JSON.parse(localStorage.getItem('skillbridge_pending_saves') || '[]');
+    const isSaved = pending.includes(projectId);
+    const newPending = isSaved ? pending.filter(id => id !== projectId) : [...pending, projectId];
+    localStorage.setItem('skillbridge_pending_saves', JSON.stringify(newPending));
+    btn.dataset.saved = String(!isSaved);
+    btn.querySelector('svg').setAttribute('fill', isSaved ? 'none' : '#111111');
+    btn.style.background = isSaved ? '' : '#f4f4f5';
+    btn.style.color = isSaved ? '' : '#111111';
+    return;
   }
+
+  if (session.role !== 'candidate') return;
+
+  const candidate = window.CandidatesDB.getById(session.user.id) || {};
+  const saved = Array.isArray(candidate.savedProjects) ? candidate.savedProjects : [];
+  const isSaved = saved.includes(projectId);
+  const newSaved = isSaved ? saved.filter(id => id !== projectId) : [...saved, projectId];
+
+  window.CandidatesDB.save({ ...candidate, savedProjects: newSaved });
+
+  btn.dataset.saved = String(!isSaved);
+  btn.querySelector('svg').setAttribute('fill', isSaved ? 'none' : '#111111');
+  btn.style.background = isSaved ? '' : '#f4f4f5';
+  btn.style.color = isSaved ? '' : '#111111';
 }
 
 /**

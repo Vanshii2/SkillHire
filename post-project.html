@@ -16,8 +16,37 @@
       padding: 56px 0 44px;
       color: white;
     }
+    .pp-hero .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .pp-hero-text { flex: 1; min-width: 0; }
     .pp-hero h1 { font-size: clamp(1.8rem,4vw,2.6rem); font-weight:800; letter-spacing:-0.03em; color:white; margin-bottom:8px; }
     .pp-hero p { color:rgba(255,255,255,0.7); font-size:1rem; }
+    #pp-hero-btn {
+      flex-shrink: 0;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      background: #1dbf73;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 14px 26px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: -0.01em;
+      transition: background 0.18s, transform 0.15s, box-shadow 0.18s;
+      box-shadow: 0 4px 14px rgba(29,191,115,0.35);
+      white-space: nowrap;
+      text-decoration: none;
+    }
+    #pp-hero-btn:hover { background: #17a362; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(29,191,115,0.45); }
+    #pp-hero-btn:active { transform: translateY(0); }
 
     .pp-body {
       max-width: 1140px;
@@ -310,8 +339,14 @@
   <main>
     <div class="pp-hero">
       <div class="container">
-        <h1>Post a Project</h1>
-        <p>Describe your project and receive tailored proposals from top freelancers.</p>
+        <div class="pp-hero-text">
+          <h1>Post a Project</h1>
+          <p>Describe your project and receive tailored proposals from top freelancers.</p>
+        </div>
+        <a id="pp-hero-btn" href="#">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+          Post First Project for Free
+        </a>
       </div>
     </div>
 
@@ -449,14 +484,19 @@
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
               </div>
               <h2 style="font-size:1.4rem;font-weight:800;margin-bottom:8px;">Upgrade to Post More Projects</h2>
-              <p style="color:#888;font-size:0.9rem;max-width:420px;margin:0 auto 32px;">Your first project post was free. Choose a plan to continue posting and reach thousands of top freelancers.</p>
+              <p style="color:#888;font-size:0.9rem;max-width:440px;margin:0 auto 8px;">Your first project post was free. Pick a plan below to keep posting.</p>
+              <p style="color:#555;font-size:0.85rem;max-width:440px;margin:0 auto 32px;">
+                <strong>Starter</strong> — 5 posts for ₹499 &nbsp;·&nbsp;
+                <strong>Pro</strong> — 15 posts/month for ₹1,299 &nbsp;·&nbsp;
+                <strong>Business</strong> — unlimited posts for ₹3,499/month
+              </p>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;padding:0 0 32px;" id="pricing-cards">
               <div class="pricing-card">
                 <div class="pricing-badge">Starter</div>
                 <div class="pricing-price">₹499<span>/post</span></div>
+                <div style="font-size:0.95rem;font-weight:700;color:#1dbf73;margin-bottom:12px;">5 Project Posts</div>
                 <ul class="pricing-features">
-                  <li>1 Project Post</li>
                   <li>30-day visibility</li>
                   <li>Up to 20 proposals</li>
                 </ul>
@@ -465,8 +505,8 @@
               <div class="pricing-card pricing-card--popular">
                 <div class="pricing-badge">Pro <span style="background:#1dbf73;color:#fff;font-size:0.65rem;padding:2px 7px;border-radius:100px;margin-left:6px;">Popular</span></div>
                 <div class="pricing-price">₹1,299<span>/month</span></div>
+                <div style="font-size:0.95rem;font-weight:700;color:#1dbf73;margin-bottom:12px;">15 Project Posts / month</div>
                 <ul class="pricing-features">
-                  <li>5 Project Posts / month</li>
                   <li>60-day visibility</li>
                   <li>Unlimited proposals</li>
                   <li>Featured listing</li>
@@ -476,8 +516,8 @@
               <div class="pricing-card">
                 <div class="pricing-badge">Business</div>
                 <div class="pricing-price">₹3,499<span>/month</span></div>
+                <div style="font-size:0.95rem;font-weight:700;color:#1dbf73;margin-bottom:12px;">Unlimited Project Posts</div>
                 <ul class="pricing-features">
-                  <li>Unlimited Posts</li>
                   <li>90-day visibility</li>
                   <li>Priority support</li>
                   <li>Dedicated manager</li>
@@ -559,11 +599,29 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     checkAuth();
+    initHeroBtn();
     initSkillsInput();
     initBudgetTypeToggle();
     initPosterToggle();
     document.getElementById('post-project-form').addEventListener('submit', handleSubmit);
   });
+
+  function initHeroBtn() {
+    const btn = document.getElementById('pp-hero-btn');
+    if (!btn) return;
+    const session = window.SessionManager && window.SessionManager.getActiveUser();
+    if (!session || session.role !== 'recruiter') return;
+
+    const postedJobs = window.JobsDB ? window.JobsDB.getByClient(session.user.id) : [];
+    if (postedJobs && postedJobs.length > 0) {
+      btn.innerHTML = `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Buy Plans`;
+      btn.href = 'pricing.html';
+    } else {
+      btn.innerHTML = `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg> Post First Project for Free`;
+      btn.href = '#post-project-form';
+    }
+    btn.style.display = 'inline-flex';
+  }
 
   function getMode() {
     const stored = localStorage.getItem('skillbridge_mode');

@@ -24,14 +24,20 @@
       max-width: 1200px;
       margin: 0 auto;
       padding: 0 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
     }
+
+    .ht-hero-text { flex: 1; min-width: 0; }
 
     .ht-hero-inner h1 {
       font-size: clamp(2rem, 4vw, 3rem);
       font-weight: 800;
       letter-spacing: -0.03em;
       color: #111;
-
     }
 
     .ht-hero-inner p {
@@ -39,6 +45,27 @@
       color: #666;
       max-width: 560px;
     }
+
+    #ht-hero-btn {
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #1dbf73;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 14px 26px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: -0.01em;
+      transition: background 0.18s, transform 0.15s, box-shadow 0.18s;
+      box-shadow: 0 4px 14px rgba(29,191,115,0.28);
+      white-space: nowrap;
+    }
+    #ht-hero-btn:hover { background: #17a362; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(29,191,115,0.36); }
+    #ht-hero-btn:active { transform: translateY(0); }
 
     /* ── Candidates section ── */
     .ht-candidates-section {
@@ -194,7 +221,13 @@
     <!-- Page Hero -->
     <div class="ht-hero">
       <div class="ht-hero-inner">
-        <h1>Find the right person.</h1>
+        <div class="ht-hero-text">
+          <h1>Hire talent for your project.</h1>
+        </div>
+        <button id="ht-hero-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+          Post 1st Project for Free
+        </button>
       </div>
     </div>
 
@@ -223,8 +256,9 @@
           <div class="filter-group">
             <span class="filter-group-label">Sort By</span>
             <select class="sort-select" id="sort-select">
+              <option value="projects" selected>Most Projects</option>
+              <option value="rating">Highest Rated</option>
               <option value="price">Lowest Price / Hr</option>
-              <option value="projects">Most Projects</option>
               <option value="skills">Most Skills</option>
             </select>
           </div>
@@ -270,50 +304,6 @@
         </div>
 
       </div>
-      </div>
-    </section>
-
-    <!-- Post a Job CTA -->
-    <section class="post-job-cta" id="post-job-section">
-      <div class="post-job-cta-inner">
-        <div class="post-job-badge">For Recruiters</div>
-        <h2>Ready to find your next<br><span>great hire?</span></h2>
-        <p>Post a job listing and let verified talent come to you. Set your requirements, skills, and budget — we'll
-          surface the right candidates instantly.</p>
-
-        <div class="post-job-perks">
-          <div class="perk-item">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-              stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="20 6 9 17 4 12" />
-            </svg>
-            Skills-first matching
-          </div>
-          <div class="perk-item">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-              stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="20 6 9 17 4 12" />
-            </svg>
-            Verified portfolios
-          </div>
-          <div class="perk-item">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-              stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="20 6 9 17 4 12" />
-            </svg>
-            Secure escrow payments
-          </div>
-        </div>
-
-        <button class="btn-post-job" id="btn-post-job-cta">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-            stroke-linecap="round" stroke-linejoin="round">
-            <line x1="12" y1="5" x2="12" y2="19" />
-            <line x1="5" y1="12" x2="19" y2="12" />
-          </svg>
-          Post a Job
-        </button>
-        <p class="post-job-subtext">A small listing fee applies. Logged-in recruiters get started immediately.</p>
       </div>
     </section>
 
@@ -382,12 +372,44 @@
       if (session && session.role === 'recruiter') {
         window.location.href = 'post-job.html';
       } else {
-        // Open recruiter login modal
         if (typeof window.openAuthModal === 'function') {
           window.openAuthModal('recruiter', 'login');
         }
       }
     });
+
+    // Hero CTA button — dynamic based on login state
+    (function initHeroBtn() {
+      const btn = document.getElementById('ht-hero-btn');
+      if (!btn) return;
+      const session = window.SessionManager && window.SessionManager.getActiveUser();
+
+      if (!session) {
+        // Guest: prompt recruiter login
+        btn.onclick = () => {
+          if (typeof window.openAuthModal === 'function') {
+            window.openAuthModal('recruiter', 'login');
+          }
+        };
+        return;
+      }
+
+      if (session.role !== 'recruiter') {
+        // Candidate viewing — hide the button
+        btn.style.display = 'none';
+        return;
+      }
+
+      // Logged in as recruiter — check if they already posted any job/project
+      const recruiterJobs = window.JobsDB ? window.JobsDB.getByRecruiter(session.user.id) : [];
+      if (recruiterJobs && recruiterJobs.length > 0) {
+        // Already posted — offer plans
+        btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Buy Plans`;
+        btn.onclick = () => { window.location.href = 'pricing.html'; };
+      } else {
+        btn.onclick = () => { window.location.href = 'post-job.html'; };
+      }
+    })();
   </script>
 </body>
 

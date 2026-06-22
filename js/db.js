@@ -22,9 +22,9 @@ const PROJECTS_DATA = [
     images: ['assets/images/aatma1.webp', 'assets/images/aatmaa2.webp'],
     tags: ['Branding', 'Identity', 'AI'],
     authorName: 'Aditi Rao',
-    authorAvatar: 'assets/images/avatar2.png',
+    authorAvatar: 'assets/images/aditi.png',
     authorId: 'aditi-rao',
-    likes: 247,
+    likes: 1200,
     views: 6800
   },
   {
@@ -35,9 +35,9 @@ const PROJECTS_DATA = [
     images: ['assets/images/spectra.....webp', 'assets/images/spectra2.avif'],
     tags: ['Dashboard', 'UI/UX', 'SaaS'],
     authorName: 'Rahul Sharma',
-    authorAvatar: 'assets/images/avatar1.png',
+    authorAvatar: 'assets/images/rahul.png',
     authorId: 'rahul-sharma',
-    likes: 189,
+    likes: 1100,
     views: 5200
   },
   {
@@ -48,9 +48,9 @@ const PROJECTS_DATA = [
     images: ['assets/images/plateui.webp', 'assets/images/plateui2.webp', 'assets/images/plateappui.webp'],
     tags: ['Mobile App', 'UI/UX', 'React Native'],
     authorName: 'Sarah Jenkins',
-    authorAvatar: 'assets/images/avatar2.png',
+    authorAvatar: 'assets/images/sara.png',
     authorId: 'sarah-jenkins',
-    likes: 312,
+    likes: 1000,
     views: 9100
   },
   {
@@ -61,7 +61,7 @@ const PROJECTS_DATA = [
     images: ['assets/images/steer.webp', 'assets/images/steer2.webp', 'assets/images/steer3.webp', 'assets/images/steer4.png'],
     tags: ['SaaS', 'MERN', 'Dashboard'],
     authorName: 'Aman Verma',
-    authorAvatar: 'assets/images/avatar1.png',
+    authorAvatar: 'assets/images/aman.png',
     authorId: 'aman-verma',
     likes: 156,
     views: 4300
@@ -74,7 +74,7 @@ const PROJECTS_DATA = [
     images: ['assets/images/matcha2.webp', 'assets/images/matcha3.webp', 'assets/images/matcha4.webp', 'assets/images/matcha5.webp'],
     tags: ['E-Commerce', 'UI Kit', 'AI'],
     authorName: 'Aditi Rao',
-    authorAvatar: 'assets/images/avatar2.png',
+    authorAvatar: 'assets/images/aditi.png',
     authorId: 'aditi-rao',
     likes: 428,
     views: 11200
@@ -87,7 +87,7 @@ const PROJECTS_DATA = [
     images: ['assets/images/tira.webp', 'assets/images/tira2.webp'],
     tags: ['Mobile App', 'AI', 'Beauty'],
     authorName: 'Sarah Jenkins',
-    authorAvatar: 'assets/images/avatar2.png',
+    authorAvatar: 'assets/images/sara.png',
     authorId: 'sarah-jenkins',
     likes: 201,
     views: 7600
@@ -100,7 +100,7 @@ const PROJECTS_DATA = [
     images: ['assets/images/pix3.webp', 'assets/images/pix4.webp', 'assets/images/pix5.webp', 'assets/images/pix6.webp'],
     tags: ['Portfolio', 'HTML/CSS', 'Template'],
     authorName: 'Rahul Sharma',
-    authorAvatar: 'assets/images/avatar1.png',
+    authorAvatar: 'assets/images/rahul.png',
     authorId: 'rahul-sharma',
     likes: 335,
     views: 8900
@@ -113,7 +113,7 @@ const PROJECTS_DATA = [
     images: ['assets/images/bookIllustraion.webp', 'assets/images/book2.webp', 'assets/images/book3.webp', 'assets/images/book4.webp', 'assets/images/book5.webp'],
     tags: ['Editorial', 'Illustration', 'Typography'],
     authorName: 'Tanmay Patel',
-    authorAvatar: 'assets/images/avatar1.png',
+    authorAvatar: 'assets/images/tanmay.png',
     authorId: 'tanmay-patel',
     likes: 519,
     views: 14300
@@ -126,7 +126,7 @@ const PROJECTS_DATA = [
     images: ['assets/images/port1.webp', 'assets/images/portbox2.webp'],
     tags: ['Portfolio', 'JavaScript', 'Animation'],
     authorName: 'Aman Verma',
-    authorAvatar: 'assets/images/avatar1.png',
+    authorAvatar: 'assets/images/aman.png',
     authorId: 'aman-verma',
     likes: 274,
     views: 6100
@@ -139,7 +139,7 @@ const PROJECTS_DATA = [
     images: ['assets/images/monkey1.webp', 'assets/images/monkey2.webp', 'assets/images/monkey3.webp', 'assets/images/monkey4.webp'],
     tags: ['NFT', 'Generative Art', 'Web3'],
     authorName: 'Tanmay Patel',
-    authorAvatar: 'assets/images/avatar1.png',
+    authorAvatar: 'assets/images/tanmay.png',
     authorId: 'tanmay-patel',
     likes: 682,
     views: 18500
@@ -152,7 +152,7 @@ const PROJECTS_DATA = [
     images: ['assets/images/mapsi.png'],
     tags: ['Dashboard', 'Maps', 'Logistics'],
     authorName: 'Rahul Sharma',
-    authorAvatar: 'assets/images/avatar1.png',
+    authorAvatar: 'assets/images/rahul.png',
     authorId: 'rahul-sharma',
     likes: 143,
     views: 3900
@@ -165,7 +165,7 @@ const PROJECTS_DATA = [
     images: ['assets/images/pix7.webp', 'assets/images/pix8.webp', 'assets/images/pix9.webp'],
     tags: ['Photography', 'Branding', 'Visual'],
     authorName: 'Aditi Rao',
-    authorAvatar: 'assets/images/avatar2.png',
+    authorAvatar: 'assets/images/aditi.png',
     authorId: 'aditi-rao',
     likes: 397,
     views: 10200
@@ -178,7 +178,7 @@ const PROJECTS_DATA = [
     images: ['assets/images/plateui.webp', 'assets/images/plateui2.webp'],
     tags: ['Mobile App', 'React Native', 'Expo'],
     authorName: 'Priya Kapoor',
-    authorAvatar: 'assets/images/6.webp',
+    authorAvatar: 'assets/images/priya.png',
     authorId: 'priya-kapoor',
     likes: 318,
     views: 8400
@@ -776,6 +776,8 @@ class SessionManager {
   static loginCandidate(email, password) {
     const candidate = CandidatesDB.getByEmail(email);
     if (candidate && (candidate.password === password || (!candidate.password && password === 'password123'))) {
+      candidate.lastLoginAt = Date.now();
+      CandidatesDB.update(candidate);
       localStorage.setItem('skillbridge_active_role', 'candidate');
       localStorage.setItem('skillbridge_active_id', candidate.id);
       return { role: 'candidate', user: candidate };
@@ -786,6 +788,8 @@ class SessionManager {
   static loginRecruiter(email, password) {
     const recruiter = RecruitersDB.getByEmail(email);
     if (recruiter && recruiter.password === password) {
+      recruiter.lastLoginAt = Date.now();
+      RecruitersDB.update(recruiter);
       localStorage.setItem('skillbridge_active_role', 'recruiter');
       localStorage.setItem('skillbridge_active_id', recruiter.id);
       return { role: 'recruiter', user: recruiter };

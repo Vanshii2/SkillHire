@@ -36,22 +36,7 @@ function renderProfile() {
     return;
   }
 
-  // ── Login gate ──
   const session = window.SessionManager && window.SessionManager.getActiveUser();
-  if (!session) {
-    mainContainer.innerHTML = `
-      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center;padding:48px 24px;">
-        <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:20px;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        <h2 style="font-size:1.6rem;font-weight:800;color:#111;letter-spacing:-0.02em;margin-bottom:10px;">Log in to view this profile</h2>
-        <p style="color:#666;font-size:0.95rem;max-width:360px;line-height:1.6;margin-bottom:28px;">Create a free account or log in to browse freelancer profiles, view portfolios, and connect with talent.</p>
-        <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
-          <button class="btn btn-primary" style="padding:11px 28px;" onclick="window.openAuthModal && window.openAuthModal('login')">Log In</button>
-          <button class="btn btn-secondary" style="padding:11px 28px;" onclick="window.openAuthModal && window.openAuthModal('register')">Create Account</button>
-        </div>
-        <a href="candidates.html" style="margin-top:20px;font-size:0.85rem;color:#aaa;text-decoration:none;">&larr; Back to Browse Freelancers</a>
-      </div>`;
-    return;
-  }
 
   // Query candidate details
   const candidate = window.CandidatesDB.getById(candidateId);
@@ -69,8 +54,13 @@ function renderProfile() {
   document.title = `${candidate.name} — ${candidate.role} | SkillBridge`;
 
   // Render Page Content
-  const isInternship = candidate.availability.toLowerCase().includes('internship');
-  const badgeClass = isInternship ? 'badge-internship' : 'badge-fulltime';
+  // Determine availability from last login (>2 months = inactive)
+  const TWO_MONTHS_MS = 60 * 24 * 60 * 60 * 1000;
+  const lastLogin = candidate.lastLoginAt || 0;
+  const isInactive = lastLogin > 0 && (Date.now() - lastLogin) > TWO_MONTHS_MS;
+  const displayAvailability = isInactive ? 'Inactive' : (candidate.availability || 'Available');
+  const isInternship = !isInactive && displayAvailability.toLowerCase().includes('internship');
+  const badgeClass = isInactive ? 'badge-inactive' : (isInternship ? 'badge-internship' : 'badge-fulltime');
 
   // Construct contact HTML channels dynamically
   const emailHtml = candidate.contact.email ? `
@@ -99,35 +89,86 @@ function renderProfile() {
     `<span class="skill-tag">${escapeHTML(skill)}</span>`
   ).join('');
 
-  // Only use candidate.projects — single unified source, no PROJECTS_DATA showcase
-  const allProjects = candidate.projects || [];
+  // Showcase projects from ProjectsDB (home-feed quality, link to full project page)
+  const showcaseProjects = window.ProjectsDB ? window.ProjectsDB.getByAuthor(candidateId) : [];
 
-  const projectsHtml = allProjects.length === 0
-    ? `<div style="color:var(--secondary-text);font-size:0.9rem;padding:24px 0;">No projects yet.</div>`
-    : `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;">
-        ${allProjects.map(proj => {
-          const thumbSrc = proj.thumbnail
-            ? proj.thumbnail
-            : (proj.screenshot ? resolveAssetPath(proj.screenshot) : '');
-          return `
-            <div style="border-radius:14px;overflow:hidden;border:1px solid var(--border-color);background:#fff;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
-              ${thumbSrc ? `
-                <div style="width:100%;height:190px;overflow:hidden;background:#f5f5f5;">
-                  <img src="${thumbSrc.startsWith('data:') ? thumbSrc : escapeHTML(thumbSrc)}"
-                    alt="${escapeHTML(proj.name)}"
-                    style="width:100%;height:100%;object-fit:cover;"
-                    onerror="this.parentElement.style.background='#f0f0f0';this.style.display='none';">
-                </div>
-              ` : `<div style="width:100%;height:140px;background:linear-gradient(135deg,#f0fdf7,#e8f5e9);display:flex;align-items:center;justify-content:center;">
-                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#c8e6c9" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-              </div>`}
-              <div style="padding:16px 18px 18px;">
-                <h3 style="font-size:0.97rem;font-weight:800;color:#1a1a2e;margin:0 0 6px;">${escapeHTML(proj.name)}</h3>
-                <p style="font-size:0.85rem;color:#666;line-height:1.6;margin:0;">${escapeHTML(proj.description || '')}</p>
-              </div>
-            </div>`;
-        }).join('')}
+  // Only show user-added projects that have the new multi-image format (skip old seeded entries)
+  const devProjects = (candidate.projects || []).filter(p => p.images && p.images.length > 0);
+  const totalProjectCount = showcaseProjects.length + devProjects.length;
+
+  // Store dev projects globally for modal click handler
+  window._profileProjects = devProjects.map(p => ({
+    ...p,
+    _resolvedThumb: '',
+    _resolvedImages: p.images && p.images.length
+      ? p.images
+      : (p.thumbnail ? [p.thumbnail] : (p.screenshot ? [resolveAssetPath(p.screenshot)] : []))
+  }));
+
+  const isOwnProfile = session && session.role === 'candidate' && session.user.id === candidateId;
+  const cardStyle = `border-radius:14px;overflow:hidden;border:1px solid var(--border-color);background:#fff;box-shadow:0 2px 8px rgba(0,0,0,0.04);transition:box-shadow 0.18s,transform 0.18s;`;
+  const cardHover = `onmouseover="this.style.boxShadow='0 8px 28px rgba(0,0,0,0.10)';this.style.transform='translateY(-2px)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.04)';this.style.transform='translateY(0)'"`;
+
+  const showcaseCards = showcaseProjects.map(proj => {
+    const thumbSrc = resolveAssetPath(proj.thumbnail);
+    const tagsHtml = (proj.tags || []).map(t => `<span style="font-size:0.72rem;font-weight:600;color:#1dbf73;background:#f0fdf7;border-radius:99px;padding:2px 10px;">${escapeHTML(t)}</span>`).join('');
+    return `
+      <a href="${prefix}project.html?id=${encodeURIComponent(proj.id)}" style="${cardStyle}text-decoration:none;display:block;color:inherit;" ${cardHover}>
+        ${thumbSrc ? `
+          <div style="width:100%;height:190px;overflow:hidden;background:#f5f5f5;">
+            <img src="${escapeHTML(thumbSrc)}" alt="${escapeHTML(proj.title)}"
+              style="width:100%;height:100%;object-fit:cover;"
+              onerror="this.parentElement.style.background='#f0f0f0';this.style.display='none';">
+          </div>
+        ` : `<div style="width:100%;height:140px;background:linear-gradient(135deg,#f0fdf7,#e8f5e9);display:flex;align-items:center;justify-content:center;">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#c8e6c9" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        </div>`}
+        <div style="padding:14px 16px 16px;">
+          ${tagsHtml ? `<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;">${tagsHtml}</div>` : ''}
+          <h3 style="font-size:0.97rem;font-weight:800;color:#1a1a2e;margin:0 0 5px;">${escapeHTML(proj.title)}</h3>
+          <p style="font-size:0.83rem;color:#666;line-height:1.5;margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${escapeHTML(proj.description || '')}</p>
+          <div style="margin-top:10px;font-size:0.75rem;color:#1dbf73;font-weight:600;">View details →</div>
+        </div>
+      </a>`;
+  });
+
+  const devCards = devProjects.map((proj, idx) => {
+    const thumbSrc = proj.thumbnail
+      ? proj.thumbnail
+      : (proj.images && proj.images[0] ? proj.images[0]
+        : (proj.screenshot ? resolveAssetPath(proj.screenshot) : ''));
+    const safeId = escapeHTML(proj.id || '');
+    return `
+      <div onclick="openProjectModal(${idx})" style="${cardStyle}cursor:pointer;position:relative;" ${cardHover}>
+        ${isOwnProfile ? `
+          <button onclick="event.stopPropagation();deleteProfileProject('${safeId}')"
+            title="Delete project"
+            style="position:absolute;top:8px;right:8px;z-index:5;width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,0.45);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;transition:background 0.15s;"
+            onmouseover="this.style.background='rgba(220,38,38,0.85)'" onmouseout="this.style.background='rgba(0,0,0,0.45)'">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          </button>` : ''}
+        ${thumbSrc ? `
+          <div style="width:100%;height:190px;overflow:hidden;background:#f5f5f5;">
+            <img src="${thumbSrc.startsWith('data:') ? thumbSrc : escapeHTML(thumbSrc)}"
+              alt="${escapeHTML(proj.name)}"
+              style="width:100%;height:100%;object-fit:cover;"
+              onerror="this.parentElement.style.background='#f0f0f0';this.style.display='none';">
+          </div>
+        ` : `<div style="width:100%;height:140px;background:linear-gradient(135deg,#f0fdf7,#e8f5e9);display:flex;align-items:center;justify-content:center;">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#c8e6c9" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        </div>`}
+        <div style="padding:16px 18px 18px;">
+          <h3 style="font-size:0.97rem;font-weight:800;color:#1a1a2e;margin:0 0 6px;">${escapeHTML(proj.name)}</h3>
+          <p style="font-size:0.85rem;color:#666;line-height:1.6;margin:0;">${escapeHTML(proj.description || '')}</p>
+          <div style="margin-top:10px;font-size:0.75rem;color:#1dbf73;font-weight:600;">View details →</div>
+        </div>
       </div>`;
+  });
+
+  const allCards = [...showcaseCards, ...devCards];
+  const projectsHtml = allCards.length === 0
+    ? `<div style="color:var(--secondary-text);font-size:0.9rem;padding:24px 0;">No projects yet.</div>`
+    : `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;">${allCards.join('')}</div>`;
 
   // Reviews are rendered dynamically via injectRatingSection() after DOM is ready
   let reviewsHtml = '';
@@ -152,7 +193,6 @@ function renderProfile() {
 
   const activeMode = localStorage.getItem('skillbridge_mode') || 'freelancer';
   const isClientMode = session && (session.role === 'recruiter' || (session.user.bothRoles && activeMode === 'client'));
-  const isOwnProfile = session && session.role === 'candidate' && session.user.id === candidate.id;
 
   if (session) {
     if (isClientMode) {
@@ -172,8 +212,12 @@ function renderProfile() {
       `;
     } else if (isOwnProfile) {
       actionButtonsHtml = `
-        <a href="${prefix}edit-profile.html" class="btn btn-primary" style="padding: 10px 20px; font-size: 0.9rem;">
+        <a href="${prefix}edit-profile.html" class="btn btn-secondary" style="padding:10px 20px;font-size:0.9rem;">
           Edit My Profile
+        </a>
+        <a href="${prefix}edit-profile.html#add-project-form" class="btn btn-primary" style="padding:10px 20px;font-size:0.9rem;background:#1dbf73;border-color:#1dbf73;display:inline-flex;align-items:center;gap:6px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Projects
         </a>
       `;
     }
@@ -196,7 +240,7 @@ function renderProfile() {
             <img src="${resolveAssetPath(candidate.avatar)}" alt="${escapeHTML(candidate.name)}" class="profile-hero-avatar">
           </div>
           <div class="profile-hero-info">
-            <span class="badge ${badgeClass}">${escapeHTML(candidate.availability)}</span>
+            <span class="badge ${badgeClass}">${escapeHTML(displayAvailability)}</span>
             <h1 style="margin-top: 4px;">${escapeHTML(candidate.name)}</h1>
             <div class="role">${escapeHTML(candidate.role)}</div>
             ${ratingBadgeHtml}
@@ -240,11 +284,48 @@ function renderProfile() {
 
         <!-- Right Main Projects list -->
         <div class="profile-main fade-in-section is-visible">
-          <h2>Projects &amp; Work <span style="font-size:0.78rem;font-weight:600;color:#aaa;margin-left:8px;">${allProjects.length} total</span></h2>
+          <h2>Projects &amp; Work <span style="font-size:0.78rem;font-weight:600;color:#aaa;margin-left:8px;">${totalProjectCount} total</span></h2>
           <p style="color: var(--secondary-text); margin-bottom: 24px;">Work built by ${escapeHTML(candidate.name.split(' ')[0])}.</p>
           <div class="projects-list">
             ${projectsHtml}
           </div>
+
+          ${(() => {
+            if (!isOwnProfile) return '';
+            const savedIds = candidate.savedProjects || [];
+            if (savedIds.length === 0) return '';
+            const savedItems = savedIds.map(id => window.ProjectsDB ? window.ProjectsDB.getById(id) : null).filter(Boolean);
+            if (savedItems.length === 0) return '';
+            const savedCardsHtml = savedItems.map(p => {
+              const thumb = resolveAssetPath(p.thumbnail);
+              const tagsHtml = (p.tags || []).map(t => `<span style="font-size:0.7rem;font-weight:600;color:#1dbf73;background:#f0fdf7;border-radius:99px;padding:2px 9px;">${escapeHTML(t)}</span>`).join('');
+              return `<a href="${prefix}project.html?id=${encodeURIComponent(p.id)}"
+                style="border-radius:14px;overflow:hidden;border:1px solid var(--border-color);background:#fff;box-shadow:0 2px 8px rgba(0,0,0,0.04);transition:box-shadow 0.18s,transform 0.18s;text-decoration:none;display:block;color:inherit;"
+                onmouseover="this.style.boxShadow='0 8px 28px rgba(0,0,0,0.10)';this.style.transform='translateY(-2px)'"
+                onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.04)';this.style.transform='translateY(0)'">
+                ${thumb ? `<div style="width:100%;height:180px;overflow:hidden;background:#f5f5f5;"><img src="${escapeHTML(thumb)}" alt="${escapeHTML(p.title)}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.style.display='none'"></div>` : ''}
+                <div style="padding:14px 16px 16px;">
+                  ${tagsHtml ? `<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:7px;">${tagsHtml}</div>` : ''}
+                  <h3 style="font-size:0.95rem;font-weight:800;color:#1a1a2e;margin:0 0 4px;">${escapeHTML(p.title)}</h3>
+                  <p style="font-size:0.82rem;color:#666;line-height:1.5;margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${escapeHTML(p.description || '')}</p>
+                  <div style="margin-top:9px;font-size:0.73rem;color:#1dbf73;font-weight:600;">View details →</div>
+                </div>
+              </a>`;
+            }).join('');
+            return `
+              <div style="margin-top:48px;">
+                <div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'grid':'none';this.querySelector('.saved-chevron').style.transform=this.nextElementSibling.style.display==='none'?'rotate(0deg)':'rotate(180deg)'"
+                  style="display:flex;align-items:center;gap:10px;cursor:pointer;padding-bottom:16px;border-bottom:1px solid #f0f0f0;user-select:none;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                  <h2 style="margin:0;font-size:1.05rem;font-weight:800;color:#111;">Saved Projects</h2>
+                  <span style="font-size:0.75rem;font-weight:700;color:#fff;background:#1dbf73;border-radius:99px;padding:2px 8px;">${savedItems.length}</span>
+                  <svg class="saved-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto;transition:transform 0.2s;transform:rotate(180deg);"><polyline points="6 9 12 15 18 9"/></svg>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px;margin-top:20px;">
+                  ${savedCardsHtml}
+                </div>
+              </div>`;
+          })()}
         </div>
 
         <!-- Render Reviews Section -->
@@ -572,6 +653,116 @@ function getGitHubUsername(url) {
     const parts = url.split('/');
     return parts[parts.length - 1] || 'profile';
   }
+}
+
+/**
+ * Opens a full project detail modal matching the project.html layout
+ */
+function openProjectModal(idx) {
+  const proj = window._profileProjects && window._profileProjects[idx];
+  if (!proj) return;
+
+  const existing = document.getElementById('proj-detail-overlay');
+  if (existing) existing.remove();
+
+  // Store images in a global so onclick handlers can reference by index (avoids embedding base64 in HTML)
+  const allImages = (proj._resolvedImages && proj._resolvedImages.length)
+    ? proj._resolvedImages
+    : (proj._resolvedThumb ? [proj._resolvedThumb] : []);
+  window._pdmImages = allImages;
+
+  const tags = proj.tags || [];
+  const tagsHtml = tags.length
+    ? `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;">
+        ${tags.map(t => `<span style="padding:4px 12px;background:#f4f4f5;border-radius:99px;font-size:0.75rem;font-weight:600;color:#555;">${escapeHTML(t)}</span>`).join('')}
+       </div>`
+    : '';
+
+  const overlay = document.createElement('div');
+  overlay.id = 'proj-detail-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:3000;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(8px);';
+
+  overlay.innerHTML = `
+    <div style="background:#fff;border-radius:20px;max-width:960px;width:100%;max-height:92vh;overflow-y:auto;box-shadow:0 32px 80px rgba(0,0,0,0.25);position:relative;">
+      <button onclick="document.getElementById('proj-detail-overlay').remove()"
+        style="position:absolute;top:14px;right:14px;z-index:10;background:#f5f5f5;border:none;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#555;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+
+      <div style="display:grid;grid-template-columns:55% 45%;min-height:420px;">
+
+        <!-- LEFT: images -->
+        <div style="padding:28px 20px 28px 28px;border-right:1px solid #f0f0f0;display:flex;flex-direction:column;">
+          <div id="pdm-main-wrap" style="width:100%;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#f0f0f0;flex-shrink:0;">
+            ${allImages.length
+              ? `<img id="pdm-main-img" src="" style="width:100%;height:100%;object-fit:cover;transition:opacity 0.2s;">`
+              : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`}
+          </div>
+          ${allImages.length > 1 ? `
+          <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
+            ${allImages.map((_, i) => `
+              <div onclick="switchPdmImageByIdx(${i})" id="pdm-thumb-${i}"
+                style="width:72px;height:50px;border-radius:8px;overflow:hidden;cursor:pointer;border:2px solid ${i===0?'#1dbf73':'#e8e8e8'};flex-shrink:0;background:#f0f0f0;">
+                <img id="pdm-thumb-img-${i}" src="" alt="" style="width:100%;height:100%;object-fit:cover;">
+              </div>`).join('')}
+          </div>` : ''}
+        </div>
+
+        <!-- RIGHT: info -->
+        <div style="padding:28px 28px 28px 24px;display:flex;flex-direction:column;">
+          <h2 style="font-size:1.4rem;font-weight:800;color:#111;margin:0 0 12px;letter-spacing:-0.02em;padding-right:36px;">${escapeHTML(proj.name)}</h2>
+          ${tagsHtml}
+          <p style="font-size:0.9rem;color:#555;line-height:1.8;margin:0;flex:1;">${escapeHTML(proj.description || 'No description provided.')}</p>
+        </div>
+      </div>
+    </div>`;
+
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
+
+  // Set images via JS after DOM is ready (avoids base64 in HTML attributes)
+  if (allImages.length) {
+    const mainImg = document.getElementById('pdm-main-img');
+    if (mainImg) mainImg.src = allImages[0];
+    allImages.forEach((src, i) => {
+      const t = document.getElementById(`pdm-thumb-img-${i}`);
+      if (t) t.src = src;
+    });
+  }
+
+  const onKey = e => { if (e.key === 'Escape') { overlay.remove(); document.removeEventListener('keydown', onKey); } };
+  document.addEventListener('keydown', onKey);
+}
+
+function switchPdmImageByIdx(idx) {
+  const src = window._pdmImages && window._pdmImages[idx];
+  if (!src) return;
+  const mainImg = document.getElementById('pdm-main-img');
+  if (!mainImg) return;
+  mainImg.style.opacity = '0';
+  setTimeout(() => { mainImg.src = src; mainImg.style.opacity = '1'; }, 180);
+  // Update border highlight on strip
+  (window._pdmImages || []).forEach((_, i) => {
+    const t = document.getElementById(`pdm-thumb-${i}`);
+    if (t) t.style.border = `2px solid ${i === idx ? '#1dbf73' : '#e8e8e8'}`;
+  });
+}
+
+function switchPdmImage(escapedSrc, dataSrc) {
+  const src = dataSrc || escapedSrc;
+  const mainImg = document.getElementById('pdm-main-img');
+  if (!mainImg || !src) return;
+  mainImg.style.opacity = '0';
+  setTimeout(() => { mainImg.src = src; mainImg.style.opacity = '1'; }, 180);
+}
+
+function deleteProfileProject(projId) {
+  if (!projId) return;
+  const session = window.SessionManager && window.SessionManager.getActiveUser();
+  if (!session || session.role !== 'candidate') return;
+  if (!confirm('Delete this project? This cannot be undone.')) return;
+  window.CandidatesDB.removeProject(session.user.id, projId);
+  renderProfile();
 }
 
 /**

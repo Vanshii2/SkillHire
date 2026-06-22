@@ -329,6 +329,10 @@
         <button class="ptab active" id="ptab-matching" onclick="showPTab('matching')">Invites <span id="invite-badge" style="display:none;background:#e53e3e;color:#fff;border-radius:100px;font-size:0.65rem;font-weight:800;padding:1px 6px;margin-left:3px;vertical-align:middle;">0</span></button>
         <button class="ptab" id="ptab-proposals" onclick="showPTab('proposals')">My Proposals</button>
         <button class="ptab" id="ptab-messages" onclick="showPTab('messages')">Messages <span id="msg-badge" style="display:none;background:#e53e3e;color:#fff;border-radius:100px;font-size:0.65rem;font-weight:800;padding:1px 6px;margin-left:3px;vertical-align:middle;">0</span></button>
+        <button class="ptab" id="ptab-saved" onclick="showPTab('saved')">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+          Saved Projects
+        </button>
         <a href="../contracts.html" class="ptab" style="text-decoration:none;display:inline-flex;align-items:center;gap:5px;">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
           My Contracts
@@ -339,6 +343,7 @@
         <div id="panel-proposals" class="panel-body" style="display:none;"></div>
         <div id="panel-messages" class="panel-body" style="display:none;"></div>
         <div id="panel-escrow" class="panel-body" style="display:none;"></div>
+        <div id="panel-saved" class="panel-body" style="display:none;"></div>
       </div>
     </div>
   </main>
@@ -360,12 +365,13 @@
   }
 
   function showPTab(name) {
-    ['matching','proposals','messages'].forEach(t => {
+    ['matching','proposals','messages','saved'].forEach(t => {
       const btn = document.getElementById('ptab-' + t);
       if (btn) btn.classList.toggle('active', t === name);
       const panel = document.getElementById('panel-' + t);
       if (panel) panel.style.display = t === name ? 'block' : 'none';
     });
+    if (name === 'saved') renderSavedProjects();
     // Clear invite badge and mark as seen when Invites tab is opened
     if (name === 'matching') {
       const b = document.getElementById('invite-badge');
@@ -1083,6 +1089,49 @@
         <span class="activity-date">${timeStr}</span>
       </div>`;
     }).join('');
+  }
+
+  function renderSavedProjects() {
+    const panel = document.getElementById('panel-saved');
+    if (!panel || panel.dataset.rendered) return;
+    panel.dataset.rendered = 'true';
+
+    const sess = window.SessionManager && window.SessionManager.getActiveUser();
+    if (!sess) { panel.innerHTML = '<p style="color:#aaa;padding:24px 0;">Not logged in.</p>'; return; }
+
+    const candidate = window.CandidatesDB.getById(sess.user.id) || {};
+    const savedIds = Array.isArray(candidate.savedProjects) ? candidate.savedProjects : [];
+
+    if (savedIds.length === 0) {
+      panel.innerHTML = `
+        <div style="text-align:center;padding:48px 24px;">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#d0d0d0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:12px;"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+          <h3 style="font-size:1rem;font-weight:700;color:#555;margin-bottom:6px;">No saved projects yet</h3>
+          <p style="color:#aaa;font-size:0.88rem;">Browse projects on the home page and hit Save to bookmark them here.</p>
+          <a href="../index.html" class="btn btn-primary" style="margin-top:16px;display:inline-block;padding:10px 24px;border-radius:10px;">Browse Projects</a>
+        </div>`;
+      return;
+    }
+
+    const allProjects = window.ProjectsDB ? window.ProjectsDB.getAll() : [];
+    const saved = allProjects.filter(p => savedIds.includes(p.id));
+
+    panel.innerHTML = `
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;padding:16px 0;">
+        ${saved.map(p => `
+          <a href="../project.html?id=${escH(p.id)}" style="display:block;border:1px solid #eee;border-radius:12px;overflow:hidden;text-decoration:none;color:inherit;transition:box-shadow 0.15s;" onmouseenter="this.style.boxShadow='0 4px 16px rgba(0,0,0,0.08)'" onmouseleave="this.style.boxShadow=''">
+            <img src="${escH(p.thumbnail)}" alt="${escH(p.title)}" style="width:100%;aspect-ratio:4/3;object-fit:cover;display:block;">
+            <div style="padding:10px 12px;">
+              <div style="font-weight:700;font-size:0.9rem;margin-bottom:2px;">${escH(p.title)}</div>
+              <div style="font-size:0.8rem;color:#888;">by ${escH(p.authorName)}</div>
+              <div style="display:flex;align-items:center;gap:10px;margin-top:8px;font-size:0.78rem;color:#999;">
+                <span>♥ ${p.likes}</span>
+                <span>👁 ${p.views}</span>
+              </div>
+            </div>
+          </a>
+        `).join('')}
+      </div>`;
   }
   </script>
 </body>

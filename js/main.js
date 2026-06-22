@@ -110,12 +110,12 @@ function initAuthModal() {
         <form id="login-form" novalidate>
           <div class="form-group">
             <label for="login-email">Email <span class="req-star">*</span></label>
-            <input type="email" id="login-email" placeholder="you@example.com" autocomplete="email" required>
+            <input type="email" id="login-email" placeholder="eg@gmail.com" autocomplete="off" required>
           </div>
           <div class="form-group">
             <label for="login-password">Password <span class="req-star">*</span></label>
             <div class="pw-wrap">
-              <input type="password" id="login-password" placeholder="Your password" autocomplete="current-password" required>
+              <input type="password" id="login-password" placeholder="Your password" autocomplete="off" required>
               <button type="button" class="pw-toggle" data-target="login-password" aria-label="Show/hide password">
                 <svg class="pw-eye-show" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
               </button>
@@ -206,6 +206,7 @@ function initAuthModal() {
                 <option value="Mobile Developer">Mobile Developer</option>
                 <option value="Java Developer">Java Developer</option>
                 <option value="Graphic Designer">Graphic Designer</option>
+                <option value="Other">Other</option>
               </select>
             </div>
             <div class="form-group" id="reg-company-group" style="display:none;">
@@ -270,36 +271,13 @@ function initAuthModal() {
   roleCards.forEach(card => {
     card.addEventListener('click', () => {
       const clickedRole = card.getAttribute('data-role');
-      const wasSelected = card.classList.contains('selected');
-      const otherCard = document.querySelector(`.auth-role-card:not([data-role="${clickedRole}"])`);
-      const otherSelected = otherCard && otherCard.classList.contains('selected');
-
-      if (wasSelected && otherSelected) {
-        // Deselect clicked one, keep other
-        card.classList.remove('selected');
-        const remaining = otherCard.getAttribute('data-role');
-        roleInput.value = remaining;
-        bothNotice.style.display = 'none';
-        skillGroup.style.display = remaining === 'freelancer' ? 'block' : 'none';
-        companyGroup.style.display = remaining === 'client' ? 'block' : 'none';
-      } else if (wasSelected && !otherSelected) {
-        // Already sole selection — no-op (keep selected)
-      } else if (!wasSelected && otherSelected) {
-        // Select both
-        card.classList.add('selected');
-        roleInput.value = 'both'; // both roles — mode switch will be available
-        bothNotice.style.display = 'block';
-        skillGroup.style.display = 'block';
-        companyGroup.style.display = 'none';
-      } else {
-        // Select only this card
-        roleCards.forEach(c => c.classList.remove('selected'));
-        card.classList.add('selected');
-        roleInput.value = clickedRole;
-        bothNotice.style.display = 'none';
-        skillGroup.style.display = clickedRole === 'freelancer' ? 'block' : 'none';
-        companyGroup.style.display = clickedRole === 'client' ? 'block' : 'none';
-      }
+      // Radio behaviour — deselect all, select only the clicked one
+      roleCards.forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      roleInput.value = clickedRole;
+      if (bothNotice) bothNotice.style.display = 'none';
+      if (skillGroup) skillGroup.style.display = clickedRole === 'freelancer' ? 'block' : 'none';
+      if (companyGroup) companyGroup.style.display = clickedRole === 'client' ? 'block' : 'none';
     });
   });
 
@@ -346,6 +324,17 @@ function initAuthModal() {
     try {
       const session = window.SessionManager.login(email, password);
       if (session) {
+        // Merge any pre-login pending saves into the candidate's profile
+        if (session.role === 'candidate') {
+          const pending = JSON.parse(localStorage.getItem('skillbridge_pending_saves') || '[]');
+          if (pending.length > 0) {
+            const candidate = window.CandidatesDB.getById(session.user.id) || {};
+            const existing = Array.isArray(candidate.savedProjects) ? candidate.savedProjects : [];
+            const merged = [...new Set([...existing, ...pending])];
+            window.CandidatesDB.save({ ...candidate, savedProjects: merged });
+            localStorage.removeItem('skillbridge_pending_saves');
+          }
+        }
         modal.classList.remove('active');
         updateNavbarState();
         const prefix = getPrefix();
@@ -414,6 +403,13 @@ function initAuthModal() {
       const card = document.querySelector(`.auth-role-card[data-role="${role}"]`);
       if (card) card.click();
     }
+    // Clear browser-autofilled values every time the modal opens
+    setTimeout(() => {
+      const emailEl = document.getElementById('login-email');
+      const pwEl = document.getElementById('login-password');
+      if (emailEl) emailEl.value = '';
+      if (pwEl) pwEl.value = '';
+    }, 50);
   };
 }
 
@@ -585,6 +581,39 @@ function initProposalModal() {
       window.ProposalsDB.submit(jobId, session, { coverLetter: cover, proposedBudget: budget, proposedTimeline: timeline });
       form.style.display = 'none';
       successDiv.style.display = 'block';
+
+      // Update the card button to Submitted state
+      const cardBtn = document.querySelector(`.bp-apply-btn[data-job-id="${jobId}"]`);
+      if (cardBtn) {
+        cardBtn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;vertical-align:-2px;"><polyline points="20 6 9 17 4 12"/></svg>Submitted`;
+        cardBtn.disabled = true;
+        cardBtn.classList.add('applied');
+        cardBtn.onclick = null;
+        cardBtn.style.background = '#e8f8f0';
+        cardBtn.style.color = '#16a060';
+        cardBtn.style.border = '1.5px solid #a7e9c8';
+        cardBtn.style.cursor = 'default';
+      }
+
+      // Auto-close modal, then fade and remove the card from the list
+      setTimeout(() => {
+        modal.classList.remove('active');
+        const card = document.querySelector(`.job-card[data-job-id="${jobId}"]`);
+        if (card) {
+          card.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+          card.style.opacity = '0';
+          card.style.transform = 'translateY(-8px)';
+          setTimeout(() => {
+            card.remove();
+            const countEl = document.getElementById('job-count-label');
+            if (countEl) {
+              const current = parseInt(countEl.textContent) || 0;
+              const remaining = Math.max(0, current - 1);
+              countEl.textContent = `${remaining} project${remaining !== 1 ? 's' : ''} found`;
+            }
+          }, 420);
+        }
+      }, 2000);
     } catch (err) {
       errEl.textContent = err.message;
     }

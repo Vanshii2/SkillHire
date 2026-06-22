@@ -4,7 +4,7 @@
 
 footer {
   background-color: var(--surface-color);
-  border-top: 1px solid var(--border-color);
+  border-top: 3px solid #1dbf73;
   margin-top: auto;
 }
 

@@ -147,7 +147,7 @@
             </div>
             <h3 class="hiw-title">Create Your Profile</h3>
             <p class="hiw-desc">Showcase your skills, portfolio, and experience. Let your work speak — no resume required.</p>
-            <a href="profile-setup.html" class="hiw-cta-link">Create Profile &rarr;</a>
+            <a href="#" class="hiw-cta-link" onclick="handleCreateProfile(event)">Create Profile &rarr;</a>
           </div>
           <div class="hiw-card hiw-card-green">
             <div class="hiw-icon hiw-icon-green">
@@ -187,7 +187,7 @@
           </button>
           <button class="proj-filter-btn" data-view="designers" id="filter-btn-designers">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            Designers
+            Freelancers
           </button>
         </div>
       </div>
@@ -382,5 +382,16 @@
   <script src="js/db.js"></script>
   <script src="js/main.js"></script>
   <script src="js/home.js"></script>
+  <script>
+    function handleCreateProfile(e) {
+      e.preventDefault();
+      const session = window.SessionManager && window.SessionManager.getActiveUser();
+      if (session) {
+        window.location.href = 'profile-setup.html';
+      } else {
+        if (window.openAuthModal) window.openAuthModal('login');
+      }
+    }
+  </script>
 </body>
 </html>
