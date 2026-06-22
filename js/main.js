@@ -665,7 +665,9 @@ function updateNavbarState() {
       ? `${prefix}recruiter/dashboard.html`
       : `${prefix}candidate/dashboard.html`;
 
-    const profileUrl = `${prefix}profile.html?id=${session.user.id}`;
+    const profileUrl = session.role === 'recruiter'
+      ? `${prefix}client-profile.html?id=${session.user.id}`
+      : `${prefix}profile.html?id=${session.user.id}`;
 
     // Role-specific link order — client: Home | Browse Freelancers | Post Project | Dashboard
     //                             freelancer: Home | Find Work | Dashboard

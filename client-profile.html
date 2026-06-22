@@ -8,15 +8,16 @@
   <link rel="stylesheet" href="css/navbar.css">
   <link rel="stylesheet" href="css/footer.css">
   <style>
-    main { padding-top: 80px; }
+    main { padding-top: 64px; }
 
     .cp-body {
-      max-width: 860px;
+      max-width: 900px;
       margin: 0 auto;
-      padding: 48px 24px 80px;
+      padding: 48px 24px 96px;
     }
 
-    .cp-card {
+    /* Hero card */
+    .cp-hero-card {
       background: #fff;
       border: 1px solid var(--border-color);
       border-radius: 20px;
@@ -25,59 +26,148 @@
     }
 
     .cp-cover {
-      height: 120px;
-      background: linear-gradient(135deg, #0f0f0f 0%, #1a1a2e 100%);
+      height: 140px;
+      background: linear-gradient(135deg, #0d1b2a 0%, #0a2617 100%);
       position: relative;
     }
 
     .cp-avatar-wrap {
       position: absolute;
-      bottom: -32px;
-      left: 32px;
+      bottom: -40px;
+      left: 36px;
     }
     .cp-avatar {
-      width: 72px; height: 72px;
+      width: 84px; height: 84px;
       border-radius: 50%;
-      border: 3px solid #fff;
+      border: 4px solid #fff;
       background: var(--accent-color);
       color: white;
-      font-size: 1.6rem;
+      font-size: 2rem;
       font-weight: 800;
       display: flex; align-items: center; justify-content: center;
       font-family: var(--font-heading);
+      overflow: hidden;
     }
+    .cp-avatar img { width: 100%; height: 100%; object-fit: cover; }
 
-    .cp-info { padding: 44px 32px 28px; }
-    .cp-name { font-size: 1.5rem; font-weight: 800; letter-spacing:-0.02em; margin-bottom: 4px; }
-    .cp-company { color: var(--secondary-text); font-size: 0.95rem; margin-bottom: 16px; }
-    .cp-meta { display: flex; gap: 20px; flex-wrap: wrap; }
+    .cp-info { padding: 54px 36px 32px; }
+    .cp-name { font-size: 1.65rem; font-weight: 800; letter-spacing: -0.025em; margin-bottom: 4px; color: #111; }
+    .cp-company { color: var(--secondary-text); font-size: 0.95rem; margin-bottom: 18px; font-weight: 500; }
+
+    .cp-meta { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 24px; }
     .cp-meta-item {
-      display: flex; align-items: center; gap: 6px;
-      font-size: 0.85rem; color: var(--secondary-text);
+      display: flex; align-items: center; gap: 7px;
+      font-size: 0.85rem; color: var(--secondary-text); font-weight: 500;
+    }
+    .cp-meta-item a { color: var(--accent-color); text-decoration: none; font-weight: 600; }
+    .cp-meta-item a:hover { text-decoration: underline; }
+
+    /* Stars */
+    .cp-stars { display: flex; align-items: center; gap: 4px; }
+    .cp-star { color: #f59e0b; font-size: 1rem; }
+    .cp-star.empty { color: #e5e7eb; }
+    .cp-rating-val { font-size: 0.9rem; font-weight: 800; color: #111; margin-left: 2px; }
+    .cp-rating-count { font-size: 0.82rem; color: #aaa; margin-left: 4px; }
+
+    /* About */
+    .cp-about {
+      background: #fafafa;
+      border: 1px solid #f0f0f0;
+      border-radius: 12px;
+      padding: 20px 22px;
+      font-size: 0.93rem;
+      color: #444;
+      line-height: 1.7;
     }
 
-    .cp-section { margin-top: 32px; }
-    .cp-section-title { font-size: 1rem; font-weight: 700; margin-bottom: 16px; letter-spacing:-0.01em; }
+    /* Section card */
+    .cp-section-card {
+      background: #fff;
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 28px 32px;
+      margin-bottom: 20px;
+    }
+    .cp-section-title {
+      font-size: 1.05rem; font-weight: 800; color: #111;
+      margin-bottom: 18px; letter-spacing: -0.015em;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .cp-count-badge {
+      font-size: 0.72rem; font-weight: 700; background: #f0fdf7;
+      color: #1dbf73; border-radius: 99px; padding: 2px 8px;
+    }
 
+    /* Job cards */
     .cp-job-card {
       background: #fafafa;
       border: 1px solid var(--border-color);
       border-radius: 12px;
       padding: 18px 20px;
       margin-bottom: 12px;
-      transition: border-color 0.15s;
+      transition: border-color 0.15s, background 0.15s;
     }
+    .cp-job-card:last-child { margin-bottom: 0; }
     .cp-job-card:hover { border-color: rgba(29,191,115,0.4); background: #fff; }
-    .cp-job-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 4px; }
-    .cp-job-meta { font-size: 0.8rem; color: var(--secondary-text); display: flex; gap: 12px; flex-wrap: wrap; }
-    .cp-job-skills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .cp-job-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 6px; color: #111; }
+    .cp-job-meta { font-size: 0.8rem; color: var(--secondary-text); display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 8px; }
+    .cp-job-skills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
     .cp-skill { padding: 3px 10px; border-radius: 100px; background: #f0f0f0; font-size: 0.75rem; font-weight: 500; color: #555; }
 
-    .cp-empty { text-align: center; padding: 40px 24px; color: var(--secondary-text); font-size: 0.9rem; }
+    /* Review cards */
+    .cp-review-card {
+      border: 1px solid #f0f0f0;
+      border-radius: 12px;
+      padding: 16px 18px;
+      margin-bottom: 12px;
+      background: #fafafa;
+    }
+    .cp-review-card:last-child { margin-bottom: 0; }
+    .cp-review-top { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .cp-review-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: #e0f5eb; color: #1dbf73;
+      font-size: 0.85rem; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; overflow: hidden;
+    }
+    .cp-review-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .cp-review-name { font-size: 0.88rem; font-weight: 700; color: #111; }
+    .cp-review-date { font-size: 0.75rem; color: #aaa; margin-left: auto; }
+    .cp-review-stars { display: flex; gap: 2px; margin-bottom: 6px; }
+    .cp-review-text { font-size: 0.85rem; color: #555; line-height: 1.6; }
 
-    .cp-not-found { text-align: center; padding: 80px 24px; }
+    .cp-empty { text-align: center; padding: 32px 24px; color: var(--secondary-text); font-size: 0.9rem; }
+
+    .cp-not-found {
+      text-align: center; padding: 96px 24px;
+      background: #fff; border: 1px solid var(--border-color);
+      border-radius: 20px;
+    }
     .cp-not-found h2 { font-size: 1.5rem; margin-bottom: 10px; }
     .cp-not-found p { color: var(--secondary-text); margin-bottom: 24px; }
+
+    /* Edit banner */
+    .cp-edit-bar {
+      display: none;
+      background: #f0fdf7;
+      border: 1px solid rgba(29,191,115,0.3);
+      border-radius: 12px;
+      padding: 12px 18px;
+      margin-bottom: 20px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .cp-edit-bar span { font-size: 0.88rem; color: #16a060; font-weight: 600; }
+    .cp-edit-bar a {
+      font-size: 0.85rem; font-weight: 700; color: #fff;
+      background: #1dbf73; border-radius: 8px; padding: 8px 16px;
+      text-decoration: none; white-space: nowrap;
+      transition: background 0.15s;
+    }
+    .cp-edit-bar a:hover { background: #17a362; }
   </style>
 </head>
 <body>
@@ -87,6 +177,8 @@
       <a href="index.html" class="logo">SkillBridge</a>
       <ul class="nav-menu" id="nav-menu-list">
         <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="hire-talent.html" class="nav-link">Browse Freelancers</a></li>
+        <li><a href="post-project.html" class="nav-link">Post Project</a></li>
       </ul>
       <div class="nav-cta">
         <button class="btn btn-secondary" id="nav-btn-login" style="margin-right:8px;">Log In</button>
@@ -100,7 +192,11 @@
   </header>
   <div class="mobile-drawer-overlay" id="mobile-overlay"></div>
   <div class="mobile-drawer" id="mobile-drawer-menu">
-    <ul class="mobile-nav-list"><li><a href="index.html" class="mobile-nav-link">Home</a></li></ul>
+    <ul class="mobile-nav-list">
+      <li><a href="index.html" class="mobile-nav-link">Home</a></li>
+      <li><a href="hire-talent.html" class="mobile-nav-link">Browse Freelancers</a></li>
+      <li><a href="post-project.html" class="mobile-nav-link">Post Project</a></li>
+    </ul>
     <div class="mobile-nav-cta">
       <button class="btn btn-secondary btn-block" id="mob-btn-login">Log In</button>
       <button class="btn btn-primary btn-block" id="mob-btn-register" style="margin-top:10px;">Register</button>
@@ -118,6 +214,22 @@
   </main>
 
   <footer id="site-footer">
+    <div class="footer-inner container">
+      <div class="footer-cols">
+        <div class="footer-col footer-brand">
+          <div class="footer-logo">SkillBridge</div>
+          <p class="footer-tagline">Where talent meets opportunity.</p>
+        </div>
+        <div class="footer-col">
+          <div class="footer-col-title">Platform</div>
+          <ul class="footer-links">
+            <li><a href="hire-talent.html">Browse Talent</a></li>
+            <li><a href="post-project.html">Post a Project</a></li>
+            <li><a href="browse-projects.html">Find Work</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
     <div class="footer-bottom-strip">
       <div class="container footer-bottom-inner">
         <div class="footer-copy">&copy; 2026 SkillBridge. All rights reserved.</div>
@@ -128,6 +240,23 @@
   <script src="js/db.js"></script>
   <script src="js/main.js"></script>
   <script>
+  function starHtml(rating, size) {
+    size = size || '16';
+    const full = Math.floor(rating);
+    const half = (rating - full) >= 0.5;
+    let html = '';
+    for (let i = 0; i < 5; i++) {
+      if (i < full) {
+        html += `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="#f59e0b" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+      } else if (i === full && half) {
+        html += `<svg width="${size}" height="${size}" viewBox="0 0 24 24"><defs><linearGradient id="hg"><stop offset="50%" stop-color="#f59e0b"/><stop offset="50%" stop-color="#e5e7eb"/></linearGradient></defs><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="url(#hg)" stroke="none"/></svg>`;
+      } else {
+        html += `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="#e5e7eb" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+      }
+    }
+    return html;
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
     const params = new URLSearchParams(window.location.search);
     const id = params.get('id');
@@ -136,50 +265,130 @@
     const recruiter = window.RecruitersDB.getById(id);
     if (!recruiter) { document.getElementById('cp-not-found').style.display = 'block'; return; }
 
+    const session = window.SessionManager && window.SessionManager.getActiveUser();
+    const isOwnProfile = session && session.role === 'recruiter' && session.user.id === id;
+
     const jobs = window.JobsDB.getByClient(id);
-    const initial = recruiter.name.charAt(0).toUpperCase();
     document.title = `${recruiter.name} — SkillBridge`;
+
+    // Reviews where candidates rated this client (stored on recruiter.reviews)
+    const reviews = Array.isArray(recruiter.reviews) ? recruiter.reviews : [];
+    const rating = recruiter.rating || 0;
+    const reviewCount = recruiter.reviewCount || reviews.length || 0;
+
+    const contactEmail = (recruiter.contact && recruiter.contact.email) || recruiter.email || '';
+
+    // Avatar
+    let avatarHtml;
+    if (recruiter.avatar && recruiter.avatar.startsWith('data:')) {
+      avatarHtml = `<img src="${recruiter.avatar}" alt="${recruiter.name}">`;
+    } else {
+      avatarHtml = recruiter.name.charAt(0).toUpperCase();
+    }
+
+    // Rating block
+    const ratingHtml = reviewCount > 0
+      ? `<div style="display:flex;align-items:center;gap:8px;">
+           <div style="display:flex;gap:2px;">${starHtml(rating, '15')}</div>
+           <span style="font-size:0.9rem;font-weight:800;color:#111;">${rating.toFixed(1)}</span>
+           <span style="font-size:0.82rem;color:#aaa;">(${reviewCount} rating${reviewCount !== 1 ? 's' : ''} from freelancers)</span>
+         </div>`
+      : `<span style="font-size:0.83rem;color:#aaa;">No ratings yet</span>`;
+
+    // Posted jobs
+    const jobsHtml = jobs.length
+      ? jobs.map(j => `
+          <div class="cp-job-card">
+            <div class="cp-job-title">${j.title || ''}</div>
+            <div class="cp-job-meta">
+              ${j.budget ? `<span>💰 ${j.budget}</span>` : ''}
+              ${j.deadline ? `<span>📅 ${j.deadline}</span>` : ''}
+              <span>${j.proposals || 0} proposal${(j.proposals || 0) !== 1 ? 's' : ''}</span>
+            </div>
+            ${(j.skills || []).length ? `<div class="cp-job-skills">${j.skills.slice(0,6).map(s => `<span class="cp-skill">${s}</span>`).join('')}</div>` : ''}
+          </div>`).join('')
+      : `<div class="cp-empty">No projects posted yet.</div>`;
+
+    // Reviews
+    const reviewsHtml = reviews.length
+      ? reviews.map(r => {
+          const initial = (r.candidateName || 'F').charAt(0).toUpperCase();
+          const avatarEl = r.candidateAvatar
+            ? `<img src="${r.candidateAvatar}" alt="${r.candidateName}">`
+            : initial;
+          return `<div class="cp-review-card">
+            <div class="cp-review-top">
+              <div class="cp-review-avatar">${avatarEl}</div>
+              <div>
+                <div class="cp-review-name">${r.candidateName || 'Freelancer'}</div>
+                <div style="display:flex;gap:2px;margin-top:2px;">${starHtml(r.rating, '13')}</div>
+              </div>
+              <div class="cp-review-date">${r.createdAt ? new Date(r.createdAt).toLocaleDateString('en-IN', {month:'short',year:'numeric'}) : ''}</div>
+            </div>
+            ${r.comment ? `<div class="cp-review-text">${r.comment}</div>` : ''}
+          </div>`;
+        }).join('')
+      : `<div class="cp-empty">No reviews from freelancers yet.</div>`;
 
     const body = document.getElementById('cp-body');
     body.innerHTML = `
-      <div class="cp-card">
+      ${isOwnProfile ? `
+      <div class="cp-edit-bar" style="display:flex;">
+        <span>This is how freelancers see your profile.</span>
+        <a href="profile-setup.html">Edit Profile</a>
+      </div>` : ''}
+
+      <!-- Hero -->
+      <div class="cp-hero-card">
         <div class="cp-cover"></div>
-        <div class="cp-avatar-wrap"><div class="cp-avatar">${initial}</div></div>
+        <div class="cp-avatar-wrap"><div class="cp-avatar">${avatarHtml}</div></div>
         <div class="cp-info">
           <div class="cp-name">${recruiter.name}</div>
-          ${recruiter.company ? `<div class="cp-company">${recruiter.company}</div>` : ''}
+          ${recruiter.company && recruiter.company !== recruiter.name ? `<div class="cp-company">${recruiter.company}</div>` : ''}
+
           <div class="cp-meta">
             <div class="cp-meta-item">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-              India
-            </div>
-            <div class="cp-meta-item">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
               ${jobs.length} project${jobs.length !== 1 ? 's' : ''} posted
             </div>
+            ${contactEmail ? `
+            <div class="cp-meta-item">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              <a href="mailto:${contactEmail}">${contactEmail}</a>
+            </div>` : ''}
           </div>
 
-          ${jobs.length ? `
-          <div class="cp-section">
-            <div class="cp-section-title">Posted Projects</div>
-            ${jobs.map(j => `
-              <div class="cp-job-card">
-                <div class="cp-job-title">${j.title}</div>
-                <div class="cp-job-meta">
-                  <span>${j.budget}</span>
-                  <span>${j.deadline}</span>
-                  <span>${j.proposals || 0} proposals</span>
-                </div>
-                ${j.skills.length ? `<div class="cp-job-skills">${j.skills.slice(0,5).map(s => `<span class="cp-skill">${s}</span>`).join('')}</div>` : ''}
-              </div>
-            `).join('')}
-          </div>
-          ` : `<div class="cp-empty" style="padding:24px 0 0;">No projects posted yet.</div>`}
+          <div style="margin-bottom:20px;">${ratingHtml}</div>
+
+          ${recruiter.about ? `
+          <div style="margin-bottom:4px;font-size:0.8rem;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:0.06em;">What I Build</div>
+          <div class="cp-about">${recruiter.about}</div>` : ''}
         </div>
       </div>
-      <a href="browse-projects.html" style="color:var(--secondary-text);font-size:0.88rem;display:inline-flex;align-items:center;gap:5px;">
+
+      <!-- Posted Projects -->
+      <div class="cp-section-card">
+        <div class="cp-section-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          Posted Projects
+          <span class="cp-count-badge">${jobs.length}</span>
+        </div>
+        ${jobsHtml}
+      </div>
+
+      <!-- Reviews from freelancers -->
+      <div class="cp-section-card">
+        <div class="cp-section-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          Ratings from Freelancers
+          <span class="cp-count-badge">${reviewCount}</span>
+        </div>
+        ${reviewsHtml}
+      </div>
+
+      <a href="javascript:history.back()" style="color:var(--secondary-text);font-size:0.88rem;display:inline-flex;align-items:center;gap:5px;margin-top:4px;">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-        Back to Projects
+        Go Back
       </a>
     `;
   });

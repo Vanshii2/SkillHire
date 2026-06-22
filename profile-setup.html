@@ -451,6 +451,29 @@
       save: () => ({ about: document.getElementById('s-about').value.trim() })
     },
     {
+      id: 'contact-client',
+      title: 'Contact Email',
+      desc: 'How should freelancers reach you?',
+      required: true,
+      render: () => `
+        <h2>Contact Email</h2>
+        <p>Add a public contact email so freelancers can reach out directly. <span style="color:#e53e3e;">*</span></p>
+        <div class="form-group">
+          <label for="s-contact-email">Email Address <span style="color:#e53e3e;">*</span></label>
+          <input type="email" id="s-contact-email" placeholder="e.g. hello@yourcompany.com" value="${(currentData().contact && currentData().contact.email) || currentData().email || ''}">
+        </div>
+      `,
+      validate: () => {
+        const val = document.getElementById('s-contact-email').value.trim();
+        if (!val || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) return 'Please enter a valid email address.';
+        return null;
+      },
+      save: () => {
+        const existing = currentData().contact || {};
+        return { contact: { ...existing, email: document.getElementById('s-contact-email').value.trim() } };
+      }
+    },
+    {
       id: 'photo',
       title: 'Profile Photo',
       desc: 'Upload a profile photo.',
@@ -701,6 +724,13 @@
       const github   = ((document.getElementById('s-github')   || {}).value || '').trim();
       if (!linkedin && !github) {
         showStepError('Please add at least one link — LinkedIn or GitHub — to continue.'); return;
+      }
+    }
+
+    if (step.id === 'contact-client') {
+      if (typeof step.validate === 'function') {
+        const err = step.validate();
+        if (err) { showStepError(err); return; }
       }
     }
 
