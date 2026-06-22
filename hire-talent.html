@@ -355,17 +355,18 @@
   <script src="js/main.js"></script>
   <script src="js/candidates.js"></script>
   <script>
-    // Post a Job button — auth gate
-    document.getElementById('btn-post-job-cta').addEventListener('click', () => {
-      const session = window.SessionManager && window.SessionManager.getActiveUser();
-      if (session && session.role === 'recruiter') {
-        window.location.href = 'post-job.html';
-      } else {
-        if (typeof window.openAuthModal === 'function') {
-          window.openAuthModal('recruiter', 'login');
+    // Post a Job button — auth gate (guarded in case element doesn't exist)
+    const _postJobCta = document.getElementById('btn-post-job-cta');
+    if (_postJobCta) {
+      _postJobCta.addEventListener('click', () => {
+        const session = window.SessionManager && window.SessionManager.getActiveUser();
+        if (session && session.role === 'recruiter') {
+          window.location.href = 'post-project.html';
+        } else {
+          if (typeof window.openAuthModal === 'function') window.openAuthModal('login');
         }
-      }
-    });
+      });
+    }
 
     // Hero CTA button — dynamic based on login state
     (function initHeroBtn() {
@@ -374,29 +375,28 @@
       const session = window.SessionManager && window.SessionManager.getActiveUser();
 
       if (!session) {
-        // Guest: prompt recruiter login
+        // Guest: open login modal
         btn.onclick = () => {
           if (typeof window.openAuthModal === 'function') {
-            window.openAuthModal('recruiter', 'login');
+            window.openAuthModal('login');
           }
         };
         return;
       }
 
       if (session.role !== 'recruiter') {
-        // Candidate viewing — hide the button
-        btn.style.display = 'none';
+        // Freelancer viewing — redirect to post-project anyway (it handles the gate)
+        btn.onclick = () => { window.location.href = 'post-project.html'; };
         return;
       }
 
-      // Logged in as recruiter — check if they already posted any job/project
+      // Logged in as client — always go to Create Project Brief
+      btn.onclick = () => { window.location.href = 'post-project.html'; };
+
+      // If they already have projects, just update the label (keep same destination)
       const recruiterJobs = window.JobsDB ? window.JobsDB.getByRecruiter(session.user.id) : [];
       if (recruiterJobs && recruiterJobs.length > 0) {
-        // Already posted — offer plans
-        btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Buy Plans`;
-        btn.onclick = () => { window.location.href = 'pricing.html'; };
-      } else {
-        btn.onclick = () => { window.location.href = 'post-job.html'; };
+        btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg> Create Project Brief`;
       }
     })();
   </script>

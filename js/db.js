@@ -196,6 +196,7 @@ window.ProjectsDB = ProjectsDB;
    Seed Candidates (Freelancers)
    ========================================================================== */
 const SEED_CANDIDATES = [
+  // Sorted: 3 projects → 3 → 2 → 2 → 2 → 1
   {
     id: 'rahul-sharma',
     name: 'Rahul Sharma',
@@ -211,58 +212,8 @@ const SEED_CANDIDATES = [
     contact: { email: 'rahul.sharma@example.com', linkedin: 'https://linkedin.com/in/rahulsharma-demo', github: 'https://github.com/rahulsharma-demo' },
     projects: [
       { name: 'DevFlow Developer Platform', description: 'A premium community platform for developers to share code snippets, collaborate, and write technical blogs.', techStack: ['React', 'Node.js', 'Express', 'MongoDB'], screenshot: 'assets/images/3.webp', github: 'https://github.com', live: 'https://example.com' },
-      { name: 'PromptKit Canvas', description: 'A sleek, collaborative canvas tool for prompt engineering with a node-based interface.', techStack: ['JavaScript', 'HTMLCanvas', 'CSS', 'LocalStorage'], screenshot: 'assets/images/4.webp', github: 'https://github.com', live: 'https://example.com' }
-    ]
-  },
-  {
-    id: 'sarah-jenkins',
-    name: 'Sarah Jenkins',
-    role: 'MERN Stack Developer',
-    avatar: 'assets/images/sara.png',
-    availability: 'Available',
-    hourlyRate: 1200,
-    password: 'password123',
-    rating: 5.0,
-    reviewCount: 21,
-    about: 'Full-stack developer focused on building scalable, type-safe REST APIs and blending them with premium user experiences.',
-    skills: ['Node.js', 'MongoDB', 'Docker', 'AWS', 'Redis', 'TypeScript', 'Express'],
-    contact: { email: 'sarah.j@example.com', linkedin: 'https://linkedin.com/in/sarahjenkins-demo', github: 'https://github.com/sarahjenkins-demo' },
-    projects: [
-      { name: 'Fintech Edge Dashboard', description: 'A premium SaaS billing and analytics dashboard. Visualizes subscription metrics, churn rates, and MRR.', techStack: ['MERN', 'React', 'Node.js', 'Express', 'MongoDB'], screenshot: 'assets/images/5.webp', github: 'https://github.com', live: 'https://example.com' }
-    ]
-  },
-  {
-    id: 'aman-verma',
-    name: 'Aman Verma',
-    role: 'Frontend Developer',
-    avatar: 'assets/images/aman.png',
-    availability: 'Available',
-    hourlyRate: 700,
-    password: 'password123',
-    rating: 4.8,
-    reviewCount: 15,
-    about: 'Creative frontend developer with a background in digital design. Specializes in custom animations, SVG manipulation, and building state-driven interactive user interfaces.',
-    skills: ['Vue.js', 'WordPress', 'PHP', 'JavaScript', 'Nuxt.js', 'CSS Animations', 'Three.js'],
-    contact: { email: 'aman.verma@example.com', linkedin: 'https://linkedin.com/in/amanverma-demo', github: 'https://github.com/amanverma-demo' },
-    projects: [
-      { name: 'TaskSphere SaaS Mockup', description: 'A tasks management board featuring drag-and-drop lists, sub-tasks, and calendar views.', techStack: ['React', 'JavaScript', 'CSS', 'HTML'], screenshot: 'assets/images/6.webp', github: 'https://github.com', live: 'https://example.com' }
-    ]
-  },
-  {
-    id: 'tanmay-patel',
-    name: 'Tanmay Patel',
-    role: 'Python / Backend Developer',
-    avatar: 'assets/images/tanmay.png',
-    availability: 'Available',
-    hourlyRate: 950,
-    password: 'password123',
-    rating: 4.7,
-    reviewCount: 29,
-    about: 'Data-driven backend engineer specialized in RESTful API services, serverless microservices, and database performance.',
-    skills: ['Python', 'Django', 'PostgreSQL', 'Redis', 'FastAPI', 'Celery', 'Linux'],
-    contact: { email: 'tanmay.p@example.com', linkedin: 'https://linkedin.com/in/tanmaypatel-demo', github: 'https://github.com/tanmaypatel-demo' },
-    projects: [
-      { name: 'Analytics Engine API', description: 'A high-throughput metrics ingestion gateway built using Django REST Framework.', techStack: ['Python', 'Django', 'PostgreSQL', 'Redis'], screenshot: 'assets/images/7.webp', github: 'https://github.com', live: 'https://example.com' }
+      { name: 'PromptKit Canvas', description: 'A sleek, collaborative canvas tool for prompt engineering with a node-based interface.', techStack: ['JavaScript', 'HTMLCanvas', 'CSS', 'LocalStorage'], screenshot: 'assets/images/4.webp', github: 'https://github.com', live: 'https://example.com' },
+      { name: 'ShopLens E-commerce UI', description: 'A modern e-commerce storefront with live product filtering, cart animations, and checkout flow built in React.', techStack: ['React', 'TailwindCSS', 'TypeScript', 'Vite'], screenshot: 'assets/images/2.webp', github: 'https://github.com', live: 'https://example.com' }
     ]
   },
   {
@@ -279,7 +230,63 @@ const SEED_CANDIDATES = [
     skills: ['UI/UX', 'AI', 'Prototyping', 'Design Systems', 'Webflow', 'Brand Identity', 'Motion Design'],
     contact: { email: 'aditi.rao@example.com', linkedin: 'https://linkedin.com/in/aditirao-demo', github: 'https://github.com/aditirao-demo' },
     projects: [
-      { name: 'Atlas Design System', description: 'A comprehensive, multi-platform design token library featuring responsive typography scales and color mapping generators.', techStack: ['AI', 'CSS', 'HTML', 'JavaScript'], screenshot: 'assets/images/8.webp', github: 'https://github.com', live: 'https://example.com' }
+      { name: 'Atlas Design System', description: 'A comprehensive, multi-platform design token library featuring responsive typography scales and color mapping generators.', techStack: ['AI', 'CSS', 'HTML', 'JavaScript'], screenshot: 'assets/images/8.webp', github: 'https://github.com', live: 'https://example.com' },
+      { name: 'NovaBrand Identity Kit', description: 'End-to-end brand identity package including logo system, color palette, and responsive component library for a SaaS startup.', techStack: ['Figma', 'Webflow', 'Motion Design', 'Brand Identity'], screenshot: 'assets/images/3.webp', github: 'https://github.com', live: 'https://example.com' },
+      { name: 'Pulse Dashboard UI', description: 'A dark-mode analytics dashboard with data-visualization components, micro-interactions, and an accessible design system.', techStack: ['Design Systems', 'Prototyping', 'CSS', 'HTML'], screenshot: 'assets/images/5.webp', github: 'https://github.com', live: 'https://example.com' }
+    ]
+  },
+  {
+    id: 'sarah-jenkins',
+    name: 'Sarah Jenkins',
+    role: 'MERN Stack Developer',
+    avatar: 'assets/images/sara.png',
+    availability: 'Available',
+    hourlyRate: 1200,
+    password: 'password123',
+    rating: 5.0,
+    reviewCount: 21,
+    about: 'Full-stack developer focused on building scalable, type-safe REST APIs and blending them with premium user experiences.',
+    skills: ['Node.js', 'MongoDB', 'Docker', 'AWS', 'Redis', 'TypeScript', 'Express'],
+    contact: { email: 'sarah.j@example.com', linkedin: 'https://linkedin.com/in/sarahjenkins-demo', github: 'https://github.com/sarahjenkins-demo' },
+    projects: [
+      { name: 'Fintech Edge Dashboard', description: 'A premium SaaS billing and analytics dashboard. Visualizes subscription metrics, churn rates, and MRR.', techStack: ['MERN', 'React', 'Node.js', 'Express', 'MongoDB'], screenshot: 'assets/images/5.webp', github: 'https://github.com', live: 'https://example.com' },
+      { name: 'CloudCart API Gateway', description: 'A microservices-based e-commerce backend with JWT auth, Redis caching, and Dockerized deployment on AWS.', techStack: ['Node.js', 'Docker', 'AWS', 'Redis', 'MongoDB'], screenshot: 'assets/images/7.webp', github: 'https://github.com', live: 'https://example.com' }
+    ]
+  },
+  {
+    id: 'aman-verma',
+    name: 'Aman Verma',
+    role: 'Frontend Developer',
+    avatar: 'assets/images/aman.png',
+    availability: 'Available',
+    hourlyRate: 700,
+    password: 'password123',
+    rating: 4.8,
+    reviewCount: 15,
+    about: 'Creative frontend developer with a background in digital design. Specializes in custom animations, SVG manipulation, and building state-driven interactive user interfaces.',
+    skills: ['Vue.js', 'WordPress', 'PHP', 'JavaScript', 'Nuxt.js', 'CSS Animations', 'Three.js'],
+    contact: { email: 'aman.verma@example.com', linkedin: 'https://linkedin.com/in/amanverma-demo', github: 'https://github.com/amanverma-demo' },
+    projects: [
+      { name: 'TaskSphere SaaS Mockup', description: 'A tasks management board featuring drag-and-drop lists, sub-tasks, and calendar views.', techStack: ['React', 'JavaScript', 'CSS', 'HTML'], screenshot: 'assets/images/6.webp', github: 'https://github.com', live: 'https://example.com' },
+      { name: 'Orbit Portfolio Builder', description: 'A drag-and-drop portfolio site builder with animated section transitions and live preview, built with Three.js and Vue.', techStack: ['Vue.js', 'Three.js', 'Nuxt.js', 'CSS Animations'], screenshot: 'assets/images/4.webp', github: 'https://github.com', live: 'https://example.com' }
+    ]
+  },
+  {
+    id: 'tanmay-patel',
+    name: 'Tanmay Patel',
+    role: 'Python / Backend Developer',
+    avatar: 'assets/images/tanmay.png',
+    availability: 'Available',
+    hourlyRate: 950,
+    password: 'password123',
+    rating: 4.7,
+    reviewCount: 29,
+    about: 'Data-driven backend engineer specialized in RESTful API services, serverless microservices, and database performance.',
+    skills: ['Python', 'Django', 'PostgreSQL', 'Redis', 'FastAPI', 'Celery', 'Linux'],
+    contact: { email: 'tanmay.p@example.com', linkedin: 'https://linkedin.com/in/tanmaypatel-demo', github: 'https://github.com/tanmaypatel-demo' },
+    projects: [
+      { name: 'Analytics Engine API', description: 'A high-throughput metrics ingestion gateway built using Django REST Framework.', techStack: ['Python', 'Django', 'PostgreSQL', 'Redis'], screenshot: 'assets/images/7.webp', github: 'https://github.com', live: 'https://example.com' },
+      { name: 'AutoSched Task Runner', description: 'A Celery-based distributed task scheduler with real-time job monitoring, retry logic, and Slack alerting.', techStack: ['Python', 'Celery', 'FastAPI', 'PostgreSQL', 'Linux'], screenshot: 'assets/images/8.webp', github: 'https://github.com', live: 'https://example.com' }
     ]
   },
   {
@@ -379,15 +386,43 @@ class CandidatesDB {
     if (!localStorage.getItem(STORAGE_KEY)) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(SEED_CANDIDATES));
     } else {
-      // Migrate: replace Figma with AI in existing candidates' skills
       const candidates = JSON.parse(localStorage.getItem(STORAGE_KEY));
       let dirty = false;
+
+      // Migrate v1: replace Figma with AI in skills
       candidates.forEach(c => {
         if (c.skills && c.skills.includes('Figma')) {
           c.skills = c.skills.map(s => s === 'Figma' ? 'AI' : s);
           dirty = true;
         }
       });
+
+      // Migrate v2: sync seed candidates' projects to the correct counts
+      if (!localStorage.getItem('sb_seed_projects_v2')) {
+        SEED_CANDIDATES.forEach(seed => {
+          const existing = candidates.find(c => c.id === seed.id);
+          if (existing) {
+            existing.projects = seed.projects;
+            dirty = true;
+          }
+        });
+        localStorage.setItem('sb_seed_projects_v2', '1');
+      }
+
+      // Migrate v2b: reorder seed candidates by project count (high → low)
+      if (!localStorage.getItem('sb_seed_order_v2')) {
+        const seedOrder = SEED_CANDIDATES.map(s => s.id);
+        candidates.sort((a, b) => {
+          const ai = seedOrder.indexOf(a.id), bi = seedOrder.indexOf(b.id);
+          if (ai === -1 && bi === -1) return 0;
+          if (ai === -1) return 1;
+          if (bi === -1) return -1;
+          return ai - bi;
+        });
+        dirty = true;
+        localStorage.setItem('sb_seed_order_v2', '1');
+      }
+
       if (dirty) localStorage.setItem(STORAGE_KEY, JSON.stringify(candidates));
     }
   }
