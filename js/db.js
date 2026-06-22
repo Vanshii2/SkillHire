@@ -455,25 +455,31 @@ class CandidatesDB {
 
   static query({ search = '', skills = [], sortBy = 'projects' } = {}) {
     let candidates = this.getAll();
-    // Only show candidates with at least 1 project
-    candidates = candidates.filter(c => c.projects && c.projects.length > 0);
     if (search.trim()) {
       const q = search.toLowerCase().trim();
       candidates = candidates.filter(c =>
         c.name.toLowerCase().includes(q) ||
-        c.role.toLowerCase().includes(q) ||
-        c.skills.some(s => s.toLowerCase().includes(q))
+        (c.role || '').toLowerCase().includes(q) ||
+        (c.skills || []).some(s => s.toLowerCase().includes(q))
       );
     }
     if (skills.length > 0) {
       candidates = candidates.filter(c =>
-        skills.some(skill => c.skills.some(s => s.toLowerCase() === skill.toLowerCase()))
+        skills.some(skill => (c.skills || []).some(s => s.toLowerCase() === skill.toLowerCase()))
       );
     }
     if (sortBy === 'price') candidates.sort((a, b) => (a.hourlyRate || 0) - (b.hourlyRate || 0));
-    else if (sortBy === 'skills') candidates.sort((a, b) => b.skills.length - a.skills.length);
+    else if (sortBy === 'skills') candidates.sort((a, b) => (b.skills || []).length - (a.skills || []).length);
     else if (sortBy === 'rating') candidates.sort((a, b) => (b.rating || 0) - (a.rating || 0));
-    else candidates.sort((a, b) => (b.projects || []).length - (a.projects || []).length);
+    else {
+      // Sort by project count descending; accounts with 0 projects go to the end
+      candidates.sort((a, b) => {
+        const aP = (a.projects || []).length;
+        const bP = (b.projects || []).length;
+        if (aP === 0 && bP === 0) return (b.rating || 0) - (a.rating || 0);
+        return bP - aP;
+      });
+    }
     return candidates;
   }
 
@@ -932,6 +938,22 @@ class EscrowDB {
             e.freelancerId || 'system',
             '✅ Payment Confirmed — Escrow Active: ' + e.jobTitle,
             `Your escrow payment of ₹${rawAmt} for "${e.jobTitle}" has been successfully funded.\n\nThe freelancer ${e.freelancerName || ''} has been notified and will begin work.\n\nYou can release payment once you've reviewed and approved the delivered work from your Payments & Escrow tab.\n\nFunded at: ${now}`
+          );
+        }
+      }
+    }
+
+    // ── WORK SUBMITTED: notify client ────────────────────────────────────
+    if (status === 'work_submitted') {
+      const wsKey = 'sb_ws_notif_' + escrowId;
+      if (!localStorage.getItem(wsKey)) {
+        localStorage.setItem(wsKey, '1');
+        if (e.clientId) {
+          MessagesDB.send(
+            e.freelancerId || 'system', e.freelancerName || 'Freelancer', 'Freelancer', '',
+            e.clientId,
+            '🚀 Final Project Ready for Review — ' + e.jobTitle,
+            `${e.freelancerName || 'Your freelancer'} has submitted the final project for "${e.jobTitle}".\n\nPlease review the deliverables and approve from your My Contracts page. The payment of ₹${rawAmt} will be released to the freelancer on approval.\n\nSubmitted: ${now}`
           );
         }
       }

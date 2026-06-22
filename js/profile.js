@@ -536,8 +536,8 @@ function openHireModal(candidate, session) {
             <input type="number" id="hf-budget" style="width:100%;padding:10px 12px;border:1.5px solid #e0e0e0;border-radius:8px;font-family:var(--font-body);font-size:0.9rem;box-sizing:border-box;" placeholder="e.g. 15000" required>
           </div>
           <div>
-            <label style="font-size:0.8rem;font-weight:700;color:#555;display:block;margin-bottom:6px;">Timeline</label>
-            <input type="text" id="hf-timeline" style="width:100%;padding:10px 12px;border:1.5px solid #e0e0e0;border-radius:8px;font-family:var(--font-body);font-size:0.9rem;box-sizing:border-box;" placeholder="e.g. 2 weeks">
+            <label style="font-size:0.8rem;font-weight:700;color:#555;display:block;margin-bottom:6px;">Timeline <span style="color:#e53e3e;">*</span></label>
+            <input type="text" id="hf-timeline" style="width:100%;padding:10px 12px;border:1.5px solid #e0e0e0;border-radius:8px;font-family:var(--font-body);font-size:0.9rem;box-sizing:border-box;" placeholder="e.g. 2 weeks" required>
           </div>
         </div>
         <div style="margin-bottom:20px;">
@@ -565,8 +565,8 @@ function openHireModal(candidate, session) {
     const timeline = document.getElementById('hf-timeline').value.trim();
     const errEl = document.getElementById('hf-error');
 
-    if (!title || !budget || !message) {
-      errEl.textContent = 'Please fill in all required fields.';
+    if (!title || !budget || !timeline || !message) {
+      errEl.textContent = 'Please fill in all required fields including Timeline.';
       errEl.style.display = 'block';
       return;
     }

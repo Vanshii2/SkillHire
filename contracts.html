@@ -294,7 +294,8 @@
           <div style="font-size:0.78rem;font-weight:800;color:#2563eb;text-transform:uppercase;margin-bottom:8px;">🔔 Work Submitted — ${new Date(sub.submittedAt).toLocaleDateString('en-IN',{day:'numeric',month:'short'})}</div>
           ${sub.message ? `<div style="font-size:0.83rem;color:#444;line-height:1.5;margin-bottom:8px;font-style:italic;">"${escH(sub.message.slice(0,200))}${sub.message.length>200?'…':''}"</div>` : ''}
           ${sub.fileName ? `<div style="font-size:0.78rem;color:#1dbf73;font-weight:600;margin-bottom:4px;">📎 ${escH(sub.fileName)}</div>` : ''}
-          ${sub.liveLink ? `<div style="font-size:0.78rem;margin-bottom:4px;"><a href="${escH(sub.liveLink)}" target="_blank" style="color:#2563eb;font-weight:600;">🔗 View Live Link</a></div>` : ''}
+          ${sub.liveLink ? `<div style="font-size:0.78rem;margin-bottom:4px;"><a href="${escH(sub.liveLink)}" target="_blank" style="color:#2563eb;font-weight:600;">🔗 View Live Demo</a></div>` : ''}
+          ${sub.codeLink ? `<div style="font-size:0.78rem;margin-bottom:4px;"><a href="${escH(sub.codeLink)}" target="_blank" style="color:#555;font-weight:600;">💻 View Code Repository</a></div>` : ''}
         </div>` : ''}
         <div style="padding:10px 14px;background:#fff8e6;border:1px solid #fde68a;border-radius:8px;font-size:0.81rem;color:#92400e;margin-bottom:12px;">
           ⚠️ Review the work above carefully. Only approve once you are satisfied.
@@ -403,32 +404,54 @@
   }
 
   // ── Submit Work Modal (same flow as freelancer dashboard) ──
-  let _cActiveSubmitId = null, _cSelectedFile = '', _cSelectedLink = '';
+  let _cActiveSubmitId = null, _cSelectedFile = '', _cSelectedLink = '', _cSelectedCode = '';
 
   function openSubmitWorkModal(escrowId) {
-    _cActiveSubmitId = escrowId; _cSelectedFile = ''; _cSelectedLink = '';
+    _cActiveSubmitId = escrowId; _cSelectedFile = ''; _cSelectedLink = ''; _cSelectedCode = '';
     const overlay = document.createElement('div');
     overlay.id = '_sw-overlay';
     overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:3000;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);';
     overlay.innerHTML = `
-      <div style="background:#fff;border-radius:20px;padding:32px;width:100%;max-width:520px;box-shadow:0 24px 64px rgba(0,0,0,0.18);">
-        <h2 style="font-size:1.2rem;font-weight:800;color:#111;margin-bottom:6px;">Submit Work for Approval</h2>
-        <p style="font-size:0.83rem;color:#888;margin-bottom:24px;line-height:1.5;">Describe your work. The client has <strong>14 days</strong> to review — if no action, payment auto-releases.</p>
-        <label style="font-size:0.75rem;font-weight:700;color:#555;display:block;margin-bottom:6px;">Message to Client <span style="color:#e53e3e;">*</span></label>
-        <textarea id="_sw-msg" style="width:100%;padding:12px 14px;border:1.5px solid #e0e0e0;border-radius:10px;font-family:inherit;font-size:0.88rem;resize:vertical;min-height:100px;box-sizing:border-box;outline:none;" placeholder="Hi, I've completed the work as discussed…"></textarea>
-        <label style="font-size:0.75rem;font-weight:700;color:#555;display:block;margin:14px 0 6px;">Attach File <span style="color:#e53e3e;">*</span> <span style="font-weight:400;color:#aaa;">(or provide live link below)</span></label>
-        <div id="_sw-file-zone" style="border:2px dashed #e0e0e0;border-radius:10px;padding:18px;text-align:center;cursor:pointer;position:relative;transition:border-color 0.15s;">
+      <div style="background:#fff;border-radius:20px;padding:32px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,0.18);">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          <h2 style="font-size:1.2rem;font-weight:800;color:#111;margin:0;">Submit Final Project</h2>
+        </div>
+        <p style="font-size:0.83rem;color:#888;margin-bottom:24px;line-height:1.5;">Share your deliverables and a message. The client will review and approve — payment releases instantly on approval.</p>
+
+        <label style="font-size:0.75rem;font-weight:700;color:#555;display:block;margin-bottom:6px;">Description / Message to Client <span style="color:#e53e3e;">*</span></label>
+        <textarea id="_sw-msg" style="width:100%;padding:12px 14px;border:1.5px solid #e0e0e0;border-radius:10px;font-family:inherit;font-size:0.88rem;resize:vertical;min-height:110px;box-sizing:border-box;outline:none;transition:border-color 0.15s;" placeholder="Hi, I've completed the work as discussed. Here's a summary of what I built…" onfocus="this.style.borderColor='#1dbf73'" onblur="this.style.borderColor='#e0e0e0'"></textarea>
+
+        <label style="font-size:0.75rem;font-weight:700;color:#555;display:block;margin:16px 0 6px;">
+          🔗 Live Demo URL <span style="font-weight:400;color:#aaa;">(Netlify, Vercel, etc.)</span>
+        </label>
+        <input id="_sw-link" type="url" style="width:100%;padding:10px 14px;border:1.5px solid #e0e0e0;border-radius:10px;font-family:inherit;font-size:0.88rem;box-sizing:border-box;outline:none;transition:border-color 0.15s;" placeholder="https://my-project.vercel.app" oninput="_cSelectedLink=this.value.trim()" onfocus="this.style.borderColor='#1dbf73'" onblur="this.style.borderColor='#e0e0e0'">
+
+        <label style="font-size:0.75rem;font-weight:700;color:#555;display:block;margin:16px 0 6px;">
+          💻 Code Repository URL <span style="font-weight:400;color:#aaa;">(GitHub, GitLab, etc.)</span>
+        </label>
+        <input id="_sw-code" type="url" style="width:100%;padding:10px 14px;border:1.5px solid #e0e0e0;border-radius:10px;font-family:inherit;font-size:0.88rem;box-sizing:border-box;outline:none;transition:border-color 0.15s;" placeholder="https://github.com/yourname/project" oninput="_cSelectedCode=this.value.trim()" onfocus="this.style.borderColor='#1dbf73'" onblur="this.style.borderColor='#e0e0e0'">
+
+        <label style="font-size:0.75rem;font-weight:700;color:#555;display:block;margin:16px 0 6px;">📎 Attach File <span style="font-weight:400;color:#aaa;">(ZIP, PDF, PNG, JPG — optional)</span></label>
+        <div id="_sw-file-zone" style="border:2px dashed #e0e0e0;border-radius:10px;padding:16px;text-align:center;cursor:pointer;position:relative;transition:border-color 0.15s;">
           <input type="file" id="_sw-file-input" style="position:absolute;inset:0;opacity:0;cursor:pointer;" onchange="(function(inp){if(inp.files&&inp.files[0]){_cSelectedFile=inp.files[0].name;document.getElementById('_sw-fname').textContent='📎 '+_cSelectedFile;document.getElementById('_sw-file-zone').style.borderColor='#1dbf73';}})(this)">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          <div style="font-size:0.82rem;color:#aaa;margin-top:6px;">Click to upload — ZIP, PDF, PNG, JPG</div>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <div style="font-size:0.81rem;color:#aaa;margin-top:5px;">Click to upload</div>
           <div id="_sw-fname" style="font-size:0.82rem;color:#1dbf73;font-weight:600;margin-top:4px;"></div>
         </div>
-        <label style="font-size:0.75rem;font-weight:700;color:#555;display:block;margin:14px 0 6px;">Live Link <span style="font-weight:400;color:#aaa;">(optional if file attached)</span></label>
-        <input id="_sw-link" type="url" style="width:100%;padding:10px 14px;border:1.5px solid #e0e0e0;border-radius:10px;font-family:inherit;font-size:0.88rem;box-sizing:border-box;outline:none;" placeholder="https://your-project-link.com" oninput="_cSelectedLink=this.value.trim()">
-        <div id="_sw-err" style="display:none;color:#e53e3e;font-size:0.8rem;margin-top:10px;"></div>
+
+        <div id="_sw-err" style="display:none;color:#e53e3e;font-size:0.8rem;margin-top:10px;padding:8px 12px;background:#fff5f5;border-radius:8px;border:1px solid #fed7d7;"></div>
+
         <div style="display:flex;gap:10px;margin-top:22px;">
           <button onclick="document.getElementById('_sw-overlay').remove()" style="padding:12px 20px;background:#f5f5f5;color:#555;border:none;border-radius:10px;font-size:0.9rem;font-weight:700;cursor:pointer;font-family:inherit;">Cancel</button>
-          <button onclick="confirmSubmitWork()" style="flex:1;padding:12px;background:#1dbf73;color:#fff;border:none;border-radius:10px;font-size:0.9rem;font-weight:800;cursor:pointer;font-family:inherit;">Submit for Approval</button>
+          <button onclick="sendUpdateOnly()" style="padding:12px 18px;background:#f0fdf7;color:#16a060;border:1.5px solid rgba(29,191,115,0.35);border-radius:10px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;" title="Send a progress update without marking work as complete">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            Add Update
+          </button>
+          <button onclick="confirmSubmitWork()" style="flex:1;padding:12px;background:#1dbf73;color:#fff;border:none;border-radius:10px;font-size:0.9rem;font-weight:800;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:7px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            Submit Final Project
+          </button>
         </div>
       </div>`;
     document.body.appendChild(overlay);
@@ -438,20 +461,55 @@
     const msg = (document.getElementById('_sw-msg')?.value || '').trim();
     const errEl = document.getElementById('_sw-err');
     errEl.style.display = 'none';
-    if (!msg) { errEl.textContent = 'Please write a message to the client.'; errEl.style.display = 'block'; return; }
-    if (!_cSelectedFile && !_cSelectedLink) { errEl.textContent = 'Please attach a file or provide a live link — at least one is required.'; errEl.style.display = 'block'; return; }
+    if (!msg) { errEl.textContent = 'Please write a message/description to the client.'; errEl.style.display = 'block'; return; }
+    if (!_cSelectedFile && !_cSelectedLink && !_cSelectedCode) { errEl.textContent = 'Please provide at least one deliverable — a live link, code repo URL, or attached file.'; errEl.style.display = 'block'; return; }
     const now = new Date().toISOString();
-    localStorage.setItem('sb_work_submission_' + _cActiveSubmitId, JSON.stringify({ message: msg, fileName: _cSelectedFile, liveLink: _cSelectedLink, submittedAt: now }));
+    localStorage.setItem('sb_work_submission_' + _cActiveSubmitId, JSON.stringify({ message: msg, fileName: _cSelectedFile, liveLink: _cSelectedLink, codeLink: _cSelectedCode, submittedAt: now }));
     const e = window.EscrowDB.getAll().find(x => x.id === _cActiveSubmitId);
     window.EscrowDB.updateStatus(_cActiveSubmitId, 'work_submitted', { submittedAt: now });
     if (e) {
       const session = window.SessionManager.getActiveUser();
-      window.MessagesDB.send(e.clientId, e.clientName || 'Client', 'Client', '', session.user.id, 'Work Submitted: ' + e.jobTitle,
-        `${session.user.name || 'Your freelancer'} has submitted work for "${e.jobTitle}".\n\nMessage: ${msg}${_cSelectedFile ? '\nFile: ' + _cSelectedFile : ''}${_cSelectedLink ? '\nLink: ' + _cSelectedLink : ''}\n\nPlease review and approve from your dashboard.`);
+      const deliverables = [
+        _cSelectedLink ? `🔗 Live Demo: ${_cSelectedLink}` : '',
+        _cSelectedCode ? `💻 Code Repo: ${_cSelectedCode}` : '',
+        _cSelectedFile ? `📎 File: ${_cSelectedFile}` : ''
+      ].filter(Boolean).join('\n');
+      window.MessagesDB.send(
+        session.user.id, session.user.name || 'Freelancer', 'Freelancer', '',
+        e.clientId,
+        '🚀 Final Project Submitted — ' + e.jobTitle,
+        `${session.user.name || 'Your freelancer'} has submitted the final project for "${e.jobTitle}".\n\n📝 ${msg}\n\n${deliverables}\n\nPlease review and approve from your My Contracts page. Payment releases on approval.\n\nSubmitted: ${new Date(now).toLocaleString('en-IN', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}`
+      );
     }
     document.getElementById('_sw-overlay').remove();
-    toast('Work submitted! Client notified. ✓', '#1dbf73');
+    toast('Final project submitted! Client has been notified. ✓', '#1dbf73');
     loadContracts();
+  }
+
+  function sendUpdateOnly() {
+    const msg = (document.getElementById('_sw-msg')?.value || '').trim();
+    const errEl = document.getElementById('_sw-err');
+    errEl.style.display = 'none';
+    if (!msg) { errEl.textContent = 'Please write a progress update message.'; errEl.style.display = 'block'; return; }
+    const e = window.EscrowDB.getAll().find(x => x.id === _cActiveSubmitId);
+    if (e) {
+      const session = window.SessionManager.getActiveUser();
+      const liveLink = (document.getElementById('_sw-link')?.value || '').trim();
+      const codeLink = (document.getElementById('_sw-code')?.value || '').trim();
+      const extras = [
+        liveLink ? `🔗 Live link: ${liveLink}` : '',
+        codeLink ? `💻 Code: ${codeLink}` : '',
+        _cSelectedFile ? `📎 File: ${_cSelectedFile}` : ''
+      ].filter(Boolean).join('\n');
+      window.MessagesDB.send(
+        session.user.id, session.user.name || 'Freelancer', 'Freelancer', '',
+        e.clientId,
+        '📢 Project Update — ' + e.jobTitle,
+        `${session.user.name || 'Your freelancer'} sent a progress update for "${e.jobTitle}".\n\n${msg}${extras ? '\n\n' + extras : ''}\n\nSent: ${new Date().toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}`
+      );
+    }
+    document.getElementById('_sw-overlay').remove();
+    toast('Update sent to client. ✓', '#0d1b2a');
   }
 
   function requestRevision(escrowId, freelancerName, jobTitle) {

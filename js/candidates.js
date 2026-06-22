@@ -2,6 +2,17 @@
    SkillBridge Candidate Directory Page Logic - Premium Edition
    ========================================================================== */
 
+function updateFilterBadge(wrapperId, count, clearFn) {
+  const wrap = document.getElementById(wrapperId);
+  if (!wrap) return;
+  if (count === 0) { wrap.innerHTML = ''; return; }
+  wrap.innerHTML = `<span style="display:inline-flex;align-items:center;gap:7px;background:#1dbf73;color:#fff;font-size:0.75rem;font-weight:700;border-radius:99px;padding:5px 13px;letter-spacing:0.01em;">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+    ${count} Filter${count !== 1 ? 's' : ''} applied
+    <button onclick="(${clearFn.toString()})()" style="background:rgba(255,255,255,0.25);border:none;border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0;color:#fff;font-size:0.8rem;line-height:1;" title="Clear all filters">✕</button>
+  </span>`;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   // Bind UI Elements
   const searchInput = document.getElementById('search-input');
@@ -107,6 +118,18 @@ function filterAndRender() {
   if (countDisplay) {
     countDisplay.textContent = `Showing ${matches.length} candidate${matches.length === 1 ? '' : 's'}`;
   }
+
+  // Filter badge
+  let filterCount = 0;
+  if (searchVal.trim()) filterCount++;
+  filterCount += selectedSkills.length;
+  if (sortVal && sortVal !== 'projects') filterCount++;
+  updateFilterBadge('filter-badge-wrap', filterCount, () => {
+    if (searchInput) searchInput.value = '';
+    skillCheckboxes.forEach(cb => cb.checked = false);
+    if (sortSelect) sortSelect.value = 'projects';
+    filterAndRender();
+  });
 
   // Handle empty state
   if (matches.length === 0) {

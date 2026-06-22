@@ -674,10 +674,12 @@ function updateNavbarState() {
     desktopMenu.innerHTML = isClient ? `
       <li><a href="${prefix}index.html" class="nav-link">Home</a></li>
       <li><a href="${prefix}candidates.html" class="nav-link">Browse Freelancers</a></li>
+      <li><a href="${prefix}projects.html" class="nav-link">Browse Projects</a></li>
       <li><a href="${prefix}post-project.html" class="nav-link">Post Project</a></li>
       <li><a href="${dashUrl}" class="nav-link">Dashboard</a></li>
     ` : `
       <li><a href="${prefix}index.html" class="nav-link">Home</a></li>
+      <li><a href="${prefix}projects.html" class="nav-link">Browse Projects</a></li>
       <li><a href="${prefix}browse-projects.html" class="nav-link">Find Work</a></li>
       <li><a href="${dashUrl}" class="nav-link">Dashboard</a></li>
     `;
@@ -714,11 +716,13 @@ function updateNavbarState() {
       mobileMenu.innerHTML = isClient ? `
         <li><a href="${prefix}index.html" class="mobile-nav-link">Home</a></li>
         <li><a href="${prefix}candidates.html" class="mobile-nav-link">Browse Freelancers</a></li>
+        <li><a href="${prefix}projects.html" class="mobile-nav-link">Browse Projects</a></li>
         <li><a href="${prefix}post-project.html" class="mobile-nav-link">Post Project</a></li>
         <li><a href="${dashUrl}" class="mobile-nav-link">Dashboard</a></li>
         <li><a href="${profileUrl}" class="mobile-nav-link">My Profile</a></li>
       ` : `
         <li><a href="${prefix}index.html" class="mobile-nav-link">Home</a></li>
+        <li><a href="${prefix}projects.html" class="mobile-nav-link">Browse Projects</a></li>
         <li><a href="${prefix}browse-projects.html" class="mobile-nav-link">Find Work</a></li>
         <li><a href="${dashUrl}" class="mobile-nav-link">Dashboard</a></li>
         <li><a href="${profileUrl}" class="mobile-nav-link">My Profile</a></li>
@@ -785,6 +789,7 @@ function updateNavbarState() {
     desktopMenu.innerHTML = `
       <li><a href="${prefix}index.html" class="nav-link">Home</a></li>
       <li><a href="${prefix}hire-talent.html" class="nav-link">Hire Talent</a></li>
+      <li><a href="${prefix}projects.html" class="nav-link">Browse Projects</a></li>
       <li><a href="${prefix}browse-projects.html" class="nav-link">Get Hired</a></li>
     `;
     desktopCta.innerHTML = `
@@ -796,6 +801,7 @@ function updateNavbarState() {
       mobileMenu.innerHTML = `
         <li><a href="${prefix}index.html" class="mobile-nav-link">Home</a></li>
         <li><a href="${prefix}hire-talent.html" class="mobile-nav-link">Hire Talent</a></li>
+        <li><a href="${prefix}projects.html" class="mobile-nav-link">Browse Projects</a></li>
         <li><a href="${prefix}browse-projects.html" class="mobile-nav-link">Get Hired</a></li>
       `;
     }
@@ -820,11 +826,13 @@ function updateNavbarState() {
    -------------------------------------------------------------------------- */
 function highlightActiveNavLink() {
   const cur = window.location.pathname;
+  const curFile = cur.split('/').pop() || 'index.html';
   document.querySelectorAll('.nav-link, .mobile-nav-link').forEach(link => {
     const href = link.getAttribute('href');
-    if (!href) return;
-    const isHome = (cur === '/' || cur.endsWith('index.html')) && (href.endsWith('index.html') || href === '/');
-    const matches = !isHome && href !== '#' && cur.endsWith(href.replace('../', '').replace('./', ''));
+    if (!href || href === '#') return;
+    const hrefFile = href.replace('../', '').replace('./', '').split('/').pop();
+    const isHome = (curFile === '' || curFile === 'index.html') && (hrefFile === 'index.html' || href === '/');
+    const matches = !isHome && hrefFile === curFile;
     link.classList.toggle('active', isHome || matches);
   });
 }

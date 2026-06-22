@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Browse Projects — SkillBridge</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/footer.css">
+  <link rel="stylesheet" href="css/home.css">
+  <style>
+    main { padding-top: 64px; }
+
+    /* Hero */
+    .bp-hero {
+      background: linear-gradient(135deg, #0d1b2a 0%, #0a2617 100%);
+      padding: 56px 0 48px;
+      color: white;
+      text-align: center;
+    }
+    .bp-hero h1 {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+    .bp-hero p {
+      font-size: 1.05rem;
+      color: rgba(255,255,255,0.72);
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    /* Search bar */
+    .bp-search-wrap {
+      max-width: 520px;
+      margin: 24px auto 0;
+      position: relative;
+    }
+    .bp-search-wrap input {
+      width: 100%;
+      padding: 13px 48px 13px 18px;
+      border-radius: 12px;
+      border: none;
+      font-size: 0.95rem;
+      font-family: var(--font-body);
+      background: rgba(255,255,255,0.12);
+      color: #fff;
+      outline: none;
+      backdrop-filter: blur(6px);
+      transition: background 0.15s;
+      box-sizing: border-box;
+    }
+    .bp-search-wrap input::placeholder { color: rgba(255,255,255,0.5); }
+    .bp-search-wrap input:focus { background: rgba(255,255,255,0.18); }
+    .bp-search-wrap svg {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255,255,255,0.5);
+      pointer-events: none;
+    }
+
+    /* Body */
+    .bp-body {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 40px 24px 96px;
+    }
+
+    /* Filter chips */
+    .bp-filters {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 32px;
+    }
+    .bp-filter-chip {
+      padding: 7px 16px;
+      border-radius: 99px;
+      border: 1.5px solid var(--border-color);
+      background: #fff;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--secondary-text);
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: var(--font-body);
+    }
+    .bp-filter-chip:hover { border-color: #1dbf73; color: #1dbf73; }
+    .bp-filter-chip.active {
+      background: #1dbf73;
+      border-color: #1dbf73;
+      color: #fff;
+    }
+
+    /* Results count */
+    .bp-results-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .bp-results-count { font-size: 0.88rem; color: var(--secondary-text); font-weight: 500; }
+
+    /* Sort */
+    .bp-sort {
+      padding: 8px 14px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-family: var(--font-body);
+      color: var(--primary-text);
+      background: #fff;
+      outline: none;
+      cursor: pointer;
+    }
+
+    /* Grid — masonry like home */
+    .bp-grid {
+      column-count: 3;
+      column-gap: 24px;
+    }
+    @media (max-width: 900px) { .bp-grid { column-count: 2; } }
+    @media (max-width: 560px) { .bp-grid { column-count: 1; } }
+
+    .bp-empty {
+      text-align: center;
+      padding: 80px 24px;
+      color: var(--secondary-text);
+      font-size: 0.95rem;
+    }
+    .bp-empty h3 { font-size: 1.2rem; margin-bottom: 8px; color: #555; }
+
+    /* Like/save button active state matching home.css */
+    .like-footer-btn.liked { color: #1dbf73 !important; }
+    .project-shot-action-btn.saved { background: #e0f5eb !important; color: #1dbf73 !important; }
+  </style>
+</head>
+<body>
+
+  <header id="site-header">
+    <div class="nav-container">
+      <a href="index.html" class="logo">SkillBridge</a>
+      <ul class="nav-menu" id="nav-menu-list"></ul>
+      <div class="nav-cta">
+        <button class="btn btn-secondary" id="nav-btn-login" style="margin-right:8px;">Log In</button>
+        <button class="btn btn-primary" id="nav-btn-register">Register</button>
+      </div>
+      <button class="mobile-toggle" id="mobile-hamburger" aria-label="Toggle Menu">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+    </div>
+  </header>
+  <div class="mobile-drawer-overlay" id="mobile-overlay"></div>
+  <div class="mobile-drawer" id="mobile-drawer-menu">
+    <ul class="mobile-nav-list" id="mobile-nav-list"></ul>
+    <div class="mobile-nav-cta" id="mob-cta-area">
+      <button class="btn btn-secondary btn-block" id="mob-btn-login">Log In</button>
+      <button class="btn btn-primary btn-block" id="mob-btn-register" style="margin-top:10px;">Register</button>
+    </div>
+  </div>
+
+  <main>
+    <!-- Hero -->
+    <div class="bp-hero">
+      <div class="container">
+        <h1>Browse Projects</h1>
+        <p>Explore work from top freelancers — design, development, branding & more.</p>
+        <div class="bp-search-wrap">
+          <input type="text" id="bp-search" placeholder="Search by project name, tag, or designer…" autocomplete="off">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="bp-body">
+      <!-- Filter chips -->
+      <div class="bp-filters" id="bp-filters"></div>
+
+      <!-- Results bar -->
+      <div class="bp-results-bar">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <div class="bp-results-count" id="bp-count">Loading…</div>
+          <div id="filter-badge-wrap-p"></div>
+        </div>
+        <select class="bp-sort" id="bp-sort">
+          <option value="likes">Most Liked</option>
+          <option value="views">Most Viewed</option>
+          <option value="newest">Newest</option>
+        </select>
+      </div>
+
+      <!-- Grid -->
+      <div class="bp-grid" id="bp-grid"></div>
+    </div>
+  </main>
+
+  <footer id="site-footer">
+    <div class="footer-inner container">
+      <div class="footer-cols">
+        <div class="footer-col footer-brand">
+          <div class="footer-logo">SkillBridge</div>
+          <p class="footer-tagline">Where talent meets opportunity.</p>
+        </div>
+        <div class="footer-col">
+          <div class="footer-col-title">Platform</div>
+          <ul class="footer-links">
+            <li><a href="hire-talent.html">Browse Talent</a></li>
+            <li><a href="projects.html">Browse Projects</a></li>
+            <li><a href="post-project.html">Post a Project</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <div class="footer-col-title">Legal</div>
+          <ul class="footer-links">
+            <li><a href="policies.html">Privacy Policy</a></li>
+            <li><a href="policies.html">Terms of Service</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom-strip">
+      <div class="container footer-bottom-inner">
+        <div class="footer-copy">&copy; 2026 SkillBridge. All rights reserved.</div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/db.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+  // ── State ──────────────────────────────────────────────────────────────────
+  let activeFilter = 'all';
+  let activeSort   = 'likes';
+  let searchQuery  = '';
+
+  const FILTER_TAGS = ['UI/UX', 'Mobile App', 'Dashboard', 'Branding', 'SaaS', 'E-Commerce', 'Illustration', 'NFT', 'Web3', 'AI'];
+
+  // ── Helpers ────────────────────────────────────────────────────────────────
+  function getLikedProjects() {
+    try { return JSON.parse(localStorage.getItem('skillbridge_liked_projects') || '[]'); } catch { return []; }
+  }
+  function setLikedProjects(arr) {
+    localStorage.setItem('skillbridge_liked_projects', JSON.stringify(arr));
+  }
+  function formatCount(n) {
+    n = n || 0;
+    if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
+    return String(n);
+  }
+  function escapeHTML(s) {
+    if (!s) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // ── Save / Like toggles ───────────────────────────────────────────────────
+  function toggleProjectSave(btn, projectId) {
+    const session = window.SessionManager && window.SessionManager.getActiveUser();
+    const isSaved = btn.dataset.saved === 'true';
+
+    if (!session) {
+      // persist in pending saves, open auth
+      const pending = JSON.parse(localStorage.getItem('skillbridge_pending_saves') || '[]');
+      const updated = isSaved ? pending.filter(id => id !== projectId) : [...pending, projectId];
+      localStorage.setItem('skillbridge_pending_saves', JSON.stringify(updated));
+      btn.dataset.saved = (!isSaved).toString();
+      btn.classList.toggle('saved', !isSaved);
+      btn.querySelector('svg').setAttribute('fill', !isSaved ? '#111' : 'none');
+      if (!isSaved && typeof window.openAuthModal === 'function') window.openAuthModal('candidate', 'login');
+      return;
+    }
+
+    if (session.role !== 'candidate') return;
+    const candidate = window.CandidatesDB.getById(session.user.id);
+    if (!candidate) return;
+    const saved = Array.isArray(candidate.savedProjects) ? candidate.savedProjects : [];
+    const newSaved = isSaved ? saved.filter(id => id !== projectId) : [...saved, projectId];
+    window.CandidatesDB.save({ ...candidate, savedProjects: newSaved });
+    btn.dataset.saved = (!isSaved).toString();
+    btn.classList.toggle('saved', !isSaved);
+    btn.querySelector('svg').setAttribute('fill', !isSaved ? '#111' : 'none');
+  }
+
+  function toggleProjectLike(btn, projectId) {
+    const liked = getLikedProjects();
+    const isLiked = liked.includes(projectId);
+    const newLiked = isLiked ? liked.filter(id => id !== projectId) : [...liked, projectId];
+    setLikedProjects(newLiked);
+
+    const countEl = btn.querySelector('.bp-like-count');
+    const project = window.ProjectsDB.getById(projectId);
+    const base = (project && project.likes) || 0;
+    const newCount = base + (isLiked ? 0 : 1);
+    if (countEl) countEl.textContent = formatCount(newCount);
+
+    btn.classList.toggle('liked', !isLiked);
+    const svg = btn.querySelector('svg');
+    svg.setAttribute('fill', !isLiked ? '#1dbf73' : 'none');
+    svg.setAttribute('stroke', !isLiked ? '#1dbf73' : 'currentColor');
+  }
+
+  // ── Render ────────────────────────────────────────────────────────────────
+  function renderGrid() {
+    const grid = document.getElementById('bp-grid');
+    const countEl = document.getElementById('bp-count');
+    if (!grid) return;
+
+    const session = window.SessionManager && window.SessionManager.getActiveUser();
+    const pendingSaves = JSON.parse(localStorage.getItem('skillbridge_pending_saves') || '[]');
+    const savedProjects = (session && session.role === 'candidate')
+      ? ((window.CandidatesDB.getById(session.user.id) || {}).savedProjects || [])
+      : pendingSaves;
+    const likedProjects = getLikedProjects();
+
+    let projects = window.ProjectsDB.getAll();
+
+    // Filter by tag
+    if (activeFilter !== 'all') {
+      projects = projects.filter(p => p.tags && p.tags.some(t => t.toLowerCase() === activeFilter.toLowerCase()));
+    }
+
+    // Filter by search
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      projects = projects.filter(p =>
+        (p.title || '').toLowerCase().includes(q) ||
+        (p.description || '').toLowerCase().includes(q) ||
+        (p.authorName || '').toLowerCase().includes(q) ||
+        (p.tags || []).some(t => t.toLowerCase().includes(q))
+      );
+    }
+
+    // Sort
+    if (activeSort === 'likes') projects = [...projects].sort((a, b) => (b.likes || 0) - (a.likes || 0));
+    else if (activeSort === 'views') projects = [...projects].sort((a, b) => (b.views || 0) - (a.views || 0));
+    // 'newest' keeps original order
+
+    if (countEl) countEl.textContent = `${projects.length} project${projects.length !== 1 ? 's' : ''}`;
+
+    // Filter badge
+    let pFilterCount = 0;
+    if (activeFilter !== 'all') pFilterCount++;
+    if (searchQuery) pFilterCount++;
+    if (activeSort !== 'likes') pFilterCount++;
+    (function updatePBadge(count) {
+      const wrap = document.getElementById('filter-badge-wrap-p');
+      if (!wrap) return;
+      if (count === 0) { wrap.innerHTML = ''; return; }
+      wrap.innerHTML = `<span style="display:inline-flex;align-items:center;gap:7px;background:#1dbf73;color:#fff;font-size:0.75rem;font-weight:700;border-radius:99px;padding:5px 13px;letter-spacing:0.01em;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+        ${count} Filter${count !== 1 ? 's' : ''} applied
+        <button onclick="activeFilter='all';activeSort='likes';searchQuery='';document.getElementById('bp-search').value='';document.getElementById('bp-sort').value='likes';renderFilters();renderGrid();" style="background:rgba(255,255,255,0.25);border:none;border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0;color:#fff;font-size:0.8rem;" title="Clear all filters">✕</button>
+      </span>`;
+    })(pFilterCount);
+
+    if (projects.length === 0) {
+      grid.innerHTML = `<div class="bp-empty" style="column-span:all;"><h3>No projects found</h3><p>Try a different filter or search term.</p></div>`;
+      return;
+    }
+
+    grid.innerHTML = projects.map((p, idx) => {
+      const isLiked = likedProjects.includes(p.id);
+      const isSaved = savedProjects.includes(p.id);
+      const heartFill  = isLiked ? '#1dbf73' : 'none';
+      const heartStroke = isLiked ? '#1dbf73' : 'currentColor';
+      const likeCount = (p.likes || 0) + (isLiked ? 1 : 0);
+      return `
+        <a href="project.html?id=${encodeURIComponent(p.id)}"
+           class="project-shot-card fade-in-section is-visible"
+           data-project-id="${escapeHTML(p.id)}">
+
+          <div class="project-shot-thumb">
+            <img src="${escapeHTML(p.thumbnail)}" alt="${escapeHTML(p.title)}" class="project-shot-img" loading="lazy">
+            <div class="project-shot-overlay">
+              <div class="project-shot-overlay-title">${escapeHTML(p.title)}</div>
+              <div class="project-shot-actions">
+                <button
+                  class="project-shot-action-btn${isSaved ? ' saved' : ''}"
+                  data-saved="${isSaved}"
+                  aria-label="Save project"
+                  onclick="event.preventDefault();event.stopPropagation();toggleProjectSave(this,'${escapeHTML(p.id)}')"
+                >
+                  <svg viewBox="0 0 24 24" fill="${isSaved ? '#111' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;">
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+                  </svg>
+                  Save
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="project-shot-footer">
+            <div class="project-shot-author">
+              <img src="${escapeHTML(p.authorAvatar)}" alt="${escapeHTML(p.authorName)}" class="project-shot-avatar" onerror="this.style.display='none'">
+              <span class="project-shot-author-name">${escapeHTML(p.authorName)}</span>
+            </div>
+            <div class="project-shot-stats">
+              <button
+                class="project-shot-stat like-footer-btn${isLiked ? ' liked' : ''}"
+                onclick="event.preventDefault();event.stopPropagation();toggleProjectLike(this,'${escapeHTML(p.id)}')"
+                style="background:none;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:4px;padding:0;font-size:inherit;color:inherit;"
+                aria-label="Like"
+              >
+                <svg viewBox="0 0 24 24" fill="${heartFill}" stroke="${heartStroke}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                </svg>
+                <span class="bp-like-count">${formatCount(likeCount)}</span>
+              </button>
+              <span class="project-shot-stat">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+                ${formatCount(p.views)}
+              </span>
+            </div>
+          </div>
+        </a>`;
+    }).join('');
+  }
+
+  // ── Filter chips ──────────────────────────────────────────────────────────
+  function renderFilters() {
+    const wrap = document.getElementById('bp-filters');
+    if (!wrap) return;
+    const tags = ['all', ...FILTER_TAGS];
+    wrap.innerHTML = tags.map(tag => `
+      <button class="bp-filter-chip${tag === activeFilter ? ' active' : ''}"
+        onclick="setFilter('${tag}')">
+        ${tag === 'all' ? 'All' : tag}
+      </button>`).join('');
+  }
+
+  function setFilter(tag) {
+    activeFilter = tag;
+    renderFilters();
+    renderGrid();
+  }
+
+  // ── Init ──────────────────────────────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', () => {
+    renderFilters();
+    renderGrid();
+
+    document.getElementById('bp-sort').addEventListener('change', e => {
+      activeSort = e.target.value;
+      renderGrid();
+    });
+
+    let searchTimer;
+    document.getElementById('bp-search').addEventListener('input', e => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(() => {
+        searchQuery = e.target.value.trim();
+        renderGrid();
+      }, 220);
+    });
+  });
+  </script>
+</body>
+</html>

@@ -76,7 +76,10 @@ function initHeroToggle() {
   const btnFindOpp = document.getElementById('hero-btn-find-opportunities');
   if(btnFindOpp) {
     btnFindOpp.addEventListener('click', () => {
-      if (window.openAuthModal) {
+      const session = window.SessionManager && window.SessionManager.getActiveUser();
+      if (session) {
+        window.location.href = 'projects.html';
+      } else if (window.openAuthModal) {
         window.openAuthModal('candidate', 'login');
       }
     });
