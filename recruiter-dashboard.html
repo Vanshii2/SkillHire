@@ -5,7 +5,7 @@
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Recruiter Dashboard — SkillBridge</title>
-  <meta name="description" content="View shortlisted candidates and contact inquiries history log.">
+  <meta name="description" content="View favourited candidates and contact inquiries history log.">
   
   <!-- CSS Stylesheets -->
   <link rel="stylesheet" href="css/base.css">
@@ -49,8 +49,8 @@
             <p id="rec-dashboard-company">Company Name</p>
           </div>
           <nav class="dashboard-menu">
-            <button class="menu-item active" data-tab="shortlisted">
-              <span class="menu-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span> Shortlisted Candidates
+            <button class="menu-item active" data-tab="favourited">
+              <span class="menu-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span> Favourite Candidates
               <span class="count-pill" id="shortlist-count-badge" style="display: none;">0</span>
             </button>
             <button class="menu-item" data-tab="contact-history">
@@ -65,14 +65,14 @@
         <!-- Main Dashboard View Panel -->
         <div class="dashboard-content">
           
-          <!-- TAB 1: Shortlisted Candidates -->
-          <div class="tab-content active" id="tab-shortlisted">
+          <!-- TAB 1: Favourite Candidates -->
+          <div class="tab-content active" id="tab-favourited">
             <div class="tab-header">
-              <h2>Shortlisted Candidates</h2>
+              <h2>Favourite Candidates</h2>
               <p>Profiles you bookmarked for review or future communication.</p>
             </div>
             
-            <div class="shortlisted-grid" id="shortlisted-candidates-grid">
+            <div class="favourited-grid" id="favourited-candidates-grid">
               <!-- Rendered Dynamically -->
             </div>
           </div>

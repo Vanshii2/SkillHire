@@ -201,7 +201,7 @@ function renderProfile() {
       actionButtonsHtml = `
         ${isOwnProfile ? `<a href="${prefix}edit-profile.html" class="btn btn-secondary" style="padding:10px 20px;font-size:0.9rem;">Edit Profile</a>` : `
         <button class="btn btn-secondary ${isSaved ? 'active' : ''}" id="profile-btn-shortlist" style="padding: 10px 20px; font-size: 0.9rem;">
-          ${isSaved ? '★ Shortlisted' : '☆ Save to Shortlist'}
+          ${isSaved ? '★ Favourite' : '☆ Save to Favourites'}
         </button>
         <button class="btn btn-secondary" id="profile-btn-contact" style="padding: 10px 20px; font-size: 0.9rem;">
           Contact Candidate
@@ -346,10 +346,10 @@ function renderProfile() {
       const activeRecId = session.user.id;
       const nowSaved = window.RecruitersDB.toggleSaveCandidate(activeRecId, candidate.id);
       if (nowSaved) {
-        btnShortlist.textContent = '★ Shortlisted';
+        btnShortlist.textContent = '★ Favourite';
         btnShortlist.classList.add('active');
       } else {
-        btnShortlist.textContent = '☆ Save to Shortlist';
+        btnShortlist.textContent = '☆ Save to Favourites';
         btnShortlist.classList.remove('active');
       }
     });
