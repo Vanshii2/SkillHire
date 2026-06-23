@@ -91,11 +91,7 @@
       font-family: var(--font-body);
     }
     .bp-filter-chip:hover { border-color: #1dbf73; color: #1dbf73; }
-    .bp-filter-chip.active {
-      background: #1dbf73;
-      border-color: #1dbf73;
-      color: #fff;
-    }
+    .bp-filter-chip.active { background: #1dbf73; border-color: #1dbf73; color: #fff; }
 
     /* Results count */
     .bp-results-bar {
@@ -126,8 +122,22 @@
       column-count: 3;
       column-gap: 24px;
     }
+    .bp-grid .project-shot-card { break-inside: avoid; -webkit-column-break-inside: avoid; margin-bottom: 24px; display: block; }
     @media (max-width: 900px) { .bp-grid { column-count: 2; } }
     @media (max-width: 560px) { .bp-grid { column-count: 1; } }
+
+    /* Image fallback placeholder */
+    .bp-img-placeholder {
+      width: 100%;
+      aspect-ratio: 4/3;
+      background: linear-gradient(135deg, #e8f5ee 0%, #d0f0e0 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #1dbf73;
+      font-size: 2.5rem;
+      letter-spacing: -0.02em;
+    }
 
     .bp-empty {
       text-align: center;
@@ -231,9 +241,9 @@
   <script src="js/main.js"></script>
   <script>
   // ── State ──────────────────────────────────────────────────────────────────
-  let activeFilter = 'all';
-  let activeSort   = 'likes';
-  let searchQuery  = '';
+  let activeFilters = new Set(); // empty = show all
+  let activeSort    = 'likes';
+  let searchQuery   = '';
 
   const FILTER_TAGS = ['UI/UX', 'Mobile App', 'Dashboard', 'Branding', 'SaaS', 'E-Commerce', 'Illustration', 'NFT', 'Web3', 'AI'];
 
@@ -315,9 +325,11 @@
 
     let projects = window.ProjectsDB.getAll();
 
-    // Filter by tag
-    if (activeFilter !== 'all') {
-      projects = projects.filter(p => p.tags && p.tags.some(t => t.toLowerCase() === activeFilter.toLowerCase()));
+    // Filter by tags (multi-select OR logic — match any selected tag)
+    if (activeFilters.size > 0) {
+      projects = projects.filter(p =>
+        p.tags && [...activeFilters].some(f => p.tags.some(t => t.toLowerCase() === f.toLowerCase()))
+      );
     }
 
     // Filter by search
@@ -339,10 +351,7 @@
     if (countEl) countEl.textContent = `${projects.length} project${projects.length !== 1 ? 's' : ''}`;
 
     // Filter badge
-    let pFilterCount = 0;
-    if (activeFilter !== 'all') pFilterCount++;
-    if (searchQuery) pFilterCount++;
-    if (activeSort !== 'likes') pFilterCount++;
+    let pFilterCount = activeFilters.size + (searchQuery ? 1 : 0) + (activeSort !== 'likes' ? 1 : 0);
     (function updatePBadge(count) {
       const wrap = document.getElementById('filter-badge-wrap-p');
       if (!wrap) return;
@@ -350,7 +359,7 @@
       wrap.innerHTML = `<span style="display:inline-flex;align-items:center;gap:7px;background:#1dbf73;color:#fff;font-size:0.75rem;font-weight:700;border-radius:99px;padding:5px 13px;letter-spacing:0.01em;">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
         ${count} Filter${count !== 1 ? 's' : ''} applied
-        <button onclick="activeFilter='all';activeSort='likes';searchQuery='';document.getElementById('bp-search').value='';document.getElementById('bp-sort').value='likes';renderFilters();renderGrid();" style="background:rgba(255,255,255,0.25);border:none;border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0;color:#fff;font-size:0.8rem;" title="Clear all filters">✕</button>
+        <button onclick="activeFilters=new Set();activeSort='likes';searchQuery='';document.getElementById('bp-search').value='';document.getElementById('bp-sort').value='likes';renderFilters();renderGrid();" style="background:rgba(255,255,255,0.25);border:none;border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0;color:#fff;font-size:0.8rem;" title="Clear all filters">✕</button>
       </span>`;
     })(pFilterCount);
 
@@ -371,7 +380,11 @@
            data-project-id="${escapeHTML(p.id)}">
 
           <div class="project-shot-thumb">
-            <img src="${escapeHTML(p.thumbnail)}" alt="${escapeHTML(p.title)}" class="project-shot-img" loading="lazy">
+            <img src="${escapeHTML(p.thumbnail)}" alt="${escapeHTML(p.title)}" class="project-shot-img" loading="lazy"
+              onerror="this.style.display='none';this.nextElementSibling&&(this.nextElementSibling.style.display='flex')">
+            <div class="bp-img-placeholder" style="display:none;">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            </div>
             <div class="project-shot-overlay">
               <div class="project-shot-overlay-title">${escapeHTML(p.title)}</div>
               <div class="project-shot-actions">
@@ -420,20 +433,33 @@
     }).join('');
   }
 
-  // ── Filter chips ──────────────────────────────────────────────────────────
+  // ── Filter chips (multi-select) ───────────────────────────────────────────
   function renderFilters() {
     const wrap = document.getElementById('bp-filters');
     if (!wrap) return;
-    const tags = ['all', ...FILTER_TAGS];
-    wrap.innerHTML = tags.map(tag => `
-      <button class="bp-filter-chip${tag === activeFilter ? ' active' : ''}"
-        onclick="setFilter('${tag}')">
-        ${tag === 'all' ? 'All' : tag}
+    // "All" chip is active only when no tags selected
+    const allActive = activeFilters.size === 0;
+    wrap.innerHTML = `
+      <button class="bp-filter-chip${allActive ? ' active' : ''}" onclick="clearFilters()">All</button>
+      ` + FILTER_TAGS.map(tag => `
+      <button class="bp-filter-chip${activeFilters.has(tag) ? ' active' : ''}"
+        onclick="toggleFilter('${tag}')">
+        ${tag}
       </button>`).join('');
   }
 
-  function setFilter(tag) {
-    activeFilter = tag;
+  function toggleFilter(tag) {
+    if (activeFilters.has(tag)) {
+      activeFilters.delete(tag);
+    } else {
+      activeFilters.add(tag);
+    }
+    renderFilters();
+    renderGrid();
+  }
+
+  function clearFilters() {
+    activeFilters.clear();
     renderFilters();
     renderGrid();
   }

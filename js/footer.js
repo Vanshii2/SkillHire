@@ -29,6 +29,13 @@
             <li><a href="policies.html" class="footer-link">Terms of Service</a></li>
           </ul>
         </div>
+        <div class="footer-column" id="footer-account-col">
+          <div class="footer-title">Account</div>
+          <ul class="footer-list">
+            <li><a href="index.html?action=login" class="footer-link footer-auth-link" id="footer-signin-link">Sign In</a></li>
+            <li><a href="index.html?action=register" class="footer-link footer-auth-link" id="footer-register-link">Register</a></li>
+          </ul>
+        </div>
       </div>
       <div class="footer-socials">
         <a href="https://twitter.com" target="_blank" rel="noopener" class="footer-social-icon" aria-label="Twitter/X">
@@ -87,6 +94,13 @@
     var tmp = document.createElement('div');
     tmp.innerHTML = FOOTER_HTML;
     document.body.appendChild(tmp.firstElementChild);
+
+    // Hide Sign In / Register links when already logged in
+    var _ftSession = window.SessionManager && window.SessionManager.getActiveUser();
+    var _ftAccountCol = document.getElementById('footer-account-col');
+    if (_ftSession && _ftAccountCol) {
+      _ftAccountCol.style.display = 'none';
+    }
 
     // Role-gate footer links
     document.getElementById('site-footer').addEventListener('click', function(ev) {

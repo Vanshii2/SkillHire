@@ -74,9 +74,20 @@ function initHeroToggle() {
   }
   
   const btnFindOpp = document.getElementById('hero-btn-find-opportunities');
-  if(btnFindOpp) {
+  if (btnFindOpp) {
     btnFindOpp.addEventListener('click', () => {
-      window.location.href = 'browse-projects.html';
+      const session = window.SessionManager && window.SessionManager.getActiveUser();
+      if (!session) {
+        if (typeof window.openAuthModal === 'function') window.openAuthModal('register', 'freelancer');
+        return;
+      }
+      const mode = localStorage.getItem('skillbridge_mode');
+      const role = mode || (session.role === 'recruiter' ? 'client' : 'freelancer');
+      if (role === 'client') {
+        if (typeof window.openAuthModal === 'function') window.openAuthModal('register', 'freelancer');
+      } else {
+        window.location.href = 'browse-projects.html';
+      }
     });
   }
 }

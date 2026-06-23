@@ -80,19 +80,6 @@ const PROJECTS_DATA = [
     views: 11200
   },
   {
-    id: 'tira-beauty-app',
-    title: 'Tira — Beauty Discovery App',
-    description: 'Tira is a mobile-first beauty discovery platform that uses AI to suggest personalised skincare and makeup products. The UI features a luxurious dark palette, gesture-driven navigation, and AR try-on previews.',
-    thumbnail: 'assets/images/tira.webp',
-    images: ['assets/images/tira.webp', 'assets/images/tira2.webp'],
-    tags: ['Mobile App', 'AI', 'Beauty'],
-    authorName: 'Sarah Jenkins',
-    authorAvatar: 'assets/images/sara.png',
-    authorId: 'sarah-jenkins',
-    likes: 201,
-    views: 7600
-  },
-  {
     id: 'pix-portfolio-template',
     title: 'Pix — Creative Portfolio Template',
     description: 'Pix is a high-impact portfolio template designed for creative professionals. The layout system adapts dynamically to the content type — photography, video, or design work — and ships with a dark and light mode.',

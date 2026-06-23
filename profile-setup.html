@@ -300,19 +300,19 @@
     {
       id: 'contact',
       title: 'Your Links',
-      desc: 'Add LinkedIn or GitHub so clients can learn more about you.',
+      desc: 'Add your LinkedIn so clients can learn more about you.',
       required: true,
       render: () => {
         const contact = currentData().contact || {};
         return `
           <h2>Professional Links</h2>
-          <p>Add at least one — LinkedIn or GitHub — so clients can verify your work. <span style="color:#e53e3e;">*</span></p>
+          <p>LinkedIn is required so clients can verify your identity.</p>
           <div class="form-group">
-            <label for="s-linkedin">LinkedIn URL</label>
+            <label for="s-linkedin">LinkedIn Profile URL <span style="color:#e53e3e;">*</span></label>
             <input type="url" id="s-linkedin" placeholder="https://linkedin.com/in/yourname" value="${contact.linkedin || ''}">
           </div>
           <div class="form-group">
-            <label for="s-github">GitHub URL</label>
+            <label for="s-github">GitHub Profile URL <span style="color:#aaa;font-size:0.82rem;font-weight:400;">(optional)</span></label>
             <input type="url" id="s-github" placeholder="https://github.com/yourname" value="${contact.github || ''}">
           </div>
         `;
@@ -722,9 +722,8 @@
 
     if (step.id === 'contact') {
       const linkedin = ((document.getElementById('s-linkedin') || {}).value || '').trim();
-      const github   = ((document.getElementById('s-github')   || {}).value || '').trim();
-      if (!linkedin && !github) {
-        showStepError('Please add at least one link — LinkedIn or GitHub — to continue.'); return;
+      if (!linkedin) {
+        showStepError('LinkedIn URL is required to continue.'); return;
       }
     }
 
